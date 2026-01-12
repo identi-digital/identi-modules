@@ -4,10 +4,9 @@ Modelo de ejemplo - Greeting
 📚 Documentación: docs/BACKEND_MODULE_GUIDE.md
 """
 from core.models.base_class import Model
-from sqlalchemy import Column, String, Text
+from sqlalchemy import Column, String, Text, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
-from datetime import datetime
 
 class GreetingModel(Model):
     """

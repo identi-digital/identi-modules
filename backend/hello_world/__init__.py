@@ -39,7 +39,9 @@ class Module:
         """Registra los servicios del módulo en el container"""
         self.log("registrando servicios")
         from .src.functionalities import Funcionalities
-        self.container.register("hello_world", lambda: Funcionalities(self.container))
+        # Obtener el nombre de la base de datos de las opciones del módulo
+        database_key = self.options.get("database", "core_db")
+        self.container.register("hello_world", lambda: Funcionalities(self.container, database_key=database_key))
     
     def register_routes(self, app):
         """Registra las rutas del módulo en FastAPI"""

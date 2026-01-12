@@ -16,12 +16,14 @@ class Funcionalities:
     Esta clase maneja todas las operaciones de base de datos
     y lógica de negocio para el módulo Hello World.
     """
-    def __init__(self, container):
+    def __init__(self, container, database_key: str = "core_db"):
         self.container = container
+        self.database_key = database_key
     
     def get_db(self) -> Session:
         """Obtiene la sesión de base de datos"""
-        return self.container.get("db_session")
+        # Las bases de datos se registran en el tipo "databases" con su nombre
+        return self.container.get(self.database_key, "databases")
     
     def create_greeting(self, data: GreetingCreate) -> GreetingModel:
         """Crea un nuevo saludo"""

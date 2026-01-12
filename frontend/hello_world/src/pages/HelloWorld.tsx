@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ApiClient } from '../../../core/apiClient';
+import { ApiClient } from '@core/apiClient';
 import { Box, Typography, Button, TextField, Paper, List, ListItem, ListItemText, Alert } from '@mui/material';
 
 interface Greeting {
