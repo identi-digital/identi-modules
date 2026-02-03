@@ -1,0 +1,177 @@
+[
+    {
+      "id": "01",
+      "name": "amazonas",
+      "description": "Amazonas",
+      "country_id": "01",
+      "center_point": "POINT (-78.05397766959659 -5.06930265663717)"
+    },
+    {
+      "id": "02",
+      "name": "ancash",
+      "description": "Áncash",
+      "country_id": "01",
+      "center_point": "POINT (-77.67012207002482 -9.40610812843693)"
+    },
+    {
+      "id": "03",
+      "name": "apurimac",
+      "description": "Apurímac",
+      "country_id": "01",
+      "center_point": "POINT (-72.97421167991634 -14.0300522776556)"
+    },
+    {
+      "id": "04",
+      "name": "arequipa",
+      "description": "Arequipa",
+      "country_id": "01",
+      "center_point": "POINT (-72.47532471269346 -15.84261255660861)"
+    },
+    {
+      "id": "05",
+      "name": "ayacucho",
+      "description": "Ayacucho",
+      "country_id": "01",
+      "center_point": "POINT (-74.0857206932188 -14.08550154484311)"
+    },
+    {
+      "id": "06",
+      "name": "cajamarca",
+      "description": "Cajamarca",
+      "country_id": "01",
+      "center_point": "POINT (-78.74478192078577 -6.428241044225269)"
+    },
+    {
+      "id": "07",
+      "name": "callao",
+      "description": "Callao",
+      "country_id": "01",
+      "center_point": "POINT (-77.12656629190751 -11.94268836376312)"
+    },
+    {
+      "id": "08",
+      "name": "cusco",
+      "description": "Cusco",
+      "country_id": "01",
+      "center_point": "POINT (-72.16830061670665 -13.18709345057596)"
+    },
+    {
+      "id": "09",
+      "name": "huancavelica",
+      "description": "Huancavelica",
+      "country_id": "01",
+      "center_point": "POINT (-75.00379120424451 -13.02599045915995)"
+    },
+    {
+      "id": "10",
+      "name": "huanuco",
+      "description": "Huánuco",
+      "country_id": "01",
+      "center_point": "POINT (-76.03496818912136 -9.418475052502568)"
+    },
+    {
+      "id": "11",
+      "name": "ica",
+      "description": "Ica",
+      "country_id": "01",
+      "center_point": "POINT (-75.57634134823662 -14.23355726082942)"
+    },
+    {
+      "id": "12",
+      "name": "junin",
+      "description": "Junín",
+      "country_id": "01",
+      "center_point": "POINT (-74.8767464633286 -11.53955072941935)"
+    },
+    {
+      "id": "13",
+      "name": "la libertad",
+      "description": "La Libertad",
+      "country_id": "01",
+      "center_point": "POINT (-78.37312099318478 -7.921330011871545)"
+    },
+    {
+      "id": "14",
+      "name": "lambayeque",
+      "description": "Lambayeque",
+      "country_id": "01",
+      "center_point": "POINT (-79.82460064670016 -6.352503908876962)"
+    },
+    {
+      "id": "15",
+      "name": "lima",
+      "description": "Lima",
+      "country_id": "01",
+      "center_point": "POINT (-76.6270701099188 -11.78625979006317)"
+    },
+    {
+      "id": "16",
+      "name": "loreto",
+      "description": "Loreto",
+      "country_id": "01",
+      "center_point": "POINT (-74.42559102472491 -4.119720865846902)"
+    },
+    {
+      "id": "17",
+      "name": "madre de dios",
+      "description": "Madre de Dios",
+      "country_id": "01",
+      "center_point": "POINT (-70.53341815129092 -11.9806683849661)"
+    },
+    {
+      "id": "18",
+      "name": "moquegua",
+      "description": "Moquegua",
+      "country_id": "01",
+      "center_point": "POINT (-70.83875717746949 -16.86061223890437)"
+    },
+    {
+      "id": "19",
+      "name": "pasco",
+      "description": "Pasco",
+      "country_id": "01",
+      "center_point": "POINT (-75.30032269855485 -10.39700732879244)"
+    },
+    {
+      "id": "20",
+      "name": "piura",
+      "description": "Piura",
+      "country_id": "01",
+      "center_point": "POINT (-80.3351058448925 -5.131424395931197)"
+    },
+    {
+      "id": "21",
+      "name": "puno",
+      "description": "Puno",
+      "country_id": "01",
+      "center_point": "POINT (-69.9502705967173 -14.93171721551021)"
+    },
+    {
+      "id": "22",
+      "name": "san martin",
+      "description": "San Martín",
+      "country_id": "01",
+      "center_point": "POINT (-76.71588808657711 -7.036177400290953)"
+    },
+    {
+      "id": "23",
+      "name": "tacna",
+      "description": "Tacna",
+      "country_id": "01",
+      "center_point": "POINT (-70.2775309222548 -17.64585119478936)"
+    },
+    {
+      "id": "24",
+      "name": "tumbes",
+      "description": "Tumbes",
+      "country_id": "01",
+      "center_point": "POINT (-80.54384579634817 -3.855282861631621)"
+    },
+    {
+      "id": "25",
+      "name": "ucayali",
+      "description": "Ucayali",
+      "country_id": "01",
+      "center_point": "POINT (-73.43648400595293 -9.617974949121782)"
+    }
+  ]

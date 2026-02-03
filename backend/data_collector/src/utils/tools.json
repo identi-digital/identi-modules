@@ -1,0 +1,1491 @@
+[
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Entidades",
+    "name": "Entidades",
+    "description": "Permite vincular la entidad que genera el modulo a otra entidad.",
+    "color": "#D7F571",
+    "icon": "finger_print",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "entity_type",
+        "display_name": "",
+        "place_holder": "Selecciona tu Entidad",
+        "description": "",
+        "type_input": "options",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "api_options": "/data-collector/entities",
+        "schema_input": [],
+        "rules": {
+          "options": [
+            {
+              "rule": "select",
+              "value": "multiple"
+            },
+            {
+              "rule": "data",
+              "value": "all"
+            }
+          ]
+        }
+      },
+     {
+        "name": "display_name",
+        "display_name": "",
+        "place_holder": "escribe como quieres que se muestre el nombre, en formato {{var}} - {{var}} (texto libre dentro de {{}} va el valor de la columna que coincida con el nombre)",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "filter",
+        "display_name": "",
+        "place_holder": "escribe el filtro que realizara la busqueda de la entidad, formato a=b&c=d",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": true,
+        "options": [],
+        "schema_input": []
+      },
+      {
+        "name": "is_multiple",
+        "display_name": "Selección múltiple",
+        "place_holder": "",
+        "description": "Permite seleccionar múltiples opciones (para relaciones many-to-many)",
+        "type_input": "boolean",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {},
+        "value": false
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "entity",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-07-18T11:42:00Z",
+    "disabled_at": null,
+    "updated_at": "2024-07-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Punto georeferencial",
+    "name": "Punto georeferencial",
+    "place_holder": "Punto georeferencial",
+    "description": "Permite al usuario ingresar un punto georeferencial",
+    "color": "#BBF7D0",
+    "icon": "all_inclusive",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "location"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Fecha",
+    "name": "Fecha",
+    "place_holder": "Escoge la fecha",
+    "description": "Muestra cualquier tipo de informacion en forma de texto",
+    "color": "#C6E2F9",
+    "icon": "calendar_month",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Título",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "date"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "date",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Número",
+    "name": "Calculadora",
+    "place_holder": "Escribe tu respuesta aquí",
+    "description": "Permite al aplicativo hacer calculos matemáticos.",
+    "color": "#FDE68A",
+    "icon": "tag",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "expresion",
+        "display_name": "Operación",
+        "place_holder": "Escriba la operación a realziar",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "calculator"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "number",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Texto",
+    "name": "Mostrar texto",
+    "place_holder": "Muestra el texto",
+    "description": "Muestra cualquier tipo de informacion en forma de texto",
+    "color": "#C6E2F9",
+    "icon": "notes",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Título",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "message"
+      }
+    ],
+    "config_form": {
+      "is_gather": false,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Multimedia",
+    "name": "Foto",
+    "place_holder": "Selecciona tu imagen aquí",
+    "place_holder_icon": "add_a_photo",
+    "description": "Permite al usuario ingresar una imagen por el app",
+    "color": "#BBF7D0",
+    "icon": "add_a_photo",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "image"
+      },
+      {
+        "name": "sub_type",
+        "display_name": "Manera que subira la imagen",
+        "description": "",
+        "type_input": "options",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [
+          {
+            "name": "camera",
+            "display_name": "Solo camara",
+            "description": "Solo se recolecta con la cámara"
+          },
+          {
+            "name": "galery",
+            "display_name": "Galería",
+            "description": "Solo se permite subir archivo"
+          },
+          {
+            "name": "all",
+            "display_name": "Camara y galería",
+            "description": "Se permite desde la cámara o galeria"
+          }
+        ],
+        "schema_input": [],
+        "rules": {}
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "media",
+        "type_media": "image/*",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Multimedia",
+    "name": "Audio",
+    "place_holder": "Click para grabar",
+    "description": "Permite al usuario ingresar un audio por el app",
+    "color": "#BBF7D0",
+    "icon": "keyboard_voice",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "audio"
+      },
+      {
+        "name": "sub_type",
+        "display_name": "Manera que subira el audio",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "options",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [
+          {
+            "name": "record",
+            "display_name": "Grabar",
+            "description": "Solo se recolecta con grabación"
+          },
+          {
+            "name": "galery",
+            "display_name": "Galería",
+            "description": "Solo se permite subir archivo"
+          },
+          {
+            "name": "all",
+            "display_name": "Grabar y galería",
+            "description": "Se permite grabación o galeria"
+          }
+        ],
+        "schema_input": [],
+        "rules": {}
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "media",
+        "type_media": "audio/*",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Poligono geografico",
+    "name": "Poligono geografico",
+    "place_holder": "Poligono geografico",
+    "description": "Permite al usuario ingresar un Poligono geografico",
+    "color": "#BBF7D0",
+    "icon": "all_inclusive",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "polygon"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "opciones",
+    "name": "desplegable",
+    "description": "Permite al usuario elegir una opción de un conjunto predefinido de opciones que se despliegan en una lista desplegable al hacer clic en el campo.",
+    "color": "#FCA5A5",
+    "icon": "keyboard_arrow_down",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "options"
+      },
+      {
+        "name": "sub_type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "dropdown"
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "options",
+        "display_name": "Opciones",
+        "place_holder": "Selecciona tu respuesta aquí",
+        "description": "",
+        "type_input": "text",
+        "label_increasing": "Agregar opciones",
+        "is_increasing": true,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "increasing": [
+            {
+              "rule": "view",
+              "value": "dropdown"
+            },
+            {
+              "rule": "max",
+              "value": 10
+            },
+            {
+              "rule": "min",
+              "value": 1
+            }
+          ]
+        },
+        "is_gather_value": true
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "option",
+        "is_module_attr": true,
+        "option": {
+          "type": "simple"
+        }
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "tools",
+    "sub_category_name": "Voz",
+    "name": "Autenticar y/o registrar voz",
+    "description": "Indica si la voz proporcionada es de algun usuario",
+    "color": "#D7F571",
+    "icon": "mic",
+    "on_action": {
+      "location": "https://identi-voice-api.dev.identi.digital/add_record",
+      "type_tool": "data",
+      "type": "api",
+      "method": "POST",
+      "content_type_request": "multipart/form-data",
+      "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXJ2aWNlIjoidm9pY2UtYXV0aGVudGljYXRpb24ifQ.2ATlG2ebvzB94aP7DARMQHi_OdkrOeQlRX_K8ywXZjE"
+    },
+    "schema_variables": [
+      {
+        "name": "new_record",
+        "description": "Si es usario nuevo o no",
+        "type_value": "boolean",
+        "is_module_attr": false,
+        "is_visual_table": false,
+        "is_representative": false,
+        "is_condition": true
+      },
+      {
+        "name": "id_user",
+        "description": "Id del usuario",
+        "type_value": "text",
+        "is_module_attr": false,
+        "is_visual_table": false,
+        "is_representative": false,
+        "is_condition": false
+      }
+    ],
+    "schema_input": [
+      {
+        "name": "file",
+        "display_name": "Archivo de audio a comparar",
+        "place_holder": "Suba el archivo aqui",
+        "description": "El audio a registar o autenticar",
+        "type_input": "audio/wav",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      }
+    ],
+    "config_form": {
+      "is_gather": false,
+      "is_channel": false,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Texto",
+    "name": "Texto",
+    "place_holder": "Escribe tu respuesta aquí",
+    "description": "Permite al usuario esribir un texto de maximo 100 carácteres.",
+    "color": "#C6E2F9",
+    "icon": "notes",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "text"
+      }
+    ],
+    "schema_advanced": [
+      {
+        "name": "min_length",
+        "display_name": "Longitud mínima",
+        "place_holder": "",
+        "description": "",
+        "type_input": "number",
+        "is_increasing": false,
+        "is_optional": true,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "number": [
+            {
+              "type_rule": "min",
+              "value": 0
+            },
+            {
+              "type_rule": "max",
+              "value": 9999999999999
+            }
+          ]
+        },
+        "value": "0"
+      },
+      {
+        "name": "max_length",
+        "display_name": "Longitud máxima",
+        "place_holder": "",
+        "description": "",
+        "type_input": "number",
+        "is_increasing": false,
+        "is_optional": true,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "number": [
+            {
+              "type_rule": "min",
+              "value": 0
+            },
+            {
+              "type_rule": "max",
+              "value": 9999999999999
+            }
+          ]
+        },
+        "value": "0"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "text",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Identificación",
+    "name": "Firma digital",
+    "place_holder": "Realice su firma digital en el espacio proporcionado.",
+    "description": "Permite al usuario ingresar una firma digital por el app",
+    "color": "#BBF7D0",
+    "icon": "all_inclusive",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "signature"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "media",
+        "type_media": "image/*",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Número",
+    "name": "Número",
+    "place_holder": "Escribe tu respuesta aquí",
+    "description": "Permite al usuario ingresar un valor numérico",
+    "color": "#FDE68A",
+    "icon": "tag",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "number"
+      }
+    ],
+    "schema_advanced": [
+      {
+        "name": "min",
+        "display_name": "Número mínimo",
+        "place_holder": "0-9999999999999",
+        "description": "",
+        "type_input": "number",
+        "is_increasing": false,
+        "is_optional": true,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "number": [
+            {
+              "type_rule": "min",
+              "value": 0
+            },
+            {
+              "type_rule": "max",
+              "value": 9999999999999
+            }
+          ]
+        }
+      },
+      {
+        "name": "max",
+        "display_name": "Número máximo",
+        "place_holder": "0-9999999999999",
+        "description": "",
+        "type_input": "number",
+        "is_increasing": false,
+        "is_optional": true,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "number": [
+            {
+              "type_rule": "min",
+              "value": 0
+            },
+            {
+              "type_rule": "max",
+              "value": 9999999999999
+            }
+          ]
+        }
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "number",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Texto",
+    "name": "Texto largo",
+    "place_holder": "Escribe tu respuesta aquí",
+    "description": "Permite al usuario esribir un texto sin limite de carácteres.",
+    "color": "#C6E2F9",
+    "icon": "format_align_left",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "text"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "text",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "opciones",
+    "name": "Si/No",
+    "description": "Permite al usuario elegir entre si o no.",
+    "color": "#FCA5A5",
+    "icon": "vertical_shades",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "options"
+      },
+      {
+        "name": "sub_type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "dropdown"
+      },
+      {
+        "name": "options",
+        "display_name": "Opciones",
+        "place_holder": "Agregar opciones",
+        "description": "",
+        "type_input": "text",
+        "value": [
+          {
+            "value": "Sí"
+          },
+          {
+            "value": "No"
+          }
+        ],
+        "is_disabled_edit": true,
+        "is_increasing": true,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "increasing": [
+            {
+              "rule": "view",
+              "value": "list"
+            },
+            {
+              "rule": "equal",
+              "value": 2
+            }
+          ]
+        }
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "option",
+        "is_module_attr": true,
+        "option": {
+          "type": "simple",
+          "values": [
+            {
+              "display_name": "si"
+            },
+            {
+              "display_name": "no"
+            }
+          ]
+        }
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Información de contacto",
+    "name": "Punto georeferencial",
+    "place_holder": "Guardar punto.",
+    "description": "Permite al usuario ingresar un punto georeferencial por el app",
+    "color": "#BBF7D0",
+    "icon": "place",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "location"
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "geojson",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "Texto",
+    "name": "Texto corto",
+    "place_holder": "Escribe tu respuesta aquí",
+    "description": "Permite al usuario esribir un texto de maximo 100 carácteres.",
+    "color": "#C6E2F9",
+    "icon": "notes",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "type_input": "text",
+        "is_hidden": true,
+        "value": "text"
+      },
+      {
+        "name": "max_length",
+        "type_input": "number",
+        "is_hidden": true,
+        "value": 100
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "text",
+        "is_module_attr": true
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  },
+  {
+    "category_name": "canal identi connect",
+    "sub_category_name": "opciones",
+    "name": "opción múltiple",
+    "description": "Permite al usuario elegir una opción de un conjunto predefinido de opciones que se mostrarán en forma de lista.",
+    "color": "#FCA5A5",
+    "icon": "check",
+    "on_action": null,
+    "schema_variables": null,
+    "schema_input": [
+      {
+        "name": "title",
+        "display_name": "Pregunta",
+        "place_holder": "Escribe el texto aquí",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": false,
+        "is_gather_name": true,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "description",
+        "display_name": "Descripción",
+        "place_holder": "Descripción opcional",
+        "description": "",
+        "type_input": "text",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      },
+      {
+        "name": "type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "options"
+      },
+      {
+        "name": "sub_type",
+        "is_hidden": true,
+        "type_input": "text",
+        "value": "list"
+      },
+      {
+        "name": "options",
+        "display_name": "Opciones",
+        "place_holder": "Agregar opciones",
+        "description": "",
+        "type_input": "text",
+        "label_increasing": "Agregar opción",
+        "is_increasing": true,
+        "is_optional": false,
+        "is_gather_name": false,
+        "is_representative": true,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {
+          "increasing": [
+            {
+              "rule": "view",
+              "value": "list"
+            },
+            {
+              "rule": "max",
+              "value": 10
+            },
+            {
+              "rule": "min",
+              "value": 1
+            }
+          ]
+        },
+        "is_gather_value": true
+      }
+    ],
+    "schema_advanced": [
+      {
+        "name": "type_option",
+        "display_name": "Selección múltiple",
+        "place_holder": "",
+        "description": "",
+        "type_input": "boolean",
+        "is_increasing": false,
+        "is_optional": true,
+        "is_gather_name": false,
+        "is_representative": false,
+        "is_condition": false,
+        "options": [],
+        "schema_input": [],
+        "rules": {}
+      }
+    ],
+    "config_form": {
+      "is_gather": true,
+      "is_channel": true,
+      "condition": null,
+      "is_unhappy_cond": false,
+      "is_success": true,
+      "gather": {
+        "type_value": "option",
+        "is_module_attr": true,
+        "option": {
+          "type": "simple"
+        }
+      }
+    },
+    "created_at": "2024-04-18T11:42:00",
+    "disabled_at": null,
+    "updated_at": "2024-04-18T11:42:00"
+  }
+]

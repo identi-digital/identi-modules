@@ -1,0 +1,1374 @@
+[
+    {
+      "id": "0902",
+      "name": "acobamba",
+      "description": "Acobamba",
+      "department_id": "09",
+      "center_point": "POINT (-74.57863706800036 -12.7955980980061)"
+    },
+    {
+      "id": "0202",
+      "name": "aija",
+      "description": "Aija",
+      "department_id": "02",
+      "center_point": "POINT (-77.67641619490273 -9.783246260529305)"
+    },
+    {
+      "id": "1002",
+      "name": "ambo",
+      "description": "Ambo",
+      "department_id": "10",
+      "center_point": "POINT (-76.23691541132152 -10.22794783937845)"
+    },
+    {
+      "id": "0903",
+      "name": "angaraes",
+      "description": "Angaraes",
+      "department_id": "09",
+      "center_point": "POINT (-74.62804516206155 -13.04690471204056)"
+    },
+    {
+      "id": "0803",
+      "name": "anta",
+      "description": "Anta",
+      "department_id": "08",
+      "center_point": "POINT (-72.36798192775477 -13.48978422853787)"
+    },
+    {
+      "id": "0203",
+      "name": "antonio raymondi",
+      "description": "Antonio Raymondi",
+      "department_id": "02",
+      "center_point": "POINT (-77.05342067771792 -9.132591492804272)"
+    },
+    {
+      "id": "0204",
+      "name": "asuncion",
+      "description": "Asunción",
+      "department_id": "02",
+      "center_point": "POINT (-77.39853047799693 -9.190908457884992)"
+    },
+    {
+      "id": "0304",
+      "name": "aymaraes",
+      "description": "Aymaraes",
+      "department_id": "03",
+      "center_point": "POINT (-73.24802352072442 -14.34109387120065)"
+    },
+    {
+      "id": "0102",
+      "name": "bagua",
+      "description": "Bagua",
+      "department_id": "01",
+      "center_point": "POINT (-78.39968902136818 -5.089750256510421)"
+    },
+    {
+      "id": "0103",
+      "name": "bongara",
+      "description": "Bongará",
+      "department_id": "01",
+      "center_point": "POINT (-77.87329054269782 -5.680389302403294)"
+    },
+    {
+      "id": "0601",
+      "name": "cajamarca",
+      "description": "Cajamarca",
+      "department_id": "06",
+      "center_point": "POINT (-78.47068823524447 -7.198599507052907)"
+    },
+    {
+      "id": "0804",
+      "name": "calca",
+      "description": "Calca",
+      "department_id": "08",
+      "center_point": "POINT (-72.03839356981378 -12.98328823998723)"
+    },
+    {
+      "id": "0402",
+      "name": "camana",
+      "description": "Camaná",
+      "department_id": "04",
+      "center_point": "POINT (-72.80467712258509 -16.40128347057324)"
+    },
+    {
+      "id": "0805",
+      "name": "canas",
+      "description": "Canas",
+      "department_id": "08",
+      "center_point": "POINT (-71.34559701910452 -14.43858884497121)"
+    },
+    {
+      "id": "0806",
+      "name": "canchis",
+      "description": "Canchis",
+      "department_id": "08",
+      "center_point": "POINT (-71.12690428839026 -14.08441998476679)"
+    },
+    {
+      "id": "0403",
+      "name": "caraveli",
+      "description": "Caravelí",
+      "department_id": "04",
+      "center_point": "POINT (-73.96301325323722 -15.68975015254093)"
+    },
+    {
+      "id": "0206",
+      "name": "carhuaz",
+      "description": "Carhuaz",
+      "department_id": "02",
+      "center_point": "POINT (-77.56820792097547 -9.289660580802128)"
+    },
+    {
+      "id": "0208",
+      "name": "casma",
+      "description": "Casma",
+      "department_id": "02",
+      "center_point": "POINT (-78.1857844576148 -9.485359882775414)"
+    },
+    {
+      "id": "0404",
+      "name": "castilla",
+      "description": "Castilla",
+      "department_id": "04",
+      "center_point": "POINT (-72.3236110099542 -15.60575824394162)"
+    },
+    {
+      "id": "0904",
+      "name": "castrovirreyna",
+      "description": "Castrovirreyna",
+      "department_id": "09",
+      "center_point": "POINT (-75.40466932358608 -13.14437549739844)"
+    },
+    {
+      "id": "0603",
+      "name": "celendin",
+      "description": "Celendín",
+      "department_id": "06",
+      "center_point": "POINT (-78.20730715473746 -6.79993269474348)"
+    },
+    {
+      "id": "0101",
+      "name": "chachapoyas",
+      "description": "Chachapoyas",
+      "department_id": "01",
+      "center_point": "POINT (-77.77624572278204 -6.441798848959546)"
+    },
+    {
+      "id": "1102",
+      "name": "chincha ",
+      "description": "Chincha ",
+      "department_id": "11",
+      "center_point": "POINT (-75.93899801677648 -13.31856818712965)"
+    },
+    {
+      "id": "0306",
+      "name": "chincheros",
+      "description": "Chincheros",
+      "department_id": "03",
+      "center_point": "POINT (-73.67362029584523 -13.47061639648964)"
+    },
+    {
+      "id": "0807",
+      "name": "chumbivilcas",
+      "description": "Chumbivilcas",
+      "department_id": "08",
+      "center_point": "POINT (-72.01194537408405 -14.46426019007668)"
+    },
+    {
+      "id": "0905",
+      "name": "churcampa",
+      "description": "Churcampa",
+      "department_id": "09",
+      "center_point": "POINT (-74.48929743584176 -12.61579113522835)"
+    },
+    {
+      "id": "0406",
+      "name": "condesuyos",
+      "description": "Condesuyos",
+      "department_id": "04",
+      "center_point": "POINT (-72.73032488114292 -15.59647768039006)"
+    },
+    {
+      "id": "0605",
+      "name": "contumaza",
+      "description": "Contumazá",
+      "department_id": "06",
+      "center_point": "POINT (-78.98247712426384 -7.354142621523089)"
+    },
+    {
+      "id": "0305",
+      "name": "cotabambas",
+      "description": "Cotabambas",
+      "department_id": "03",
+      "center_point": "POINT (-72.26818043503692 -14.01867485034573)"
+    },
+    {
+      "id": "0801",
+      "name": "cusco",
+      "description": "Cusco",
+      "department_id": "08",
+      "center_point": "POINT (-71.98149554832519 -13.55269494062815)"
+    },
+    {
+      "id": "1003",
+      "name": "dos de mayo",
+      "description": "Dos de Mayo",
+      "department_id": "10",
+      "center_point": "POINT (-76.6259058909724 -9.658091398119916)"
+    },
+    {
+      "id": "0808",
+      "name": "espinar",
+      "description": "Espinar",
+      "department_id": "08",
+      "center_point": "POINT (-71.37876192887063 -14.90290866824955)"
+    },
+    {
+      "id": "1004",
+      "name": "huacaybamba",
+      "description": "Huacaybamba",
+      "department_id": "10",
+      "center_point": "POINT (-76.81020995539025 -8.995634902283212)"
+    },
+    {
+      "id": "0607",
+      "name": "hualgayoc",
+      "description": "Hualgayoc",
+      "department_id": "06",
+      "center_point": "POINT (-78.54667312146962 -6.708775882821882)"
+    },
+    {
+      "id": "0501",
+      "name": "huamanga",
+      "description": "Huamanga",
+      "department_id": "05",
+      "center_point": "POINT (-74.22969570701275 -13.26976208697122)"
+    },
+    {
+      "id": "0901",
+      "name": "huancavelica",
+      "description": "Huancavelica",
+      "department_id": "09",
+      "center_point": "POINT (-75.08645038884193 -12.71785760930043)"
+    },
+    {
+      "id": "1201",
+      "name": "huancayo ",
+      "description": "Huancayo ",
+      "department_id": "12",
+      "center_point": "POINT (-75.06596824687882 -12.09529455076791)"
+    },
+    {
+      "id": "0504",
+      "name": "huanta",
+      "description": "Huanta",
+      "department_id": "05",
+      "center_point": "POINT (-74.17157428312595 -12.56412112272759)"
+    },
+    {
+      "id": "0201",
+      "name": "huaraz",
+      "description": "Huaraz",
+      "department_id": "02",
+      "center_point": "POINT (-77.64357984336924 -9.561316276381486)"
+    },
+    {
+      "id": "0210",
+      "name": "huari",
+      "description": "Huari",
+      "department_id": "02",
+      "center_point": "POINT (-77.08194158943381 -9.436731346353259)"
+    },
+    {
+      "id": "0212",
+      "name": "huaylas",
+      "description": "Huaylas",
+      "department_id": "02",
+      "center_point": "POINT (-77.82799013293325 -8.94268633658992)"
+    },
+    {
+      "id": "0906",
+      "name": "huaytara",
+      "description": "Huaytará",
+      "department_id": "09",
+      "center_point": "POINT (-75.09186718485194 -13.65453946731935)"
+    },
+    {
+      "id": "0407",
+      "name": "islay",
+      "description": "Islay",
+      "department_id": "04",
+      "center_point": "POINT (-71.72115839815419 -16.96007425422808)"
+    },
+    {
+      "id": "0608",
+      "name": "jaen",
+      "description": "Jaén",
+      "department_id": "06",
+      "center_point": "POINT (-79.0057319235708 -5.712853004745477)"
+    },
+    {
+      "id": "1205",
+      "name": "junin ",
+      "description": "Junín ",
+      "department_id": "12",
+      "center_point": "POINT (-75.90645567085937 -11.03650690092661)"
+    },
+    {
+      "id": "0505",
+      "name": "la mar",
+      "description": "La Mar",
+      "department_id": "05",
+      "center_point": "POINT (-73.72050085744459 -13.04787162732335)"
+    },
+    {
+      "id": "0408",
+      "name": "la union",
+      "description": "La Uniòn",
+      "department_id": "04",
+      "center_point": "POINT (-72.80511744463287 -15.06572083955558)"
+    },
+    {
+      "id": "1006",
+      "name": "leoncio prado",
+      "description": "Leoncio Prado",
+      "department_id": "10",
+      "center_point": "POINT (-76.03636399691554 -9.054130430246605)"
+    },
+    {
+      "id": "0506",
+      "name": "lucanas",
+      "description": "Lucanas",
+      "department_id": "05",
+      "center_point": "POINT (-74.34889359476848 -14.61569110691511)"
+    },
+    {
+      "id": "0105",
+      "name": "luya",
+      "description": "Luya",
+      "department_id": "01",
+      "center_point": "POINT (-78.0831579456006 -6.310786927090412)"
+    },
+    {
+      "id": "0213",
+      "name": "mariscal luzuriaga",
+      "description": "Mariscal Luzuriaga",
+      "department_id": "02",
+      "center_point": "POINT (-77.33819235902983 -8.86799161937132)"
+    },
+    {
+      "id": "1103",
+      "name": "nasca ",
+      "description": "Nasca ",
+      "department_id": "11",
+      "center_point": "POINT (-75.08172105529326 -14.94315054250213)"
+    },
+    {
+      "id": "1008",
+      "name": "pachitea",
+      "description": "Pachitea",
+      "department_id": "10",
+      "center_point": "POINT (-75.89018714122435 -10.0492542085982)"
+    },
+    {
+      "id": "1104",
+      "name": "palpa ",
+      "description": "Palpa ",
+      "department_id": "11",
+      "center_point": "POINT (-75.17600557713627 -14.37213356748217)"
+    },
+    {
+      "id": "0507",
+      "name": "parinacochas",
+      "description": "Parinacochas",
+      "department_id": "05",
+      "center_point": "POINT (-73.63505937397677 -15.03087303206478)"
+    },
+    {
+      "id": "0508",
+      "name": "paucar del sara sara",
+      "description": "Pàucar del Sara Sara",
+      "department_id": "05",
+      "center_point": "POINT (-73.2633048169519 -15.12408450318961)"
+    },
+    {
+      "id": "0811",
+      "name": "paucartambo",
+      "description": "Paucartambo",
+      "department_id": "08",
+      "center_point": "POINT (-71.52740799261841 -13.15435874971786)"
+    },
+    {
+      "id": "0216",
+      "name": "pomabamba",
+      "description": "Pomabamba",
+      "department_id": "02",
+      "center_point": "POINT (-77.43524922308805 -8.717600126848687)"
+    },
+    {
+      "id": "1009",
+      "name": "puerto inca",
+      "description": "Puerto Inca",
+      "department_id": "10",
+      "center_point": "POINT (-75.0901922790285 -9.367741699728981)"
+    },
+    {
+      "id": "0217",
+      "name": "recuay",
+      "description": "Recuay",
+      "department_id": "02",
+      "center_point": "POINT (-77.4240219648056 -9.952930811922956)"
+    },
+    {
+      "id": "0609",
+      "name": "san ignacio",
+      "description": "San Ignacio",
+      "department_id": "06",
+      "center_point": "POINT (-78.94394458932754 -5.124213129530463)"
+    },
+    {
+      "id": "0610",
+      "name": "san marcos",
+      "description": "San Marcos",
+      "department_id": "06",
+      "center_point": "POINT (-78.0632389432691 -7.283673694438917)"
+    },
+    {
+      "id": "0611",
+      "name": "san miguel",
+      "description": "San Miguel",
+      "department_id": "06",
+      "center_point": "POINT (-78.99662087677511 -6.977213640490239)"
+    },
+    {
+      "id": "0612",
+      "name": "san pablo",
+      "description": "San Pablo",
+      "department_id": "06",
+      "center_point": "POINT (-78.7494464111862 -7.076965163757715)"
+    },
+    {
+      "id": "0613",
+      "name": "santa cruz",
+      "description": "Santa Cruz",
+      "department_id": "06",
+      "center_point": "POINT (-78.98157043507722 -6.684351548248715)"
+    },
+    {
+      "id": "0219",
+      "name": "sihuas",
+      "description": "Sihuas",
+      "department_id": "02",
+      "center_point": "POINT (-77.58562807001877 -8.482474219784994)"
+    },
+    {
+      "id": "0907",
+      "name": "tayacaja",
+      "description": "Tayacaja",
+      "department_id": "09",
+      "center_point": "POINT (-74.7690731626207 -12.24531359692944)"
+    },
+    {
+      "id": "0107",
+      "name": "utcubamba",
+      "description": "Utcubamba",
+      "department_id": "01",
+      "center_point": "POINT (-78.33078789152916 -5.770393327030331)"
+    },
+    {
+      "id": "0511",
+      "name": "vilcas huaman",
+      "description": "Vilcas Huamán",
+      "department_id": "05",
+      "center_point": "POINT (-73.89713115573218 -13.65421237007624)"
+    },
+    {
+      "id": "1011",
+      "name": "yarowilca ",
+      "description": "Yarowilca ",
+      "department_id": "10",
+      "center_point": "POINT (-76.59564639072617 -9.799854045267349)"
+    },
+    {
+      "id": "0220",
+      "name": "yungay",
+      "description": "Yungay",
+      "department_id": "02",
+      "center_point": "POINT (-77.74324121152884 -9.203172413382818)"
+    },
+    {
+      "id": "1604",
+      "name": "mariscal ramon castilla ",
+      "description": "Mariscal Ramón Castilla ",
+      "department_id": "16",
+      "center_point": "POINT (-71.7035659865075 -3.926990235751423)"
+    },
+    {
+      "id": "0301",
+      "name": "abancay",
+      "description": "Abancay",
+      "department_id": "03",
+      "center_point": "POINT (-72.83215692728614 -13.73225365113871)"
+    },
+    {
+      "id": "0802",
+      "name": "acomayo",
+      "description": "Acomayo",
+      "department_id": "08",
+      "center_point": "POINT (-71.65587926765464 -13.95260291885136)"
+    },
+    {
+      "id": "1602",
+      "name": "alto amazonas ",
+      "description": "Alto Amazonas ",
+      "department_id": "16",
+      "center_point": "POINT (-76.10765750307628 -5.319705749316083)"
+    },
+    {
+      "id": "0302",
+      "name": "andahuaylas",
+      "description": "Andahuaylas",
+      "department_id": "03",
+      "center_point": "POINT (-73.39275030112161 -13.82742341047021)"
+    },
+    {
+      "id": "0303",
+      "name": "antabamba",
+      "description": "Antabamba",
+      "department_id": "03",
+      "center_point": "POINT (-72.73801187332381 -14.43827072276519)"
+    },
+    {
+      "id": "0401",
+      "name": "arequipa",
+      "description": "Arequipa",
+      "department_id": "04",
+      "center_point": "POINT (-71.55600995693501 -16.345850362316)"
+    },
+    {
+      "id": "1302",
+      "name": "ascope ",
+      "description": "Ascope ",
+      "department_id": "13",
+      "center_point": "POINT (-79.15183753602831 -7.725780478482469)"
+    },
+    {
+      "id": "2502",
+      "name": "atalaya ",
+      "description": "Atalaya ",
+      "department_id": "25",
+      "center_point": "POINT (-73.21979134908206 -10.38916660521913)"
+    },
+    {
+      "id": "2002",
+      "name": "ayabaca ",
+      "description": "Ayabaca ",
+      "department_id": "20",
+      "center_point": "POINT (-79.81359165433066 -4.715533304504635)"
+    },
+    {
+      "id": "2102",
+      "name": "azangaro ",
+      "description": "Azángaro ",
+      "department_id": "21",
+      "center_point": "POINT (-70.14596991642014 -14.81007214048921)"
+    },
+    {
+      "id": "1502",
+      "name": "barranca ",
+      "description": "Barranca ",
+      "department_id": "15",
+      "center_point": "POINT (-77.65656597270933 -10.67012119742857)"
+    },
+    {
+      "id": "2202",
+      "name": "bellavista ",
+      "description": "Bellavista ",
+      "department_id": "22",
+      "center_point": "POINT (-76.3192872473162 -7.638530797947787)"
+    },
+    {
+      "id": "1303",
+      "name": "bolivar ",
+      "description": "Bolívar ",
+      "department_id": "13",
+      "center_point": "POINT (-77.7411597961221 -7.280258622073965)"
+    },
+    {
+      "id": "0205",
+      "name": "bolognesi",
+      "description": "Bolognesi",
+      "department_id": "02",
+      "center_point": "POINT (-77.149822794132 -10.11026300084498)"
+    },
+    {
+      "id": "0602",
+      "name": "cajabamba",
+      "description": "Cajabamba",
+      "department_id": "06",
+      "center_point": "POINT (-78.09559830385986 -7.540766271190535)"
+    },
+    {
+      "id": "1503",
+      "name": "cajatambo ",
+      "description": "Cajatambo ",
+      "department_id": "15",
+      "center_point": "POINT (-77.03507746873228 -10.51826628242024)"
+    },
+    {
+      "id": "0701",
+      "name": "prov. const. del callao",
+      "description": "Prov. Const. del Callao",
+      "department_id": "07",
+      "center_point": "POINT (-77.1265662919075 -11.94268836376312)"
+    },
+    {
+      "id": "2302",
+      "name": "candarave ",
+      "description": "Candarave ",
+      "department_id": "23",
+      "center_point": "POINT (-70.30177847400188 -17.11274148057963)"
+    },
+    {
+      "id": "0502",
+      "name": "cangallo",
+      "description": "Cangallo",
+      "department_id": "05",
+      "center_point": "POINT (-74.48459960370919 -13.49898645369995)"
+    },
+    {
+      "id": "1504",
+      "name": "canta ",
+      "description": "Canta ",
+      "department_id": "15",
+      "center_point": "POINT (-76.70800651371205 -11.54179945431393)"
+    },
+    {
+      "id": "2103",
+      "name": "carabaya ",
+      "description": "Carabaya ",
+      "department_id": "21",
+      "center_point": "POINT (-70.17994363304227 -13.791134016726)"
+    },
+    {
+      "id": "1304",
+      "name": "chepen ",
+      "description": "Chepén ",
+      "department_id": "13",
+      "center_point": "POINT (-79.45597904897566 -7.143077242382548)"
+    },
+    {
+      "id": "2104",
+      "name": "chucuito ",
+      "description": "Chucuito ",
+      "department_id": "21",
+      "center_point": "POINT (-69.35674922049463 -16.60308364342018)"
+    },
+    {
+      "id": "1209",
+      "name": "chupaca ",
+      "description": "Chupaca ",
+      "department_id": "12",
+      "center_point": "POINT (-75.43281329956453 -12.20732722885735)"
+    },
+    {
+      "id": "2501",
+      "name": "coronel portillo ",
+      "description": "Coronel Portillo ",
+      "department_id": "25",
+      "center_point": "POINT (-74.05929271076988 -8.670663912303313)"
+    },
+    {
+      "id": "1902",
+      "name": "daniel alcides carrion ",
+      "description": "Daniel Alcides Carrión ",
+      "department_id": "19",
+      "center_point": "POINT (-76.48117169699621 -10.50849886859926)"
+    },
+    {
+      "id": "2105",
+      "name": "el collao ",
+      "description": "El Collao ",
+      "department_id": "21",
+      "center_point": "POINT (-69.7557115455459 -16.72727425373949)"
+    },
+    {
+      "id": "2203",
+      "name": "el dorado ",
+      "description": "El Dorado ",
+      "department_id": "22",
+      "center_point": "POINT (-76.74595730039687 -6.560359632157043)"
+    },
+    {
+      "id": "1402",
+      "name": "ferrenafe ",
+      "description": "Ferreñafe ",
+      "department_id": "14",
+      "center_point": "POINT (-79.52619494814917 -6.368992186970941)"
+    },
+    {
+      "id": "1311",
+      "name": "gran chimu ",
+      "description": "Gran Chimú ",
+      "department_id": "13",
+      "center_point": "POINT (-78.64920729431215 -7.580178427714723)"
+    },
+    {
+      "id": "2204",
+      "name": "huallaga ",
+      "description": "Huallaga ",
+      "department_id": "22",
+      "center_point": "POINT (-76.89544977303619 -6.765709491063391)"
+    },
+    {
+      "id": "2003",
+      "name": "huancabamba ",
+      "description": "Huancabamba ",
+      "department_id": "20",
+      "center_point": "POINT (-79.5140019345906 -5.444779751452447)"
+    },
+    {
+      "id": "1506",
+      "name": "huaral ",
+      "description": "Huaral ",
+      "department_id": "15",
+      "center_point": "POINT (-76.91306024020025 -11.32496762125088)"
+    },
+    {
+      "id": "1507",
+      "name": "huarochiri ",
+      "description": "Huarochirí ",
+      "department_id": "15",
+      "center_point": "POINT (-76.42580507553849 -11.94040911416688)"
+    },
+    {
+      "id": "1803",
+      "name": "ilo ",
+      "description": "Ilo ",
+      "department_id": "18",
+      "center_point": "POINT (-71.20900680275793 -17.57909324399769)"
+    },
+    {
+      "id": "1305",
+      "name": "julcan ",
+      "description": "Julcán ",
+      "department_id": "13",
+      "center_point": "POINT (-78.46372313338875 -8.167743469153756)"
+    },
+    {
+      "id": "2205",
+      "name": "lamas ",
+      "description": "Lamas ",
+      "department_id": "22",
+      "center_point": "POINT (-76.4190628911529 -6.27662094988245)"
+    },
+    {
+      "id": "1403",
+      "name": "lambayeque ",
+      "description": "Lambayeque ",
+      "department_id": "14",
+      "center_point": "POINT (-79.97191930753962 -6.188127345214875)"
+    },
+    {
+      "id": "1501",
+      "name": "lima ",
+      "description": "Lima ",
+      "department_id": "15",
+      "center_point": "POINT (-76.90354993669901 -12.02041907318648)"
+    },
+    {
+      "id": "1603",
+      "name": "loreto ",
+      "description": "Loreto ",
+      "department_id": "16",
+      "center_point": "POINT (-75.22966887227115 -3.850880546854447)"
+    },
+    {
+      "id": "2206",
+      "name": "mariscal caceres",
+      "description": "Mariscal Cáceres ",
+      "department_id": "22",
+      "center_point": "POINT (-77.18412246741019 -7.274470457565854)"
+    },
+    {
+      "id": "1601",
+      "name": "maynas ",
+      "description": "Maynas ",
+      "department_id": "16",
+      "center_point": "POINT (-73.48029693457342 -2.571619252249266)"
+    },
+    {
+      "id": "2108",
+      "name": "melgar ",
+      "description": "Melgar ",
+      "department_id": "21",
+      "center_point": "POINT (-70.6857442671296 -14.59599802772535)"
+    },
+    {
+      "id": "2004",
+      "name": "morropon ",
+      "description": "Morropón ",
+      "department_id": "20",
+      "center_point": "POINT (-79.99022454293008 -5.257861184410718)"
+    },
+    {
+      "id": "2201",
+      "name": "moyobamba ",
+      "description": "Moyobamba ",
+      "department_id": "22",
+      "center_point": "POINT (-77.12621913989223 -5.897316971878536)"
+    },
+    {
+      "id": "1903",
+      "name": "oxapampa ",
+      "description": "Oxapampa ",
+      "department_id": "19",
+      "center_point": "POINT (-74.97315595065864 -10.29383266326104)"
+    },
+    {
+      "id": "1509",
+      "name": "oyon ",
+      "description": "Oyón ",
+      "department_id": "15",
+      "center_point": "POINT (-76.87602147514082 -10.75782702050754)"
+    },
+    {
+      "id": "2503",
+      "name": "padre abad ",
+      "description": "Padre Abad ",
+      "department_id": "25",
+      "center_point": "POINT (-75.42779894325919 -8.796102170514038)"
+    },
+    {
+      "id": "2005",
+      "name": "paita ",
+      "description": "Paita ",
+      "department_id": "20",
+      "center_point": "POINT (-81.00898450747651 -5.060566326160087)"
+    },
+    {
+      "id": "1308",
+      "name": "pataz ",
+      "description": "Pataz ",
+      "department_id": "13",
+      "center_point": "POINT (-77.32547649284854 -8.141369594460993)"
+    },
+    {
+      "id": "2101",
+      "name": "puno ",
+      "description": "Puno ",
+      "department_id": "21",
+      "center_point": "POINT (-70.07770670988205 -16.08328569180888)"
+    },
+    {
+      "id": "2001",
+      "name": "piura ",
+      "description": "Piura ",
+      "department_id": "20",
+      "center_point": "POINT (-80.85745077392306 -5.32447670570764)"
+    },
+    {
+      "id": "1605",
+      "name": "requena ",
+      "description": "Requena ",
+      "department_id": "16",
+      "center_point": "POINT (-74.04724804994385 -5.99978360447753)"
+    },
+    {
+      "id": "2208",
+      "name": "rioja ",
+      "description": "Rioja ",
+      "department_id": "22",
+      "center_point": "POINT (-77.4659194101037 -5.862573310828622)"
+    },
+    {
+      "id": "2209",
+      "name": "san martin ",
+      "description": "San Martín ",
+      "department_id": "22",
+      "center_point": "POINT (-75.8720491467397 -6.502663459528209)"
+    },
+    {
+      "id": "2111",
+      "name": "san roman ",
+      "description": "San Román ",
+      "department_id": "21",
+      "center_point": "POINT (-70.42293204265172 -15.70091619961708)"
+    },
+    {
+      "id": "2112",
+      "name": "sandia ",
+      "description": "Sandia ",
+      "department_id": "21",
+      "center_point": "POINT (-69.32532147084207 -13.85077436786336)"
+    },
+    {
+      "id": "1310",
+      "name": "santiago de chuco ",
+      "description": "Santiago de Chuco ",
+      "department_id": "13",
+      "center_point": "POINT (-78.13844475957363 -8.174720831079876)"
+    },
+    {
+      "id": "1206",
+      "name": "satipo ",
+      "description": "Satipo ",
+      "department_id": "12",
+      "center_point": "POINT (-74.10109052621165 -11.56125675828036)"
+    },
+    {
+      "id": "2006",
+      "name": "sullana ",
+      "description": "Sullana ",
+      "department_id": "20",
+      "center_point": "POINT (-80.6396929166588 -4.583381816375997)"
+    },
+    {
+      "id": "2301",
+      "name": "tacna ",
+      "description": "Tacna ",
+      "department_id": "23",
+      "center_point": "POINT (-70.22145865046456 -17.89227392326409)"
+    },
+    {
+      "id": "2007",
+      "name": "talara ",
+      "description": "Talara ",
+      "department_id": "20",
+      "center_point": "POINT (-81.08217503104137 -4.485149249382182)"
+    },
+    {
+      "id": "1701",
+      "name": "tambopata ",
+      "description": "Tambopata ",
+      "department_id": "17",
+      "center_point": "POINT (-70.04675914897555 -12.20089753066813)"
+    },
+    {
+      "id": "1207",
+      "name": "tarma ",
+      "description": "Tarma ",
+      "department_id": "12",
+      "center_point": "POINT (-75.68086032189143 -11.279302991621)"
+    },
+    {
+      "id": "2210",
+      "name": "tocache ",
+      "description": "Tocache ",
+      "department_id": "22",
+      "center_point": "POINT (-76.63610819852899 -8.250690780373477)"
+    },
+    {
+      "id": "2401",
+      "name": "tumbes ",
+      "description": "Tumbes ",
+      "department_id": "24",
+      "center_point": "POINT (-80.43343600412824 -3.806245456092982)"
+    },
+    {
+      "id": "1606",
+      "name": "ucayali ",
+      "description": "Ucayali ",
+      "department_id": "16",
+      "center_point": "POINT (-75.36730994724114 -7.30612580399388)"
+    },
+    {
+      "id": "1208",
+      "name": "yauli ",
+      "description": "Yauli ",
+      "department_id": "12",
+      "center_point": "POINT (-76.12334190097302 -11.49530796807869)"
+    },
+    {
+      "id": "1510",
+      "name": "yauyos ",
+      "description": "Yauyos ",
+      "department_id": "15",
+      "center_point": "POINT (-75.90159718948965 -12.51562801108884)"
+    },
+    {
+      "id": "2403",
+      "name": "zarumilla ",
+      "description": "Zarumilla ",
+      "department_id": "24",
+      "center_point": "POINT (-80.25533273747688 -3.655528916299109)"
+    },
+    {
+      "id": "1505",
+      "name": "canete ",
+      "description": "Cañete ",
+      "department_id": "15",
+      "center_point": "POINT (-76.36274196745974 -12.79430957677544)"
+    },
+    {
+      "id": "0207",
+      "name": "carlos fermin fitzcarrald",
+      "description": "Carlos Fermín Fitzcarrald",
+      "department_id": "02",
+      "center_point": "POINT (-77.24230084838754 -9.046132076545419)"
+    },
+    {
+      "id": "0405",
+      "name": "caylloma",
+      "description": "Caylloma",
+      "department_id": "04",
+      "center_point": "POINT (-71.68013440684491 -15.67844098690234)"
+    },
+    {
+      "id": "1203",
+      "name": "chanchamayo ",
+      "description": "Chanchamayo ",
+      "department_id": "12",
+      "center_point": "POINT (-75.13183973702573 -11.02954777658329)"
+    },
+    {
+      "id": "1401",
+      "name": "chiclayo ",
+      "description": "Chiclayo ",
+      "department_id": "14",
+      "center_point": "POINT (-79.54923005850526 -6.80548474521427)"
+    },
+    {
+      "id": "0604",
+      "name": "chota",
+      "description": "Chota",
+      "department_id": "06",
+      "center_point": "POINT (-78.87134701084486 -6.435058196402204)"
+    },
+    {
+      "id": "1202",
+      "name": "concepcion ",
+      "description": "Concepción ",
+      "department_id": "12",
+      "center_point": "POINT (-75.13071947148816 -11.76567631046707)"
+    },
+    {
+      "id": "2402",
+      "name": "contralmirante villar ",
+      "description": "Contralmirante Villar ",
+      "department_id": "24",
+      "center_point": "POINT (-80.74199598405426 -3.969820847556409)"
+    },
+    {
+      "id": "0209",
+      "name": "corongo",
+      "description": "Corongo",
+      "department_id": "02",
+      "center_point": "POINT (-77.88025510020235 -8.567587155491442)"
+    },
+    {
+      "id": "0606",
+      "name": "cutervo",
+      "description": "Cutervo",
+      "department_id": "06",
+      "center_point": "POINT (-78.83863407295878 -6.174446047105816)"
+    },
+    {
+      "id": "1607",
+      "name": "datem del maranon ",
+      "description": "Datem del Marañón ",
+      "department_id": "16",
+      "center_point": "POINT (-76.97766457198779 -4.136107491449732)"
+    },
+    {
+      "id": "1802",
+      "name": "general sanchez cerro ",
+      "description": "General Sánchez Cerro ",
+      "department_id": "18",
+      "center_point": "POINT (-70.82824619816002 -16.45650694327125)"
+    },
+    {
+      "id": "0307",
+      "name": "grau",
+      "description": "Grau",
+      "department_id": "03",
+      "center_point": "POINT (-72.61995180997725 -14.0617920271052)"
+    },
+    {
+      "id": "1005",
+      "name": "huamalies",
+      "description": "Huamalíes",
+      "department_id": "10",
+      "center_point": "POINT (-76.60013012408562 -9.384160064526334)"
+    },
+    {
+      "id": "0503",
+      "name": "huanca sancos",
+      "description": "Huanca Sancos",
+      "department_id": "05",
+      "center_point": "POINT (-74.45944653886842 -13.94391597435322)"
+    },
+    {
+      "id": "2106",
+      "name": "huancane ",
+      "description": "Huancané ",
+      "department_id": "21",
+      "center_point": "POINT (-69.60691949279261 -15.11757904675731)"
+    },
+    {
+      "id": "1001",
+      "name": "huanuco",
+      "description": "Huánuco",
+      "department_id": "10",
+      "center_point": "POINT (-76.18112797377637 -9.761600716859128)"
+    },
+    {
+      "id": "0211",
+      "name": "huarmey",
+      "description": "Huarmey",
+      "department_id": "02",
+      "center_point": "POINT (-77.92714552763437 -10.09497620224453)"
+    },
+    {
+      "id": "1508",
+      "name": "huaura ",
+      "description": "Huaura ",
+      "department_id": "15",
+      "center_point": "POINT (-77.23874479980182 -11.03436618973149)"
+    },
+    {
+      "id": "1101",
+      "name": "ica ",
+      "description": "Ica ",
+      "department_id": "11",
+      "center_point": "POINT (-75.64318248694096 -14.30113807967012)"
+    },
+    {
+      "id": "1204",
+      "name": "jauja ",
+      "description": "Jauja ",
+      "department_id": "12",
+      "center_point": "POINT (-75.49233018329119 -11.68714030162443)"
+    },
+    {
+      "id": "2303",
+      "name": "jorge basadre ",
+      "description": "Jorge Basadre ",
+      "department_id": "23",
+      "center_point": "POINT (-70.72909129787577 -17.57754146164851)"
+    },
+    {
+      "id": "0809",
+      "name": "la convencion",
+      "description": "La Convención",
+      "department_id": "08",
+      "center_point": "POINT (-72.92253400716031 -12.35063212349188)"
+    },
+    {
+      "id": "2107",
+      "name": "lampa ",
+      "description": "Lampa ",
+      "department_id": "21",
+      "center_point": "POINT (-70.64122321718261 -15.38455448493601)"
+    },
+    {
+      "id": "1010",
+      "name": "lauricocha ",
+      "description": "Lauricocha ",
+      "department_id": "10",
+      "center_point": "POINT (-76.70326741963038 -10.20317352641718)"
+    },
+    {
+      "id": "1702",
+      "name": "manu ",
+      "description": "Manu ",
+      "department_id": "17",
+      "center_point": "POINT (-71.28468798299063 -12.27942962092236)"
+    },
+    {
+      "id": "1007",
+      "name": "maranon",
+      "description": "Marañón",
+      "department_id": "10",
+      "center_point": "POINT (-76.69136726793153 -8.720910644398614)"
+    },
+    {
+      "id": "1801",
+      "name": "mariscal nieto ",
+      "description": "Mariscal Nieto ",
+      "department_id": "18",
+      "center_point": "POINT (-70.78705027958144 -17.01260272744027)"
+    },
+    {
+      "id": "2109",
+      "name": "moho ",
+      "description": "Moho ",
+      "department_id": "21",
+      "center_point": "POINT (-69.38070306262073 -15.33495500021263)"
+    },
+    {
+      "id": "0214",
+      "name": "ocros",
+      "description": "Ocros",
+      "department_id": "02",
+      "center_point": "POINT (-77.42886807780549 -10.48830503127621)"
+    },
+    {
+      "id": "1306",
+      "name": "otuzco ",
+      "description": "Otuzco ",
+      "department_id": "13",
+      "center_point": "POINT (-78.55676490679397 -7.839204453734578)"
+    },
+    {
+      "id": "1307",
+      "name": "pacasmayo ",
+      "description": "Pacasmayo ",
+      "department_id": "13",
+      "center_point": "POINT (-79.42414498612658 -7.428566599296225)"
+    },
+    {
+      "id": "0215",
+      "name": "pallasca",
+      "description": "Pallasca",
+      "department_id": "02",
+      "center_point": "POINT (-77.90514473649415 -8.319368733691192)"
+    },
+    {
+      "id": "0810",
+      "name": "paruro",
+      "description": "Paruro",
+      "department_id": "08",
+      "center_point": "POINT (-71.91468983817937 -13.88459556181655)"
+    },
+    {
+      "id": "1901",
+      "name": "pasco ",
+      "description": "Pasco ",
+      "department_id": "19",
+      "center_point": "POINT (-76.15014379824106 -10.74843852435223)"
+    },
+    {
+      "id": "2207",
+      "name": "picota ",
+      "description": "Picota ",
+      "department_id": "22",
+      "center_point": "POINT (-76.254817354791 -6.90183775243433)"
+    },
+    {
+      "id": "1105",
+      "name": "pisco ",
+      "description": "Pisco ",
+      "department_id": "11",
+      "center_point": "POINT (-75.94264560586102 -13.80501508420605)"
+    },
+    {
+      "id": "2504",
+      "name": "purus",
+      "description": "Purús",
+      "department_id": "25",
+      "center_point": "POINT (-71.58273004786501 -10.37420051600256)"
+    },
+    {
+      "id": "0812",
+      "name": "quispicanchi",
+      "description": "Quispicanchi",
+      "department_id": "08",
+      "center_point": "POINT (-71.03277385800422 -13.52462988812435)"
+    },
+    {
+      "id": "0106",
+      "name": "rodriguez de mendoza",
+      "description": "Rodríguez de Mendoza",
+      "department_id": "01",
+      "center_point": "POINT (-77.45360571629934 -6.371810821980834)"
+    },
+    {
+      "id": "2110",
+      "name": "san antonio de putina ",
+      "description": "San Antonio de Putina ",
+      "department_id": "21",
+      "center_point": "POINT (-69.6155929659904 -14.71190857822792)"
+    },
+    {
+      "id": "1309",
+      "name": "sanchez carrion ",
+      "description": "Sánchez Carrión ",
+      "department_id": "13",
+      "center_point": "POINT (-77.90768096060448 -7.791563109094978)"
+    },
+    {
+      "id": "0218",
+      "name": "santa",
+      "description": "Santa",
+      "department_id": "02",
+      "center_point": "POINT (-78.28715806499561 -8.968913673022357)"
+    },
+    {
+      "id": "2008",
+      "name": "sechura ",
+      "description": "Sechura ",
+      "department_id": "20",
+      "center_point": "POINT (-80.67179548692732 -5.870225316679697)"
+    },
+    {
+      "id": "0509",
+      "name": "sucre",
+      "description": "Sucre",
+      "department_id": "05",
+      "center_point": "POINT (-73.73041476773668 -14.12111486845558)"
+    },
+    {
+      "id": "1703",
+      "name": "tahuamanu ",
+      "description": "Tahuamanu ",
+      "department_id": "17",
+      "center_point": "POINT (-70.32880332021693 -11.15198981407602)"
+    },
+    {
+      "id": "2304",
+      "name": "tarata ",
+      "description": "Tarata ",
+      "department_id": "23",
+      "center_point": "POINT (-69.97246970248024 -17.41467444482268)"
+    },
+    {
+      "id": "1301",
+      "name": "trujillo ",
+      "description": "Trujillo ",
+      "department_id": "13",
+      "center_point": "POINT (-78.89668816205749 -8.065553182141908)"
+    },
+    {
+      "id": "0813",
+      "name": "urubamba",
+      "description": "Urubamba",
+      "department_id": "08",
+      "center_point": "POINT (-72.28969382787356 -13.25728417630079)"
+    },
+    {
+      "id": "0510",
+      "name": "victor fajardo",
+      "description": "Víctor Fajardo",
+      "department_id": "05",
+      "center_point": "POINT (-74.28346042968377 -13.76445377399015)"
+    },
+    {
+      "id": "1312",
+      "name": "viru ",
+      "description": "Virú ",
+      "department_id": "13",
+      "center_point": "POINT (-78.6026543389986 -8.520323863466052)"
+    },
+    {
+      "id": "2113",
+      "name": "yunguyo ",
+      "description": "Yunguyo ",
+      "department_id": "21",
+      "center_point": "POINT (-69.02164744484338 -16.30467840403128)"
+    },
+    {
+      "id": "0104",
+      "name": "condorcanqui",
+      "description": "Condorcanqui",
+      "department_id": "01",
+      "center_point": "POINT (-78.0383886141223 -4.164981834601287)"
+    },
+    {
+      "id": "1608",
+      "name": "putumayo",
+      "description": "Putumayo",
+      "department_id": "16",
+      "center_point": "POINT (-72.66799 -2.4503)"
+    }
+  ]

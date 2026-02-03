@@ -1,0 +1,152 @@
+/* *,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+main {
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+} */
+
+/* .Container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: rgb(59 204 151 / 100%);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#3bcc97', endColorstr='#75890c', GradientType=1);
+} */
+
+.account {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 0 solid #000;
+}
+
+.account .account__photo {
+  width: 100%;
+  height: 100%;
+  background-color: #001624;
+  background-size: cover;
+}
+
+.account .account__photo .account_Photo_img {
+  width: 100%;
+  height: 100%;
+}
+
+.account .account__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 20px 30px;
+}
+
+.account .account__card .account__head {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
+  color: #09304f;
+}
+
+.account .account__card .account__head .account__logo__img {
+  position: relative;
+  float: left;
+  width: 450px;
+}
+
+.account .account__card .account__head .account__title {
+  margin: 7px 0;
+}
+
+.account .account__card .account__head .account__title .account__logo__text {
+  color: #087408;
+  font-weight: 350;
+  font-size: 1.5em;
+}
+
+.account .account__card .form {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 640px) {
+  .account .account__card .form {
+    padding: 0 6rem;
+  }
+}
+
+.account .account__card .form .form__form-group {
+  margin-bottom: 10px;
+}
+
+.account .account__card .form .form__form-group-label {
+  margin-bottom: 10px;
+  color: #696f79;
+}
+
+.account__btns {
+  position: relative;
+  width: 100%;
+  min-width: 150px;
+  margin: 10px 0;
+  background-color: #09304f;
+  border-radius: 0.1rem;
+}
+
+.account__btns .btn {
+  display: inline-block;
+  width: 100%;
+  margin-right: 0;
+  padding: 0.7rem 0.75rem;
+  color: white;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.1rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  user-select: none;
+}
+
+.account__btns .btn:disabled {
+  opacity: 0.65;
+}
+
+.account__btns .btn:focus,
+.account__btns .btn:active,
+.account__btns .btn:hover {
+  border-radius: 1rem;
+  outline: none;
+  cursor: pointer;
+}
+
+a {
+  margin-top: 20px;
+  color: #09304f;
+  font-weight: 500;
+  font-size: 0.7em;
+  font-style: inherit;
+}

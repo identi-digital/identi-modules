@@ -1,0 +1,1 @@
+"""Services for deforesting module"""
