@@ -2185,13 +2185,22 @@ class Funcionalities:
         
         # Calcular balance total
         total_balance = sum(float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount) for m in movements)
-        
+        today = datetime.today().date()
+        first_day_month = today.replace(day=1)
         return BalanceSummaryGatherersResponse(
-            total_balance=total_balance,
-            average_balance=total_balance / len(movements) if len(movements) > 0 else 0,
-            daily_amount=sum(float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount) for m in movements if m.created_at.date() == datetime.date.today()),
-            monthly_amount=sum(float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount) for m in movements if m.created_at.date() == datetime.date.today().replace(day=1))
-        )
+                    total_balance=total_balance,
+                    average_balance=total_balance / len(movements) if movements else 0,
+                    daily_amount=sum(
+                        float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount)
+                        for m in movements
+                        if m.created_at.date() == today
+                    ),
+                    monthly_amount=sum(
+                        float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount)
+                        for m in movements
+                        if m.created_at.date() >= first_day_month
+                    )
+                )
     
     # ========== LOT CERTIFICATION METHODS ==========
     def get_certifications_by_lot(self, lot_id: UUID) -> List[LotCertificationWithDetailsResponse]:

@@ -41,7 +41,7 @@ class Funcionalities:
         self.database_key = database_key
         
     def _get_db(self) -> Session:
-        """Obtiene la sesiÃƒÂ³n de base de datos desde el container"""
+        """Obtiene la sesion de base de datos desde el container"""
         return self.container.get(self.database_key, "databases")
         
     
@@ -73,18 +73,18 @@ class Funcionalities:
         Ventajas del ORM:
         - Type safety: errores detectados en desarrollo
         - Sin SQL injection
-        - CÃƒÂ³digo mÃƒÂ¡s legible y mantenible
+        - Codigo mas legible y mantenible
         """
         db = self._get_db()
         
-        # Calcular fecha lÃƒÂ­mite para considerar activo (15 dÃƒÂ­as atrÃƒÂ¡s)
+        # Calcular fecha li­mite para considerar activo (15 di­as atras)
         fifteen_days_ago = datetime.utcnow() - timedelta(days=15)
         
         # ============================================================================
-        # CTE 1: farmer_visits - Calcula la ÃƒÂºltima fecha de visita para cada farmer
+        # CTE 1: farmer_visits - Calcula la iºltima fecha de visita para cada farmer
         # ============================================================================
         
-        # Subquery para verificar si el farmer estÃƒÂ¡ en los detalles del registro
+        # Subquery para verificar si el farmer esta en los detalles del registro
         # detail es un ARRAY(JSONB) con estructura: [{"type_value": "entity", "value": {"id": "farmer-uuid", "display_name": "..."}}]
         # Usamos unnest para iterar sobre el array, cada elemento ya es JSONB
         detail_elem = sql_func.unnest(CoreRegisterModel.detail).alias("detail_elem")
@@ -175,12 +175,12 @@ class Funcionalities:
         ).cte('farmer_status')
         
         # ============================================================================
-        # Construir filtros dinÃƒÂ¡micos
+        # Construir filtros dinamicos
         # ============================================================================
         
         filters = []
         
-        # Aplicar bÃƒÂºsqueda
+        # Aplicar biºsqueda
         if search:
             search_pattern = f"%{search}%"
             filters.append(
@@ -231,14 +231,14 @@ class Funcionalities:
             order_by_clauses.append(farmer_status_cte.c.created_at.desc())
         
         # ============================================================================
-        # Calcular paginaciÃƒÂ³n
+        # Calcular paginacion
         # ============================================================================
         
         offset = (page - 1) * per_page
         total_pages = (total + per_page - 1) // per_page if total > 0 else 0
         
         # ============================================================================
-        # Query principal con paginaciÃƒÂ³n
+        # Query principal con paginacion
         # ============================================================================
         
         main_query = select(farmer_status_cte).select_from(farmer_status_cte)
@@ -257,7 +257,7 @@ class Funcionalities:
         # Construir respuesta
         farmer_responses = []
         for row in results:
-            # Construir objetos de informaciÃƒÂ³n relacionada
+            # Construir objetos de informacion relacionada
             country_info = None
             if row.country_id_val:
                 country_info = CountryInfo(
@@ -323,12 +323,12 @@ class Funcionalities:
         )
     
     def get_farmer_by_id(self, farmer_id: UUID) -> Optional[FarmerResponse]:
-        """Obtiene un farmer especÃƒÂ­fico por ID (solo si no estÃƒÂ¡ deshabilitado) con informaciÃƒÂ³n relacionada y ÃƒÂºltima visita"""
+        """Obtiene un farmer especi­fico por ID (solo si no esta deshabilitado) con informacion relacionada y iºltima visita"""
         db = self._get_db()
         from datetime import datetime, timedelta
         from sqlalchemy import text
         
-        # Query con joins para obtener informaciÃƒÂ³n relacionada
+        # Query con joins para obtener informacion relacionada
         result = db.query(
             FarmerModel,
             CountryModel,
@@ -357,7 +357,7 @@ class Funcionalities:
         
         farmer, country, department, province, district = result
         
-        # Buscar la ÃƒÂºltima visita del farmer en core_registers usando ORM
+        # Buscar la iºltima visita del farmer en core_registers usando ORM
         last_visit_date = None
         try:
             detail_elem = sql_func.unnest(CoreRegisterModel.detail).alias("detail_elem")
@@ -384,7 +384,7 @@ class Funcionalities:
             if result_visit:
                 last_visit_date = result_visit
         except Exception as e:
-            print(f"Ã¢Å¡Â Ã¯Â¸Â  Error al buscar ÃƒÂºltima visita del farmer {farmer.id}: {e}")
+            print(f" Error al buscar iºltima visita del farmer {farmer.id}: {e}")
             last_visit_date = None
         
         # Calcular estado
@@ -396,7 +396,7 @@ class Funcionalities:
         else:
             status = "inactivo"
         
-        # Construir objetos de informaciÃƒÂ³n relacionada
+        # Construir objetos de informacion relacionada
         country_info = None
         if country:
             country_info = CountryInfo(
@@ -479,7 +479,7 @@ class Funcionalities:
             raise e
     
     def delete_farmer(self, farmer_id: UUID) -> bool:
-        """Elimina un farmer (deshabilitado lÃƒÂ³gico)"""
+        """Elimina un farmer (deshabilitado logico)"""
         db = self._get_db()
         try:
             farmer = db.query(FarmerModel).filter(
@@ -549,7 +549,7 @@ class Funcionalities:
             raise e
     
     def delete_plot(self, plot_id: UUID) -> bool:
-        """Elimina una parcela (deshabilitado lÃƒÂ³gico)"""
+        """Elimina una parcela (deshabilitado logico)"""
         db = self._get_db()
         try:
             plot = db.query(FarmPlotModel).filter(
@@ -581,7 +581,7 @@ class Funcionalities:
         
         query = db.query(CropModel).filter(CropModel.disabled_at.is_(None))
         
-        # Aplicar bÃƒÂºsqueda si se proporciona
+        # Aplicar biºsqueda si se proporciona
         if search:
             query = query.filter(
                 (CropModel.name.isnot(None) & CropModel.name.ilike(f"%{search}%")) |
@@ -629,7 +629,7 @@ class Funcionalities:
     
     # Plot Section methods
     def create_plot_section(self, plot_id: UUID, section_data: PlotSectionCreate) -> PlotSectionResponse:
-        """Agrega una nueva secciÃƒÂ³n a una parcela"""
+        """Agrega una nueva seccion a una parcela"""
         db = self._get_db()
         try:
             # Verificar que la parcela existe
@@ -664,7 +664,7 @@ class Funcionalities:
         return [PlotSectionResponse.model_validate(section) for section in sections]
     
     def update_plot_section(self, plot_id: UUID, section_id: UUID, section_data: PlotSectionUpdate) -> Optional[PlotSectionResponse]:
-        """Actualiza una secciÃƒÂ³n de parcela"""
+        """Actualiza una seccion de parcela"""
         db = self._get_db()
         try:
             section = db.query(PlotSectionModel).filter(
@@ -689,7 +689,7 @@ class Funcionalities:
             raise e
     
     def delete_plot_section(self, plot_id: UUID, section_id: UUID) -> bool:
-        """Elimina una secciÃƒÂ³n de parcela (deshabilitado lÃƒÂ³gico)"""
+        """Elimina una seccion de parcela (deshabilitado logico)"""
         db = self._get_db()
         try:
             section = db.query(PlotSectionModel).filter(
@@ -719,10 +719,10 @@ class Funcionalities:
         search: str = "",
         token: Optional[str] = None
     ) -> PaginatedFarmResponse:
-        """Obtiene farms paginados de un farmer (solo los no deshabilitados) con informaciÃƒÂ³n adicional"""
+        """Obtiene farms paginados de un farmer (solo los no deshabilitados) con informacion adicional"""
         db = self._get_db()
         
-        # Query con joins para obtener informaciÃƒÂ³n relacionada
+        # Query con joins para obtener informacion relacionada
         query = db.query(
             FarmModel,
             FarmerModel,
@@ -750,7 +750,7 @@ class Funcionalities:
             FarmerModel.disabled_at.is_(None)
         )
         
-        # Aplicar bÃƒÂºsqueda si se proporciona
+        # Aplicar biºsqueda si se proporciona
         if search:
             query = query.filter(
                 (FarmModel.name.isnot(None) & FarmModel.name.ilike(f"%{search}%"))
@@ -775,7 +775,7 @@ class Funcionalities:
         
         results = query.offset(offset).limit(per_page).all()
         
-        # Construir respuestas con informaciÃƒÂ³n adicional agrupada
+        # Construir respuestas con informacion adicional agrupada
         from .schemas import FarmerInfo, CountryInfo, DepartmentInfo, ProvinceInfo, DistrictInfo
         
         farm_responses = []
@@ -838,7 +838,7 @@ class Funcionalities:
             # Construir lista de CropResponse
             crops_list = [CropResponse.model_validate(crop) for crop in crops_query]
             
-            # Verificar y obtener informaciÃƒÂ³n de deforestaciÃƒÂ³n
+            # Verificar y obtener informacion de deforestacion
             deforestation_info = None
             try:
                 deforestation_data = check_and_update_deforestation_status(
@@ -853,7 +853,7 @@ class Funcionalities:
                 if deforestation_data:
                     deforestation_info = DeforestationRequestInfo(**deforestation_data)
             except Exception as e:
-                print(f"Ã¢Å¡Â Ã¯Â¸Â  Error al verificar deforestaciÃƒÂ³n para farm {farm.id}: {e}")
+                print(f" Error al verificar deforestacion para farm {farm.id}: {e}")
             
             farm_dict = {
                 'id': farm.id,
@@ -874,7 +874,7 @@ class Funcionalities:
                 'province': province_info,
                 'district': district_info,
                 'crops': crops_list,  # Agregar lista de crops
-                'deforestation_request': deforestation_info,  # Agregar info de deforestaciÃƒÂ³n
+                'deforestation_request': deforestation_info,  # Agregar info de deforestacion
                 'created_at': farm.created_at,
                 'updated_at': farm.updated_at,
                 'disabled_at': farm.disabled_at
@@ -905,11 +905,11 @@ class Funcionalities:
         
         Args:
             farmer_id: ID del farmer
-            page: NÃƒÂºmero de pÃƒÂ¡gina
-            page_size: TamaÃƒÂ±o de pÃƒÂ¡gina
+            page: Niºmero de pagina
+            page_size: Tamai±o de pagina
             sort_by: Campo por el cual ordenar
             order: Orden ('asc' o 'desc')
-            search: Texto de bÃƒÂºsqueda (opcional)
+            search: Texto de biºsqueda (opcional)
             
         Returns:
             PaginatedCoreRegisterResponse con los registros encontrados
@@ -943,9 +943,9 @@ class Funcionalities:
             CoreRegisterModel.disabled_at.is_(None)
         )
         
-        # Aplicar bÃƒÂºsqueda si se proporciona (buscar en detail, entity_name, etc.)
+        # Aplicar biºsqueda si se proporciona (buscar en detail, entity_name, etc.)
         if search:
-            # Intentar buscar por UUID si el search es un UUID vÃƒÂ¡lido
+            # Intentar buscar por UUID si el search es un UUID valido
             try:
                 search_uuid = UUID(search)
                 query = query.filter(
@@ -954,7 +954,7 @@ class Funcionalities:
                     (CoreRegisterModel.schema_form_id == search_uuid)
                 )
             except ValueError:
-                # Si no es un UUID vÃƒÂ¡lido, buscar por entity_name o nombre del formulario
+                # Si no es un UUID valido, buscar por entity_name o nombre del formulario
                 query = query.filter(
                     (CoreRegisterModel.entity_name.ilike(f"%{search}%")) |
                     (FormModel.name.ilike(f"%{search}%"))
@@ -969,13 +969,13 @@ class Funcionalities:
                 else:
                     query = query.order_by(sort_column.asc())
         else:
-            # Ordenamiento por defecto: mÃƒÂ¡s recientes primero
+            # Ordenamiento por defecto: mas recientes primero
             query = query.order_by(CoreRegisterModel.created_at.desc())
         
         # Contar total
         total = query.count()
         
-        # Aplicar paginaciÃƒÂ³n
+        # Aplicar paginacion
         offset = (page - 1) * per_page
         total_pages = (total + per_page - 1) // per_page
         
@@ -1033,7 +1033,7 @@ class Funcionalities:
     
     def upload_farm_geometry(self, farm_id: UUID, geometry_data: 'FarmGeometryUpload', token: Optional[str] = None) -> 'FarmGeometryResponse':
         """
-        Sube la geometrÃƒÂ­a (polÃƒÂ­gono) de una farm en formato GeoJSON.
+        Sube la geometri­a (poligono) de una farm en formato GeoJSON.
         
         - Si is_principal=True: guarda en farms.geometry (MultiPolygon)
         - Si is_principal=False: crea un nuevo farm_plot (Polygon)
@@ -1078,12 +1078,12 @@ class Funcionalities:
             geometry = feature.get('geometry')
             
             if not geometry:
-                raise ValueError("La feature no contiene una geometrÃƒÂ­a vÃƒÂ¡lida")
+                raise ValueError("La feature no contiene una geometri­a valida")
             
-            # Validar que la geometrÃƒÂ­a sea Polygon o MultiPolygon
+            # Validar que la geometri­a sea Polygon o MultiPolygon
             geom_type = geometry.get('type')
             if geom_type not in ['Polygon', 'MultiPolygon']:
-                raise ValueError(f"El tipo de geometrÃƒÂ­a debe ser Polygon o MultiPolygon, recibido: {geom_type}")
+                raise ValueError(f"El tipo de geometri­a debe ser Polygon o MultiPolygon, recibido: {geom_type}")
             
             plot_id = None
             geometry_geojson = None
@@ -1116,15 +1116,15 @@ class Funcionalities:
                 db.commit()
                 db.refresh(farm)
                 
-                # Obtener la geometrÃƒÂ­a actualizada en formato GeoJSON
+                # Obtener la geometri­a actualizada en formato GeoJSON
                 geometry_geojson = geometry_to_geojson(farm.geometry, db) if farm.geometry else None
-                message = "GeometrÃƒÂ­a principal actualizada exitosamente en tabla farms"
+                message = "Geometri­a principal actualizada exitosamente en tabla farms"
                 
-                # Enviar polÃƒÂ­gono a GFW para anÃƒÂ¡lisis de deforestaciÃƒÂ³n
+                # Enviar poligono a GFW para analisis de deforestacion
                 try:
-                    print(f"Ã°Å¸Å’Â³ Enviando polÃƒÂ­gono a GFW para anÃƒÂ¡lisis de deforestaciÃƒÂ³n...")
+                    print(f" Enviando poligono a GFW para analisis de deforestacion...")
                     
-                    # Obtener configuraciÃƒÂ³n de GFW desde environment o config
+                    # Obtener configuracion de GFW desde environment o config
                     from .environment import GFW_API_URL
                     from .services.gfw import GeoJSONTransformer
                     
@@ -1136,11 +1136,11 @@ class Funcionalities:
                             token=token
                         )
                     else:
-                        print(f"Ã¢Å¡Â Ã¯Â¸Â  No hay token de autorizaciÃƒÂ³n para enviar a GFW")
+                        print(f" No hay token de autorizacion para enviar a GFW")
                         gfw_response = None
                     
                     if gfw_response:
-                        print(f"Ã¢Å“â€¦ Respuesta de GFW recibida: {gfw_response}")
+                        print(f" Respuesta de GFW recibida: {gfw_response}")
                         
                         # Guardar o actualizar en deforestation_requests
                         save_or_update_deforestation_request(
@@ -1151,11 +1151,11 @@ class Funcionalities:
                             DeforestationRequestStatusEnum=DeforestationRequestStatusEnum
                         )
                     else:
-                        print(f"Ã¢Å¡Â Ã¯Â¸Â  No se recibiÃƒÂ³ respuesta de GFW")
+                        print(f" No se recibio respuesta de GFW")
                         
                 except Exception as gfw_error:
-                    # No fallar la operaciÃƒÂ³n principal si falla GFW
-                    print(f"Ã¢Å¡Â Ã¯Â¸Â  Error al procesar GFW (no crÃƒÂ­tico): {gfw_error}")
+                    # No fallar la operacion principal si falla GFW
+                    print(f" Error al procesar GFW (no cri­tico): {gfw_error}")
                     import traceback
                     traceback.print_exc()
                 
@@ -1163,7 +1163,7 @@ class Funcionalities:
                 # Si no es principal, crear un nuevo plot en farm_plots
                 # Convertir a Polygon si es MultiPolygon (farm_plots solo acepta Polygon)
                 if geom_type == 'MultiPolygon':
-                    # Tomar el primer polÃƒÂ­gono del MultiPolygon
+                    # Tomar el primer poligono del MultiPolygon
                     polygon_geojson = {
                         'type': 'Polygon',
                         'coordinates': geometry['coordinates'][0]
@@ -1193,7 +1193,7 @@ class Funcionalities:
                 # Obtener el ID del plot creado
                 plot_id = result.fetchone()[0]
                 
-                # Obtener la geometrÃƒÂ­a del plot en formato GeoJSON
+                # Obtener la geometri­a del plot en formato GeoJSON
                 geojson_result = db.execute(
                     text("""
                         SELECT ST_AsGeoJSON(geometry)::json as geojson
@@ -1223,7 +1223,7 @@ class Funcionalities:
             raise e
         except Exception as e:
             db.rollback()
-            print(f"Ã¢ÂÅ’ Error al subir geometrÃƒÂ­a: {e}")
+            print(f" Error al subir geometri­a: {e}")
             import traceback
             traceback.print_exc()
             raise e
