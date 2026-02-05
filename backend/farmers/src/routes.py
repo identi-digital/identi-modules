@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Request, HTTPException, Query
-from fastapi.responses import StreamingResponse
 from uuid import UUID
 from typing import Optional
 from modules.data_collector.src.schemas import PaginatedCoreRegisterResponse
@@ -7,7 +6,8 @@ from .schemas import (
     FarmerCreate, FarmerUpdate, FarmerResponse, PaginatedResponse,
     PlotResponse, PlotUpdate, CropResponse, PaginatedCropResponse,
     PlotSectionCreate, PlotSectionUpdate, PlotSectionResponse,
-    FarmResponse, PaginatedFarmResponse, FarmGeometryUpload, FarmGeometryResponse
+    FarmResponse, PaginatedFarmResponse, FarmGeometryUpload, FarmGeometryResponse,
+    FarmUpdate
 )
 
 router = APIRouter(
@@ -72,7 +72,7 @@ def get_farmer(farmer_id: UUID, svc=Depends(get_funcionalities)):
         raise HTTPException(status_code=404, detail="Farmer no encontrado")
     return farmer
 
-@router.put("/{farmer_id}", response_model=FarmerResponse)
+@router.patch("/{farmer_id}", response_model=FarmerResponse)
 def update_farmer(
     farmer_id: UUID,
     farmer_data: FarmerUpdate,
@@ -107,6 +107,17 @@ def get_farms_by_farmer(
     """Obtiene una lista paginada de farms de un farmer. La geometría se devuelve en formato GeoJSON."""
     return svc.get_farms_by_farmer_paginated(farmer_id, page=page, per_page=per_page, sort_by=sort_by, order=order, search=search, token=token)
 
+@router.patch("/farms/{farm_id}", response_model=FarmResponse)
+def update_farm(
+    farm_id: UUID,
+    farm_data: FarmUpdate,
+    svc=Depends(get_funcionalities),
+    token: Optional[str] = Depends(get_auth_token)
+):
+    """Actualiza un farm existente"""
+    farm = svc.patch_farms(farm_id, farm_data, token=token)
+    if not farm:
+        raise HTTPException(status_code=404, detail="Farm no encontrada")
 @router.post("/farms/{farm_id}/geometry", response_model=FarmGeometryResponse)
 def upload_farm_geometry(
     farm_id: UUID,

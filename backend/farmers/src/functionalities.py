@@ -24,7 +24,7 @@ from .schemas import (
     PlotSectionCreate, PlotSectionUpdate, PlotSectionResponse,
     FarmResponse, PaginatedFarmResponse,
     CountryInfo, DepartmentInfo, ProvinceInfo, DistrictInfo,
-    FarmGeometryUpload, FarmGeometryResponse,
+    FarmGeometryUpload, FarmGeometryResponse, FarmUpdate,
     DeforestationRequestInfo
 )
 from modules.deforesting.src.resources import (
@@ -468,7 +468,9 @@ class Funcionalities:
             # Actualizar solo los campos proporcionados
             update_data = farmer_data.model_dump(exclude_none=True)
             for key, value in update_data.items():
-                setattr(farmer, key, value)
+                if value != getattr(farmer, key):
+                    if value not in ['', ' ', None, "first_name", "last_name", "dni"]:
+                        setattr(farmer, key, value)
             
             farmer.updated_at = datetime.utcnow()
             db.commit()
@@ -890,6 +892,38 @@ class Funcionalities:
             total_pages=total_pages
         )
     
+    # patch farms
+    def patch_farms(
+        self,
+        farm_id: UUID,
+        farm_data: FarmUpdate,
+        token: Optional[str] = None
+    ) -> Optional[FarmResponse]:
+        """Actualiza un farm existente"""
+        db = self._get_db()
+        try:
+            farm = db.query(FarmModel).filter(
+                FarmModel.id == farm_id,
+                FarmModel.disabled_at.is_(None)
+            ).first()
+            
+            if not farm:
+                return None
+            
+            # Actualizar solo los campos proporcionados
+            update_data = farm_data.model_dump(exclude_none=True)
+            for key, value in update_data.items():
+                if value != getattr(farm, key):
+                    if value not in ['', ' ', None]:
+                        setattr(farm, key, value)
+            
+            farm.updated_at = datetime.utcnow()
+            db.commit()
+            db.refresh(farm)
+            return FarmResponse.model_validate(farm)
+        except Exception as e:
+            db.rollback()
+            raise e
     # Core Register methods
     def get_registers_by_farmer(
         self, 

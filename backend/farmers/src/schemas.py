@@ -242,3 +242,15 @@ class FarmGeometryResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+class FarmUpdate(BaseModel):
+    name: Optional[str] = None
+    total_area: Optional[float] = None
+    cultivated_area: Optional[float] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    country_id: Optional[str] = None
+    department_id: Optional[str] = None
+    province_id: Optional[str] = None
+    district_id: Optional[str] = None
+    
