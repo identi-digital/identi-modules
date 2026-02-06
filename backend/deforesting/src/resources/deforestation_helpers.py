@@ -192,8 +192,17 @@ def check_and_update_deforestation_status(
                         status_enum = status_mapping.get(status_str.lower(), DeforestationRequestStatusEnum.PENDING)
                         
                         # Extraer métricas
-                        natural_forest_loss_ha = data_dict.get("natural_forest_loss_ha")
-                        natural_forest_coverage_ha = data_dict.get("natural_forest_coverage_ha")
+                        kpis = data_dict.get("deforestation_kpis", [])
+                        if len(kpis) > 0:
+                            kpi = kpis[-1]
+                        else:
+                            kpi = {}
+
+                        print("kpis", kpis)
+                        print("kpi", kpi)
+                        natural_forest_loss_ha = kpi.get("Natural Forest Loss (ha) (Beta)")
+                        natural_forest_coverage_ha = kpi.get("Natural Forest Coverage (HA) (Beta)")
+                        
                         
                         # Actualizar registro
                         deforestation_record.status = status_enum
