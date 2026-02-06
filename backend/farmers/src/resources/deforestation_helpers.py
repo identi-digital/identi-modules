@@ -198,7 +198,8 @@ def check_and_update_deforestation_status(
                         else:
                             kpi = {}
 
-
+                        print("kpis", kpis)
+                        print("kpi", kpi)
                         natural_forest_loss_ha = kpi.get("Natural Forest Loss (ha) (Beta)")
                         natural_forest_coverage_ha = kpi.get("Natural Forest Coverage (HA) (Beta)")
                         
