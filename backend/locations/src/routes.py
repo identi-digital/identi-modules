@@ -33,10 +33,11 @@ def get_departments(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
+    country_id: Optional[int] = Query(None, description="Id del país"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de departments"""
-    return svc.get_departments_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search)
+    return svc.get_departments_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search, country_id=country_id)
 
 @router.get("/provinces", response_model=PaginatedProvinceResponse)
 def get_provinces(
@@ -45,11 +46,11 @@ def get_provinces(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
+    department_id: Optional[int] = Query(None, description="Id del departamento"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de provinces"""
-    return svc.get_provinces_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search)
-
+    return svc.get_provinces_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search, department_id=department_id)
 @router.get("/districts", response_model=PaginatedDistrictResponse)
 def get_districts(
     page: int = Query(1, ge=1, description="Número de página"),
@@ -57,8 +58,8 @@ def get_districts(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
+    province_id: Optional[int] = Query(None, description="Id de la provincia"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de districts"""
-    return svc.get_districts_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search)
-
+    return svc.get_districts_paginated(page=page, per_page=per_page, sort_by=sort_by, order=order, search=search, province_id=province_id)

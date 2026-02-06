@@ -77,7 +77,8 @@ class Funcionalities:
         per_page: int = 10,
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
-        search: str = ""
+        search: str = "",
+        country_id: Optional[int] = None
     ) -> PaginatedDepartmentResponse:
         """Obtiene departments paginados (solo los no deshabilitados)"""
         db = self._get_db()
@@ -87,6 +88,10 @@ class Funcionalities:
             DepartmentModel,
             func.ST_AsText(DepartmentModel.center_point).label('center_point_text')
         ).filter(DepartmentModel.disabled_at.is_(None))
+        
+        # Filtrar por country_id si se proporciona
+        if country_id is not None and country_id != "":
+            query = query.filter(DepartmentModel.country_id == country_id)
         
         # Aplicar búsqueda si se proporciona
         if search:
@@ -144,7 +149,8 @@ class Funcionalities:
         per_page: int = 10,
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
-        search: str = ""
+        search: str = "",
+        department_id: Optional[int] = None
     ) -> PaginatedProvinceResponse:
         """Obtiene provinces paginados (solo los no deshabilitados)"""
         db = self._get_db()
@@ -154,6 +160,10 @@ class Funcionalities:
             ProvinceModel,
             func.ST_AsText(ProvinceModel.center_point).label('center_point_text')
         ).filter(ProvinceModel.disabled_at.is_(None))
+        
+        # Filtrar por department_id si se proporciona
+        if department_id is not None and department_id != "":
+            query = query.filter(ProvinceModel.department_id == department_id)
         
         # Aplicar búsqueda si se proporciona
         if search:
@@ -211,7 +221,8 @@ class Funcionalities:
         per_page: int = 10,
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
-        search: str = ""
+        search: str = "",
+        province_id: Optional[int] = None
     ) -> PaginatedDistrictResponse:
         """Obtiene districts paginados (solo los no deshabilitados)"""
         db = self._get_db()
@@ -222,6 +233,10 @@ class Funcionalities:
             func.ST_AsText(DistrictModel.center_point).label('center_point_text')
         ).filter(DistrictModel.disabled_at.is_(None))
         
+        # Filtrar por province_id si se proporciona
+        if province_id is not None and province_id != "":
+            query = query.filter(DistrictModel.province_id == province_id)
+            
         # Aplicar búsqueda si se proporciona
         if search:
             query = query.filter(
