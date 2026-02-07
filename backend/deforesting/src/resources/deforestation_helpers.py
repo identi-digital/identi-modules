@@ -222,8 +222,8 @@ def check_and_update_deforestation_status(
         if deforestation_record:
             return {
                 "status": deforestation_record.status.value if hasattr(deforestation_record.status, 'value') else str(deforestation_record.status),
-                "natural_forest_loss_ha": float(deforestation_record.natural_forest_loss_ha) if deforestation_record.natural_forest_loss_ha else None,
-                "natural_forest_coverage_ha": float(deforestation_record.natural_forest_coverage_ha) if deforestation_record.natural_forest_coverage_ha else None
+                "natural_forest_loss_ha": float(deforestation_record.natural_forest_loss_ha) if deforestation_record.natural_forest_loss_ha is not None else None,
+                "natural_forest_coverage_ha": float(deforestation_record.natural_forest_coverage_ha) if deforestation_record.natural_forest_coverage_ha is not None else None
             }
         
         return None
