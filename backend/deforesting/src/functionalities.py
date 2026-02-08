@@ -201,7 +201,6 @@ class Funcionalities:
             # siempre tendremos un deforestation_request válido
             loss = float(deforestation_request.natural_forest_loss_ha) if deforestation_request.natural_forest_loss_ha is not None else 0
             natural_forest_loss_ha = loss
-            deforestation_request_id = deforestation_request.id
             
             if loss == 0:
                 state_deforesting = DeforestationStateEnum.BAJA_NULA
@@ -229,7 +228,7 @@ class Funcionalities:
                 district_description=district_description,
                 state_deforesting=state_deforesting,
                 natural_forest_loss_ha=natural_forest_loss_ha,
-                deforestation_request_id=deforestation_request_id,
+                deforestation_request=deforestation_request,
                 created_at=farm.created_at
             ))
         

@@ -90,6 +90,12 @@ class locationResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class DeforestationRequestResponse(BaseModel):
+    id: UUID
+    status: str
+    natural_forest_loss_ha : float
+    natural_forest_coverage_ha: float
+
 class FarmDeforestationResponse(BaseModel):
     """Schema para respuesta de paginación de parcelas con estado de deforestación"""
     id: UUID
@@ -102,7 +108,7 @@ class FarmDeforestationResponse(BaseModel):
     district_description: Optional[str] = None  # district.description
     state_deforesting: DeforestationStateEnum  # Estado calculado basado en natural_forest_loss_ha
     natural_forest_loss_ha: Optional[float] = None  # Pérdida de bosque natural en hectáreas
-    deforestation_request_id: Optional[UUID] = None  # ID del request si existe
+    deforestation_request: Optional[DeforestationRequestResponse] = None  # ID del request si existe
     total_area: Optional[float] = None
     geometry: Optional[dict] = None  # GeoJSON format
     created_at: datetime
