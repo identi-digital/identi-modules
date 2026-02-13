@@ -2176,7 +2176,8 @@ class Funcionalities:
 
         if gatherer_id:
             query = query.filter(
-                BalanceMovementModel.gatherer_id == gatherer_id
+                BalanceMovementModel.gatherer_id == gatherer_id,
+                BalanceMovementModel.type_movement == BalanceMovementTypeEnum.PURCHASE
             )
 
         movements = query.order_by(

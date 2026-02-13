@@ -9,6 +9,7 @@ from typing import Optional
 from botocore.config import Config as ConfigBotoCore
 from botocore.exceptions import ClientError
 import boto3
+from uuid import uuid4
 
 # Agregar backend al path para importar la interfaz
 current_file = Path(__file__).resolve()
@@ -66,7 +67,10 @@ class StorageS3Manager(StorageInterface):
         Returns:
             Ruta completa con el prefijo AWS_S3_BASE_PATH si está configurado
         """
-        key_url = object_name.lstrip('/')
+        name = object_name.replace('/', '')
+        id = uuid4().hex
+        name = f"{id}-{name}"
+        key_url = name.lstrip('/')
         if self.AWS_S3_BASE_PATH:
             # Asegurar que no haya dobles barras
             base_path = self.AWS_S3_BASE_PATH.rstrip('/')
@@ -158,13 +162,12 @@ class StorageS3Manager(StorageInterface):
         except ClientError as e:
             raise RuntimeError(f"Error al eliminar archivo: {e}") from e
     
-    def get_presigned_url(
+    def post_presigned_url(
         self,
         object_name: str,
         expiration: int = 3600,
-        is_download: bool = True,
         bucket: Optional[str] = None,
-        **kwargs
+        file_type: Optional[str] = None,
     ) -> str:
         """Genera una URL pre-firmada para acceso temporal al archivo
         
@@ -178,30 +181,55 @@ class StorageS3Manager(StorageInterface):
         key_url = self._get_full_path(object_name)
         
         try:
-            if is_download:
+            # URL para subir
+            url = self.get_s3_client().generate_presigned_url(
+                ClientMethod='put_object',
+                Params={
+                    'Bucket': bucket,
+                    'Key': key_url,
+                    'ContentType': file_type
+                },
+                ExpiresIn=expiration
+            )
+            return url, key_url
+        except ClientError as e:
+            raise RuntimeError(f"Error al generar URL pre-firmada: {e}") from e
+
+    def get_presigned_url(
+            self,
+            key: str,
+            expiration: int = 3600,
+            is_download: bool = True,
+            bucket: Optional[str] = None,
+            **kwargs
+        ) -> str:
+            """Genera una URL pre-firmada para acceso temporal al archivo
+            
+            Args:
+                object_name: Ruta y nombre del archivo
+                expiration: Tiempo de expiraci??n en segundos
+                is_download: Si es True, genera URL para descargar (GET), si es False para subir (PUT)
+                bucket: Bucket a usar (opcional)
+            """
+            bucket = bucket or self.AWS_BUCKET
+            
+            try:
                 # URL para descargar
-                content_disposition = "attachment; filename=" + key_url.split('/')[-1]
+                if is_download:
+                    content_disposition = "attachment; filename=" + key.split('/')[-1]
+                else:
+                    content_disposition = "inline; filename=" + key.split('/')[-1]
+            
                 url = self.get_s3_client().generate_presigned_url(
                     ClientMethod="get_object",
                     Params={
                         'Bucket': bucket,
-                        'Key': key_url,
+                        'Key': key,
                         'ResponseContentDisposition': content_disposition
                     },
                     ExpiresIn=expiration
                 )
-            else:
-                # URL para subir
-                file_type = kwargs.get('file_type', 'application/octet-stream')
-                url = self.get_s3_client().generate_presigned_url(
-                    ClientMethod='put_object',
-                    Params={
-                        'Bucket': bucket,
-                        'Key': key_url,
-                        'ContentType': file_type
-                    },
-                    ExpiresIn=expiration
-                )
-            return url
-        except ClientError as e:
-            raise RuntimeError(f"Error al generar URL pre-firmada: {e}") from e
+           
+                return url
+            except ClientError as e:
+                raise RuntimeError(f"Error al generar URL pre-firmada: {e}") from e

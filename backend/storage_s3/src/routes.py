@@ -75,9 +75,9 @@ def get_funcionalities(request: Request):
 
 # ========== Rutas para Presigned URLs (S3) ==========
 
-@router.get("/presigned-upload/{object_name:path}", response_model=PresignedUploadResponse)
+@router.get("/presigned-upload", response_model=PresignedUploadResponse)
 async def get_presigned_upload_url(
-    object_name: str,
+    file_name: str = Query(..., description="Nombre del objeto en S3"),
     expiration: int = Query(3600, ge=1, le=604800, description="Tiempo de expiración en segundos (máximo 7 días)"),
     file_type: Optional[str] = Query("application/octet-stream", description="Tipo MIME del archivo"),
     storage=Depends(get_storage)
@@ -88,10 +88,9 @@ async def get_presigned_upload_url(
     El cliente puede usar esta URL para subir archivos directamente a S3 sin pasar por el servidor.
     """
     try:
-        url = storage.get_presigned_url(
-            object_name=object_name,
+        url, key_url = storage.post_presigned_url(
+            file_name=file_name,
             expiration=expiration,
-            is_download=False,
             file_type=file_type
         )
         
@@ -99,7 +98,7 @@ async def get_presigned_upload_url(
             success=True,
             url=url,
             expiration=expiration,
-            object_name=object_name
+            key=key_url
         )
     except Exception as e:
         raise HTTPException(
@@ -108,9 +107,10 @@ async def get_presigned_upload_url(
         )
 
 
-@router.get("/presigned-download/{object_name:path}", response_model=PresignedDownloadResponse)
+@router.get("/presigned-get", response_model=PresignedDownloadResponse)
 async def get_presigned_download_url(
-    object_name: str,
+    key: str = Query(..., description="Key del objeto en S3 (ruta completa)"),
+    is_download: bool = Query(True, description="Si es True, genera URL para descargar (GET), si es False para subir (PUT)"),
     expiration: int = Query(3600, ge=1, le=604800, description="Tiempo de expiración en segundos (máximo 7 días)"),
     storage=Depends(get_storage)
 ):
@@ -121,16 +121,15 @@ async def get_presigned_download_url(
     """
     try:
         url = storage.get_presigned_url(
-            object_name=object_name,
+            key=key,
             expiration=expiration,
-            is_download=True
+            is_download=is_download
         )
         
         return PresignedDownloadResponse(
             success=True,
             url=url,
             expiration=expiration,
-            object_name=object_name
         )
     except Exception as e:
         raise HTTPException(
