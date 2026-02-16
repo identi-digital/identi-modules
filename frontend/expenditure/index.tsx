@@ -13,6 +13,10 @@ export const getModuleRoute = (route: string): string => {
   return `/${MODULE_NAME}${route === '/' ? '' : route}`;
 };
 
+export const getListRoute = (): string => {
+  return `/${MODULE_NAME}`;
+};
+
 export const getCreateRoute = (): string => {
   return `/${MODULE_NAME}/create`;
 };
