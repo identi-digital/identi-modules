@@ -5,4 +5,7 @@ export const FarmService = {
   uploadFarmGeometry(farm_id: string, data: any) {
     return api().post(`/farms/${farm_id}/geometry`, data);
   },
+  patchFarm(id: string, data: any) {
+    return api().patch(`/farms/${id}`, data);
+  },
 };

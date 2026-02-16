@@ -57,7 +57,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
     viewMode,
     entityValuesArray,
     updateEntityFieldValue,
-    loadMoreEntityValues,
+    // loadMoreEntityValues,
     isEdit,
     entityDetail,
     itemValue,
@@ -81,7 +81,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
   const open = Boolean(anchorEl);
   const id = open ? 'date-popover' : undefined;
 
-  // console.log(element?.metadata?.data_input?.title);
+  console.log(element);
 
   if (element.type_value === 'option') {
     // console.log(element);

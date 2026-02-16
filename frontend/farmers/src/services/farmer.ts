@@ -28,6 +28,9 @@ export const FarmerService = {
   getById(id: string) {
     return api().get(`/${id}`);
   },
+  patchFarmer(id: string, data: any) {
+    return api().patch(`/${id}`, data);
+  },
 
   getPlotsByFarmerId(id: string) {
     return api().get(`/${id}/plots`);

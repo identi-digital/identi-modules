@@ -10,16 +10,18 @@ import { showMessage } from '@ui/utils/Messages';
 
 type AssignNetWeightProps = {
   currentValue: number;
+  open: boolean;
   idLot: string;
   userId: string;
-  handleCloseDialog: (isRefresh?: boolean) => void;
+  handleClose: (isRefresh?: boolean) => void;
   handleChangeNetWeight: (id: string, value: number) => void;
 };
 
 const AssignNetWeight: React.FC<AssignNetWeightProps> = ({
   currentValue,
+  open,
   idLot,
-  handleCloseDialog,
+  handleClose,
   handleChangeNetWeight,
   //   handleEditEntityDetail
 }) => {
@@ -48,10 +50,10 @@ const AssignNetWeight: React.FC<AssignNetWeightProps> = ({
 
   return (
     <Dialog
-      open={true}
+      open={open}
       title="Asignar peso neto"
       subtitle="Ingresa el campo solicitado"
-      onClose={() => handleCloseDialog()}
+      onClose={() => handleClose()}
       sx={{
         '& .MuiDialog-container': {
           '& .MuiPaper-root': {
@@ -63,7 +65,7 @@ const AssignNetWeight: React.FC<AssignNetWeightProps> = ({
       actions={
         <Box display="flex" justifyContent={'space-between'} width={'100%'}>
           <Button
-            onClick={() => handleCloseDialog()}
+            onClick={() => handleClose()}
             variant="outlined"
             disabled={isSaving}
             text="Cancelar"

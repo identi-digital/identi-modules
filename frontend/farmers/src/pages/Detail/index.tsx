@@ -1,6 +1,6 @@
 // Ruta de detalle: /detail/:id
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, styled } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import Paper from '@/ui/components/atoms/Paper/Paper';
 import {
   Compost,
@@ -10,14 +10,23 @@ import {
 import { ModuleConfig } from '@core/moduleLoader';
 import { getListRoute } from '../../../index';
 import Tabs from '@/ui/components/molecules/Tabs/Tabs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ProducerTab from './tabs/ProducerTab';
 import FarmsTab from './tabs/FarmsTab';
 import FormsTab from './tabs/FormsTab';
 import { FarmerService } from '../../services/farmer';
 import { FarmerGet } from '../../models/farmer';
-
 import LinearProgress from '@/ui/components/atoms/LinearProgress/LinearProgress';
+
+export const BoxIconButton = styled(Box)(() => ({
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '&:hover': {
+    cursor: 'pointer',
+  },
+}));
 
 export const CaptionStyled = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -34,7 +43,7 @@ export const FieldValueStyled = styled(Typography)(({ theme }) => ({
 }));
 export const TitleSectionStyled = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
-  fontSize: 16,
+  fontSize: 15,
   fontWeight: 600,
   marginBottom: 16,
 }));
@@ -50,8 +59,12 @@ export default function FarmerDetail({ config }: FarmerDetailProps) {
   const [tab, setTab] = useState<number>(0);
 
   const [farmer, setFarmer] = useState<FarmerGet | null>(null);
-
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleRefresh = useCallback(() => {
+    setIsRefresh((prev: boolean) => !prev);
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -68,7 +81,7 @@ export default function FarmerDetail({ config }: FarmerDetailProps) {
       .catch(() => {
         setIsLoading(false);
       });
-  }, [id]);
+  }, [id, isRefresh]);
 
   if (!farmer) {
     return (
@@ -101,7 +114,9 @@ export default function FarmerDetail({ config }: FarmerDetailProps) {
       </Paper>
 
       <LinearProgress loading={isLoading} />
-      {tab === 0 && <ProducerTab farmer={farmer} />}
+      {tab === 0 && (
+        <ProducerTab farmer={farmer} handleRefresh={handleRefresh} />
+      )}
       {tab === 1 && <FarmsTab farmer={farmer} />}
       {tab === 2 && <FormsTab farmer={farmer} farmerId={farmer.id} />}
     </>

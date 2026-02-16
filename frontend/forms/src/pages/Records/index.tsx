@@ -38,9 +38,9 @@ import {
 // import { useContextAuth } from '~/ui/contexts/AuthContext';
 // import { BSON } from 'realm-web';
 import { EntityDetail } from '../../models/entities';
-import { sortEntityDetailByOrder } from '@ui/utils/EntityUtils';
+// import { sortEntityDetailByOrder } from '@ui/utils/EntityUtils';
 import DateRange from '@ui/components/atoms/DateField/DateRange';
-import { showMessage, showYesNoQuestion } from '@ui/utils/Messages';
+import { showMessage } from '@ui/utils/Messages';
 import { saveAs } from '@ui/utils/dowloadExcel';
 // import useModules from '~/atlas/modules';
 import IButton from '@ui/components/atoms/Button/Button';
@@ -51,6 +51,7 @@ import MapComponent from '@ui/components/molecules/MapComponent';
 import { getListRoute } from '@/modules/forms';
 import { FormService } from '../../services/forms';
 import { ModuleConfig } from '@/core/moduleLoader';
+// import { StorageService } from '@/services/storage';
 
 // const ChipSelectedStyled = styled(Box)<TypographyProps>(({ theme }) => ({
 //   display: 'flex',
@@ -65,19 +66,19 @@ import { ModuleConfig } from '@/core/moduleLoader';
 //   fontWeight: 600
 // }));
 
-type DataRow = {
-  id?: string;
-  entity_name: string;
-  quantity: number;
-  presentation?: string;
-  lot: string;
-  price: number;
-  total_price: number;
-  date: string;
-  status?: string;
-  entity_id_producer?: string;
-  entity_type_producer?: string;
-};
+// type DataRow = {
+//   id?: string;
+//   entity_name: string;
+//   quantity: number;
+//   presentation?: string;
+//   lot: string;
+//   price: number;
+//   total_price: number;
+//   date: string;
+//   status?: string;
+//   entity_id_producer?: string;
+//   entity_type_producer?: string;
+// };
 
 type HeaderType = {
   name: string;
@@ -86,6 +87,7 @@ type HeaderType = {
   header_type_media?: string;
   header_type_map?: string;
   options?: any[];
+  order: number;
 };
 
 type MediaViewerProps = {
@@ -122,8 +124,8 @@ export default function RecordsPage({ config }: RecordsPageProps) {
     startDate: Date | null;
     endDate: Date | null;
   }>({
-    startDate: null,
-    endDate: null,
+    startDate: new Date(new Date().getFullYear(), 0, 1),
+    endDate: new Date(),
   });
   const [search, setSearch] = useState<string>('');
   const [isLoadingDownload, setIsLoadingDownload] = useState<boolean>(false);
@@ -148,38 +150,34 @@ export default function RecordsPage({ config }: RecordsPageProps) {
 
   const _processingData = useCallback(async (data: any[]) => {
     try {
-      // console.log(data);
-      const headers: HeaderType[] = [];
+      console.log(data);
+      // const headers: HeaderType[] = [];
       const newArrElements: any[] = data.map((entity: any) => {
-        const entityDetail: EntityDetail[] = sortEntityDetailByOrder(
-          entity.detail,
-        );
-        // console.log(entityDetail);
+        // const entityDetail: EntityDetail[] = sortEntityDetailByOrder(
+        //   entity.detail ?? [],
+        // );
+        // console.log(entity.detail);
         // console.log(entity);
         const newDataRow: any = {
           id: entity._id,
           disabled_at: entity.disabled_at ?? null,
         };
-        entityDetail.forEach((detail: EntityDetail) => {
+        entity.detail.forEach((detail: EntityDetail) => {
           if (detail.type_value !== 'geojson') {
             // si esta en la lista de headers no lo agrego
-            // console.log(detail);
-            if (headers.findIndex((item) => item.name === detail.name) === -1) {
-              // if (detail.value.includes('geojson')) {
-              // }
-              // console.log(detail);
-              headers.push({
-                name: detail.name,
-                display_name: detail.display_name,
-                header_type:
-                  typeof detail.value === 'string' &&
-                  detail.value.includes('geojson')
-                    ? 'geojson'
-                    : detail.type_value,
-                header_type_media: detail.type_media,
-                options: detail.option,
-              });
-            }
+            // if (headers.findIndex((item) => item.name === detail.name) === -1) {
+            //   headers.push({
+            //     name: detail.name,
+            //     display_name: detail.display_name,
+            //     header_type:
+            //       typeof detail.value === 'string' &&
+            //       detail.value.includes('geojson')
+            //         ? 'geojson'
+            //         : detail.type_value,
+            //     header_type_media: detail.type_media,
+            //     options: detail.option,
+            //   });
+            // }
             if (detail.type_value === 'entity') {
               // console.log(detail);
               let str = '-';
@@ -242,20 +240,21 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         }
         return newDataRow;
       });
-      const headerDate: HeaderType = {
-        name: 'Fecha de creación',
-        display_name: 'Fecha de creación',
-        header_type: 'date',
-      };
-      if (data.length > 0) {
-        headers.push(headerDate);
-      }
+      // const headerDate: HeaderType = {
+      //   name: 'Fecha de creación',
+      //   display_name: 'Fecha de creación',
+      //   header_type: 'date',
+      // };
+      // if (data.length > 0) {
+      //   headers.push(headerDate);
+      // }
       // console.log(headers);
 
-      setHeaderNames(headers);
+      // setHeaderNames(headers);
+      console.log(newArrElements);
       return newArrElements;
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       return [];
     }
   }, []);
@@ -269,15 +268,17 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       search: string,
     ) => {
       setSearch(search);
-      const order: any = {
-        created_at: -1,
-      };
+      // const order: any = {
+      //   created_at: -1,
+      // };
 
       let start = '';
       let end = '';
       // console.log(dateRange);
       if (dateRange) {
-        const startDate = new Date(dateRange?.startDate || new Date());
+        const startDate = new Date(
+          dateRange?.startDate || new Date(new Date().getFullYear(), 0, 1),
+        );
         const endDate = new Date(dateRange?.endDate || new Date());
 
         // al startDate le pongo el inicio del día
@@ -309,6 +310,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         end,
       );
       const { items, total } = get;
+      console.log(items);
       if (items) {
         let newItems = [];
         newItems = await _processingData(items);
@@ -333,36 +335,38 @@ export default function RecordsPage({ config }: RecordsPageProps) {
     [tab, form_id, dateRange],
   );
 
-  const getSignedUrl = async (key: string): Promise<string> => {
-    if (!key) return '';
-    return new Promise<string>((resolve, reject) => {
-      resolve('');
-      // getPresignedFile(`${key}`, true)
-      //   .then((response) => {
-      //     const { url_presigned, _expire } = response?.data?.data;
-      //     resolve(url_presigned);
-      //   })
-      //   .catch((error) => {
-      //     reject(error);
-      //   });
-    });
-  };
+  // const getSignedUrl = async (key: string): Promise<string> => {
+  //   if (!key) return '';
+  //   return new Promise<string>((resolve, reject) => {
+  //     resolve('');
+  //     StorageService.presignedDownload(`${key}`, false)
+  //       .then((response) => {
+  //         console.log(response);
+  //         const { url_presigned } = response?.data?.data;
+  //         resolve(url_presigned);
+  //       })
+  //       .catch((error) => {
+  //         reject(error);
+  //       });
+  //   });
+  // };
 
-  const loadImageUrl = useCallback(async (element: any) => {
-    try {
-      if (!element?.value) return '';
-      // const media = await getMediaById(element?.value);
-      return '';
-      // if (media && media.path) {
-      //   // setMedia(media);
-      //   const url: string = await getSignedUrl(media.path);
-      //   return url;
-      // }
-    } catch (error) {
-      return '';
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // const loadImageUrl = useCallback(async (element: any) => {
+  //   try {
+  //     if (!element?.value) return '';
+  //     const media = await StorageService.getMediaById(element?.value);
+  //     console.log(media);
+  //     // return '';
+  //     if (media && media.path) {
+  //       // setMedia(media);
+  //       const url: string = await getSignedUrl(media.path);
+  //       return url;
+  //     }
+  //   } catch (error) {
+  //     return '';
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const handleDownloadData = useCallback(async () => {
     if (!form_id) return;
@@ -484,70 +488,70 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   //   setIsLoadingDownload(false);
   // }, [headers, module?.name, _paginateLots, search, loadImageUrl]);
 
-  const handleDelete = useCallback(
-    async (row: DataRow) => {
-      const { id } = row;
-      // console.log(row);
-      const result: boolean = await showYesNoQuestion(
-        '¿Está seguro de que desea eliminar el registro?',
-        '',
-        'warning',
-        false,
-        ['Cancelar', 'Eliminar'],
-      );
-      if (result && id) {
-        console.log('disabledEntity', id);
-        // disabledEntity(id)
-        //   .then(() => {
-        //     // deshabilitar movimiento
-        //     // disableMovementByReference(id);
-        //     handleRefresh();
-        //     showMessage('', 'Se eliminó correctamente', 'success', false);
-        //   })
-        //   .catch(() => {
-        //     showMessage(
-        //       '',
-        //       'No se pudo eliminar el registro correctamente',
-        //       'warning',
-        //       true,
-        //     );
-        //   });
-      }
-    },
-    [handleRefresh],
-  );
+  // const handleDelete = useCallback(
+  //   async (row: DataRow) => {
+  //     const { id } = row;
+  //     // console.log(row);
+  //     const result: boolean = await showYesNoQuestion(
+  //       '¿Está seguro de que desea eliminar el registro?',
+  //       '',
+  //       'warning',
+  //       false,
+  //       ['Cancelar', 'Eliminar'],
+  //     );
+  //     if (result && id) {
+  //       console.log('disabledEntity', id);
+  //       // disabledEntity(id)
+  //       //   .then(() => {
+  //       //     // deshabilitar movimiento
+  //       //     // disableMovementByReference(id);
+  //       //     handleRefresh();
+  //       //     showMessage('', 'Se eliminó correctamente', 'success', false);
+  //       //   })
+  //       //   .catch(() => {
+  //       //     showMessage(
+  //       //       '',
+  //       //       'No se pudo eliminar el registro correctamente',
+  //       //       'warning',
+  //       //       true,
+  //       //     );
+  //       //   });
+  //     }
+  //   },
+  //   [handleRefresh],
+  // );
 
-  const handleRestore = useCallback(
-    async (row: DataRow) => {
-      const { id } = row;
-      const result: boolean = await showYesNoQuestion(
-        '¿Está seguro de que desea restaurar el registro?',
-        '',
-        'warning',
-        false,
-        ['Cancelar', 'Restaurar'],
-      );
-      if (result && id) {
-        console.log('restoreEntity', id);
-        // restoreEntity(id)
-        //   .then(() => {
-        //     // habilitar movimiento
-        //     // enableMovementByReference(id);
-        //     handleRefresh();
-        //     showMessage('', 'Se restauró correctamente', 'success', false);
-        //   })
-        //   .catch(() => {
-        //     showMessage(
-        //       '',
-        //       'No se pudo restaurar el registro correctamente',
-        //       'warning',
-        //       true,
-        //     );
-        //   });
-      }
-    },
-    [handleRefresh],
-  );
+  // const handleRestore = useCallback(
+  //   async (row: DataRow) => {
+  //     const { id } = row;
+  //     const result: boolean = await showYesNoQuestion(
+  //       '¿Está seguro de que desea restaurar el registro?',
+  //       '',
+  //       'warning',
+  //       false,
+  //       ['Cancelar', 'Restaurar'],
+  //     );
+  //     if (result && id) {
+  //       console.log('restoreEntity', id);
+  //       // restoreEntity(id)
+  //       //   .then(() => {
+  //       //     // habilitar movimiento
+  //       //     // enableMovementByReference(id);
+  //       //     handleRefresh();
+  //       //     showMessage('', 'Se restauró correctamente', 'success', false);
+  //       //   })
+  //       //   .catch(() => {
+  //       //     showMessage(
+  //       //       '',
+  //       //       'No se pudo restaurar el registro correctamente',
+  //       //       'warning',
+  //       //       true,
+  //       //     );
+  //       //   });
+  //     }
+  //   },
+  //   [handleRefresh],
+  // );
 
   // const handleDateRangeChange = (range: { startDate: Date; endDate: Date } | null) => {
   //   //filtro el datarows con el rango de fechas
@@ -564,7 +568,58 @@ export default function RecordsPage({ config }: RecordsPageProps) {
     if (form_id) {
       FormService.getById(form_id)
         .then((resp: any) => {
-          // console.log(resp);
+          console.log(resp);
+          const headers: HeaderType[] = [];
+          // crear los headers a partir del schema
+          // recorro el schema y las instructions
+          if (resp.schema && resp.schema.instructions) {
+            resp.schema.instructions.forEach((element: any) => {
+              if (element && element.schema_gather) {
+                headers.push({
+                  name: element?.schema_gather?.name,
+                  display_name:
+                    element?.metadata?.data_input?.title ??
+                    element?.schema_gather?.name,
+                  header_type: element?.schema_gather?.type_value,
+                  header_type_media: element?.schema_gather?.type_media,
+                  options: element?.schema_gather?.options,
+                  order: +element?.schema_gather?.is_visual_table || 0,
+                });
+              }
+            });
+            const headerDate: HeaderType = {
+              name: 'Fecha de creación',
+              display_name: 'Fecha de creación',
+              header_type: 'date',
+              order: -1,
+            };
+            headers.push(headerDate);
+            console.log('newHeaders', headers);
+            const sorted = headers.sort((a, b) => {
+              const getPriority = (item: any) => {
+                if (item.order === -1) return 3; // último siempre
+                if (item.order === 0 || item.order == null) return 2; // medio
+                return 1; // positivos
+              };
+
+              const priorityA = getPriority(a);
+              const priorityB = getPriority(b);
+
+              // primero por prioridad
+              if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+              }
+
+              // si ambos son positivos, ordena por order
+              if (priorityA === 1) {
+                return a.order - b.order;
+              }
+
+              return 0;
+            });
+            console.log(sorted);
+            setHeaderNames(sorted);
+          }
           setModule(resp);
         })
         .catch((_err: any) => {
@@ -738,7 +793,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         }
 
         return {
-          sorteable: true,
+          sorteable: false,
           align: 'left',
           text: header.display_name,
           value: header.name,

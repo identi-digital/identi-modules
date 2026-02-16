@@ -11,6 +11,15 @@ import { FarmGet } from '../../../models/farm';
 import { FarmerGet } from '../../../models/farmer';
 import UploadGeoFile from './UploadGeoFile';
 import { showMessage } from '@/ui/utils/Messages';
+import {
+  trackFarmDownloadDeforestationReport,
+  trackFarmDownloadPolygon,
+} from '../../../analytics/farms/track';
+import {
+  LOW_DEFORESTATION_RATE,
+  MEDIUM_DEFORESTATION_RATE,
+} from '@/core/config/environment';
+import LegendDeforest from './DeforestFarmReport/LeyendDeforest';
 
 const DEFAULT_GEOJSON: any = {
   type: 'FeatureCollection',
@@ -53,15 +62,18 @@ const renderGFWStatus = (coverage_value: number, loss_value: number) => {
     bgColor: '',
   };
   // const newValue = value.toFixed(2);
-  if (loss_value === 0) {
+  if (loss_value === LOW_DEFORESTATION_RATE) {
     obj.color = '#15803D';
     obj.bgColor = '#DCFCE7';
   }
-  if (loss_value > 0 && loss_value <= 0.2) {
+  if (
+    loss_value > LOW_DEFORESTATION_RATE &&
+    loss_value <= MEDIUM_DEFORESTATION_RATE
+  ) {
     obj.color = '#B45309';
     obj.bgColor = '#FEF3C7';
   }
-  if (loss_value > 0.2) {
+  if (loss_value > MEDIUM_DEFORESTATION_RATE) {
     obj.color = '#EF4444';
     obj.bgColor = '#FEE2E2';
   }
@@ -104,6 +116,7 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
     farmer,
     handleOnUploadFile,
   } = props;
+  console.log(farm);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const componentRef = useRef<HTMLDivElement>(null);
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
@@ -120,6 +133,9 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
     a.download = 'polygon.geojson';
     a.click();
     URL.revokeObjectURL(url);
+    trackFarmDownloadPolygon({
+      farm_id: farm?.id ?? '',
+    });
     setIsDownloading(false);
   }, [farm]);
 
@@ -163,6 +179,9 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
       pdf.addImage(imgData, 'PNG', x, y, width, height);
       const name = farm?.name ?? '';
       pdf.save(`informe_deforestación_${name ?? ''}.pdf`);
+      trackFarmDownloadDeforestationReport({
+        farm_id: farm?.id ?? '',
+      });
     } catch (error) {
       showMessage('', 'No se ha podido generar el informe', 'error');
     } finally {
@@ -223,12 +242,23 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
               }
             />
           </Box>
-          <Box>
-            <Box mt={2}>{renderGFWStatus(0.55, 0.1)}</Box>
-          </Box>
+          {farm?.deforestation_request &&
+            farm?.deforestation_request?.natural_forest_coverage_ha !== null &&
+            farm?.deforestation_request?.natural_forest_coverage_ha >= 0 &&
+            farm?.deforestation_request?.natural_forest_loss_ha !== null &&
+            farm?.deforestation_request?.natural_forest_loss_ha >= 0 && (
+              <Box>
+                <Box mt={2}>
+                  {renderGFWStatus(
+                    farm?.deforestation_request?.natural_forest_coverage_ha,
+                    farm?.deforestation_request?.natural_forest_loss_ha,
+                  )}
+                </Box>
+              </Box>
+            )}
         </Grid>
         <Grid size={8}>
-          <Box sx={{ padding: '16px', width: '100%', marginTop: '16px' }}>
+          {/* <Box sx={{ padding: '16px', width: '100%', marginTop: '16px' }}>
             <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
               <strong>Cobertura y pérdida de bosque natural</strong>
             </Typography>
@@ -262,7 +292,8 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
               🟥 Riesgo de pérdida significativa de bosque natural (más de 0.2
               ha)
             </Typography>
-          </Box>
+          </Box> */}
+          <LegendDeforest showTitle={false} />
           <Box display={'flex'} flexDirection={'column'}>
             <Box display={'flex'}>
               <Button
@@ -274,15 +305,22 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
                 disabled={isDownloading}
                 margin
               />
-              <Button
-                text="Reporte de deforestación"
-                variant="outlined"
-                onClick={handleDownloadPDF}
-                color="primary"
-                isLoading={isLoadingReport}
-                disabled={isLoadingReport}
-                margin
-              />
+              {farm?.deforestation_request &&
+                farm?.deforestation_request?.natural_forest_coverage_ha !==
+                  null &&
+                farm?.deforestation_request?.natural_forest_coverage_ha >= 0 &&
+                farm?.deforestation_request?.natural_forest_loss_ha !== null &&
+                farm?.deforestation_request?.natural_forest_loss_ha >= 0 && (
+                  <Button
+                    text="Reporte de deforestación"
+                    variant="outlined"
+                    onClick={handleDownloadPDF}
+                    color="primary"
+                    isLoading={isLoadingReport}
+                    disabled={isLoadingReport}
+                    margin
+                  />
+                )}
             </Box>
             <Box ml={1}>
               <UploadGeoFile
@@ -317,8 +355,10 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
               departamento: farm?.department?.name ?? '',
               district: farm?.district?.name ?? '',
               polygon: farm?.geometry ?? DEFAULT_GEOJSON,
-              natural_forest_coverage: 0,
-              natural_forest_lost: 0,
+              natural_forest_coverage:
+                farm?.deforestation_request?.natural_forest_coverage_ha ?? 0,
+              natural_forest_lost:
+                farm?.deforestation_request?.natural_forest_loss_ha ?? 0,
               date: new Date(farm?.created_at ?? '').toLocaleDateString(
                 'es-ES',
               ),

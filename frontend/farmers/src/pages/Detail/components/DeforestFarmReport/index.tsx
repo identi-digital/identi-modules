@@ -1,8 +1,13 @@
 import React from 'react';
 import IdentiLogo from '@ui/assets/img/identi_logo.png';
-import { Box, styled, Typography } from '@mui/material';
+import { Box, Divider, styled, Typography } from '@mui/material';
 import MapComponent from '@/ui/components/molecules/MapComponent/Map';
 import './styles.css';
+import {
+  LOW_DEFORESTATION_RATE,
+  MEDIUM_DEFORESTATION_RATE,
+} from '@/core/config/environment';
+import LegendDeforest from './LeyendDeforest';
 
 const HeaderStyle = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -13,20 +18,21 @@ const HeaderStyle = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
   borderRadius: '8px',
-  minHeight: '100px',
+  minHeight: '80px',
 }));
 const TableHeaderBox = styled(Box)(() => ({
   width: '33.33%',
-  fontWeight: 600,
+  fontWeight: 500,
+  color: '#595857',
 }));
 const TableItemBox = styled(Box)(() => ({
   width: '33.33%',
 }));
-const IndicatorBox = styled(Box)(() => ({
-  width: '15px',
-  height: '15px',
-  borderRadius: '4px',
-}));
+// const IndicatorBox = styled(Box)(() => ({
+//   width: '15px',
+//   height: '15px',
+//   borderRadius: '4px',
+// }));
 
 type FarmProps = {
   farm_id: string;
@@ -53,38 +59,47 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
   props: DeforestFarmProps,
 ) => {
   const { farm } = props;
-  let value = 0;
-  if (
-    !isNaN(farm.natural_forest_coverage) &&
-    !isNaN(farm.natural_forest_lost) &&
-    farm.natural_forest_coverage > 0
-  ) {
-    value = (farm.natural_forest_lost / farm.natural_forest_coverage) * 100;
-  }
+  // let value = 0;
+  // if (
+  //   !isNaN(farm.natural_forest_coverage) &&
+  //   !isNaN(farm.natural_forest_lost) &&
+  //   farm.natural_forest_coverage > 0
+  // ) {
+  //   value = (farm.natural_forest_lost / farm.natural_forest_coverage) * 100;
+  // }
   let name = '';
-  if (farm.natural_forest_lost === 0) {
+  if (farm.natural_forest_lost === LOW_DEFORESTATION_RATE) {
     name = 'Baja';
   }
-  if (farm.natural_forest_lost > 0 && farm.natural_forest_lost <= 0.2) {
+  if (
+    farm.natural_forest_lost > LOW_DEFORESTATION_RATE &&
+    farm.natural_forest_lost <= MEDIUM_DEFORESTATION_RATE
+  ) {
     name = 'Media';
   }
-  if (farm.natural_forest_lost > 0.2) {
+  if (farm.natural_forest_lost > MEDIUM_DEFORESTATION_RATE) {
     name = 'Alta';
   }
   const indicators = [
     {
       name: 'Alta',
+      reportLabel: 'Riesgo de deforestación Alto',
       color: '#EF4444',
+      bgColor: '#FEE2E2',
       percent: 'N/A',
     },
     {
       name: 'Media',
+      reportLabel: 'Riesgo de deforestación Medio',
       color: '#B45309',
+      bgColor: '#FEF3C7',
       percent: 'N/A',
     },
     {
       name: 'Baja',
+      reportLabel: 'Riesgo de deforestación Bajo',
       color: '#15803D',
+      bgColor: '#DCFCE7',
       percent: 'N/A',
     },
   ];
@@ -94,7 +109,7 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
       {/* header */}
       <HeaderStyle>
         <Box>
-          <Typography variant="h4">
+          <Typography variant="h5">
             Informe de evaluación de deforestación
           </Typography>
         </Box>
@@ -102,15 +117,54 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           <img src={IdentiLogo} alt="logo" style={{ width: '100px' }} />
         </Box>
       </HeaderStyle>
+      <Box mt={2}>
+        <Typography
+          variant="body1"
+          sx={{ color: 'primary.main', fontWeight: 600 }}
+        >
+          Datos de origen
+        </Typography>
+        <Divider sx={{ borderWidth: '1px', borderColor: 'primary.main' }} />
+      </Box>
       <Box display="flex" flexWrap="wrap">
         {[
-          { label: 'Parcela', value: farm.farm_name || '-', fontSize: '16px' },
           {
             label: 'Agricultor',
             value: farm.producer_name || '-',
             fontSize: '14px',
           },
           { label: 'DNI', value: farm.producer_dni || '-', fontSize: '14px' },
+        ].map((item, index) => (
+          <Box
+            key={index}
+            width={{ xs: '100%', sm: '33.33%' }}
+            p={1}
+            boxSizing="border-box"
+          >
+            <Typography variant="caption">{item.label}</Typography>
+            <Typography
+              fontSize={item.fontSize}
+              fontWeight={600}
+              color={'primary'}
+            >
+              {item.value}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+      <Box mt={2}>
+        <Typography
+          variant="body1"
+          sx={{ color: 'primary.main', fontWeight: 600 }}
+        >
+          Detalle de parcela
+        </Typography>
+        <Divider sx={{ borderWidth: '1px', borderColor: 'primary.main' }} />
+      </Box>
+      <Box display="flex" flexWrap="wrap">
+        {[
+          { label: 'Parcela', value: farm.farm_name || '-', fontSize: '16px' },
+
           {
             label: 'Hectáreas totales',
             value: farm.farm_ha || 0,
@@ -162,13 +216,14 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           flexDirection={'row'}
           p={1}
           sx={{
-            backgroundColor: '#E68C38',
+            backgroundColor: '#E4E4E4',
             borderRadius: '4px',
           }}
         >
-          <TableHeaderBox>Riesgo de perdida de bosque natural</TableHeaderBox>
-          <TableHeaderBox>Área de bosque natural cubierto</TableHeaderBox>
-          <TableHeaderBox>% Area de bosque natural perdido</TableHeaderBox>
+          <TableHeaderBox>Riesgo de deforestación</TableHeaderBox>
+          {/* <TableHeaderBox>Riesgo de perdida de bosque natural</TableHeaderBox> */}
+          <TableHeaderBox>Área de bosque natural (Ha)</TableHeaderBox>
+          <TableHeaderBox>Área deforestada (Ha)</TableHeaderBox>
         </Box>
         {indicators.map((item, index) => {
           if (name === item.name) {
@@ -182,27 +237,21 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
               >
                 <TableItemBox display={'flex'} alignItems={'flex-end'}>
                   <Box width={'55%'}>
-                    {item.name} {`(${farm.natural_forest_lost.toFixed(2)} HA)`}
+                    {item.name}
+                    {/* {`(${farm.natural_forest_lost.toFixed(2)} HA)`} */}
                   </Box>
-                  <IndicatorBox sx={{ backgroundColor: item.color }} />
+                  {/* <IndicatorBox sx={{ backgroundColor: item.color }} /> */}
                 </TableItemBox>
                 <TableItemBox>
-                  {farm.natural_forest_coverage.toFixed(2)} HA
+                  {farm.natural_forest_coverage.toFixed(2)}
                 </TableItemBox>
-                <TableItemBox>{value.toFixed(2)} %</TableItemBox>
+                <TableItemBox>
+                  {farm.natural_forest_lost.toFixed(2)}
+                </TableItemBox>
+                {/* <TableItemBox>{value.toFixed(2)} %</TableItemBox> */}
               </Box>
             );
           }
-          return (
-            <Box key={index} display={'flex'} flexDirection={'row'} p={1}>
-              <TableItemBox display={'flex'} alignItems={'flex-end'}>
-                <Box width={'55%'}>{item.name}</Box>
-                <IndicatorBox sx={{ backgroundColor: item.color }} />
-              </TableItemBox>
-              <TableItemBox>0 HA</TableItemBox>
-              <TableItemBox>{item.percent}</TableItemBox>
-            </Box>
-          );
         })}
         <Typography
           color="GrayText"
@@ -211,54 +260,50 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
         >
           <em>*Información generada por Global Forest Watch</em>
         </Typography>
-        <Box sx={{ padding: '8px', width: '100%', marginTop: '16px' }}>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            <strong>Cobertura y pérdida de bosque natural</strong>
-          </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            Bosque natural cubierto: superficie actual de bosque natural
-            presente en la parcela.
-          </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            Riesgo de bosque natural perdido: superficie que ha sido deforestada
-            respecto al total original.
-          </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            Riesgo de bosque natural perdido (%): proporción del bosque original
-            que ha sido perdido, expresada como porcentaje.
-          </Typography>
+        <LegendDeforest showTitle={true} />
 
+        <Box mt={2}>
           <Typography
-            color="GrayText"
-            sx={{ fontSize: '0.7rem', marginTop: '16px' }}
+            variant="body1"
+            sx={{ color: 'primary.main', fontWeight: 600 }}
           >
-            <strong>Estado de deforestación:</strong>
+            Conclusión del informe
           </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            🟩 Sin riesgo de pérdida de bosque natural (0 ha)
-          </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            🟨 Riesgo de pérdida leve de bosque natural (entre 0.01 ha y 0.2 ha)
-          </Typography>
-          <Typography color="GrayText" sx={{ fontSize: '0.7rem' }}>
-            🟥 Riesgo de pérdida significativa de bosque natural (más de 0.2 ha)
-          </Typography>
+          <Divider sx={{ borderWidth: '1px', borderColor: 'primary.main' }} />
         </Box>
-        {/* <Box display={'flex'} flexDirection={'row'} p={1}>
-          <TableHeaderBox>Alta </TableHeaderBox>
-          <TableItemBox>0 HA</TableItemBox>
-          <TableItemBox>N/A</TableItemBox>
+        <Box sx={{ marginTop: '8px', width: '100%' }}>
+          {indicators.map((item, index) => {
+            if (name === item.name) {
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    padding: '8px',
+                    width: '100%',
+                    backgroundColor: item.bgColor,
+                    borderRadius: '4px',
+                  }}
+                >
+                  <Typography sx={{ fontSize: '0.9rem', color: '#595857' }}>
+                    Según la ultima evaluación realizada el{' '}
+                    <strong>2026</strong>, el productor{' '}
+                    <strong>{farm.producer_name || '-'}</strong> (Parcela{' '}
+                    <strong>{farm.farm_name || '-'}</strong>) registra{' '}
+                    <strong>{farm.natural_forest_lost.toFixed(2)} ha</strong> de
+                    área deforestada de un área total de{' '}
+                    <strong>
+                      {farm.natural_forest_coverage.toFixed(2)} ha
+                    </strong>
+                    . El predio se clasifica con{' '}
+                    <strong>{item.reportLabel}</strong>, según los estándares de
+                    evaluación vigentes.
+                  </Typography>
+                </Box>
+              );
+            }
+            return null;
+          })}
         </Box>
-        <Box display={'flex'} flexDirection={'row'} p={1}>
-          <TableHeaderBox>Media </TableHeaderBox>
-          <TableItemBox>0 HA</TableItemBox>
-          <TableItemBox>N/A</TableItemBox>
-        </Box>
-        <Box display={'flex'} flexDirection={'row'} p={1}>
-          <TableHeaderBox>Baja </TableHeaderBox>
-          <TableItemBox>{farm.farm_ha} HA</TableItemBox>
-          <TableItemBox>100 %</TableItemBox>
-        </Box> */}
       </Box>
     </Box>
   );

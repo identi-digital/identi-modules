@@ -1,5 +1,5 @@
 // Ruta principal: Lista de agricultores
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Grid,
@@ -14,7 +14,7 @@ import { ModuleConfig } from '@core/moduleLoader';
 // import { getDetailRoute } from '../../../index';
 import FilterComponent from '@/ui/components/molecules/FilterComponent';
 import { useCallback, useEffect, useState } from 'react';
-import { Add, Delete, Visibility } from '@mui/icons-material';
+import { Add, Delete } from '@mui/icons-material';
 import { TableHeadColumn } from '@/ui/components/molecules/TableHead/TableHead';
 import DataTable from '@/ui/components/organisms/DataTable/ServerSide/DataTable';
 import { AxiosResponse } from 'axios';
@@ -38,7 +38,7 @@ interface GatherersListProps {
 }
 
 export default function GatherersList({ config }: GatherersListProps) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // console.log(config);
   const theme = useTheme();
   const isActiveDesktop = useMediaQuery(theme.breakpoints.down('md'));
@@ -55,8 +55,8 @@ export default function GatherersList({ config }: GatherersListProps) {
   const textDebounce = useDebounce(search, 500);
 
   const [resume, setResume] = useState({
-    totalBalance: 0,
-    averageBalance: 0,
+    total_balance: 0,
+    average_balance: 0,
     daily_amount: 0,
     monthly_amount: 0,
   });
@@ -309,7 +309,7 @@ export default function GatherersList({ config }: GatherersListProps) {
             resumeKeys={[
               {
                 text: 'Monto total de transacciones',
-                value: `${resume.totalBalance}`,
+                value: `${resume.total_balance}`,
                 //   value: `${lastTransactionAmount}`,
                 color: '#FF5B00',
                 money: true,
@@ -317,7 +317,7 @@ export default function GatherersList({ config }: GatherersListProps) {
               },
               {
                 text: 'Promedio por transacción',
-                value: `${resume.averageBalance}`,
+                value: `${resume.average_balance}`,
                 //   value: `${dailyExpense}`,
                 //   color: '#EF4444',
                 money: true,
