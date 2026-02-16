@@ -130,6 +130,7 @@ async def get_presigned_download_url(
             success=True,
             url=url,
             expiration=expiration,
+            object_name=key.split("/")[-1]  # Extraer el nombre del archivo del key
         )
     except Exception as e:
         raise HTTPException(
