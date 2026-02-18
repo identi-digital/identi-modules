@@ -154,11 +154,11 @@ const ProducerTab: React.FC<ProducerTabProps> = (props: ProducerTabProps) => {
       />
       <ProducerLocationDialog
         farmerLocation={{
-          id: farmer.id,
-          country_id: farmer.country.id ?? '',
-          department_id: farmer.department.id ?? '',
-          province_id: farmer.province.id ?? '',
-          district_id: farmer.district.id ?? '',
+          id: farmer?.id ?? '',
+          country_id: farmer?.country?.id ?? '',
+          department_id: farmer?.department?.id ?? '',
+          province_id: farmer?.province?.id ?? '',
+          district_id: farmer?.district?.id ?? '',
         }}
         open={isOpenProducerLocationDialog}
         handleSave={handlePatchProducer}

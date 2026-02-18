@@ -12,10 +12,10 @@ const LegendDeforest: React.FC<LegendDeforestProps> = (
   return (
     <>
       {showTitle && (
-        <Box mt={2}>
+        <Box mt={1}>
           <Typography
             variant="body2"
-            sx={{ color: 'primary.main', fontWeight: 600 }}
+            sx={{ color: 'primary.main', fontWeight: 600, mb: 1 }}
           >
             Leyenda estado de deforestación
           </Typography>
@@ -23,7 +23,7 @@ const LegendDeforest: React.FC<LegendDeforestProps> = (
         </Box>
       )}
 
-      <Box mt={1} sx={{ padding: '8px', width: '100%' }}>
+      <Box sx={{ padding: '8px', width: '100%' }}>
         <Typography sx={{ fontSize: '0.7rem' }}>
           <strong>Riesgo bajo: </strong>Baja probabilidad de ser observado según
           el cumplimiento de la normativa de la UE.

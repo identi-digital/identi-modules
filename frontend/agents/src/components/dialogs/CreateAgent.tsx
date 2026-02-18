@@ -37,6 +37,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
     identity_id: agent?.identity_id ?? '',
     username: agent?.username ?? '',
     status: agent?.status ?? 'active',
+    tenant_id: localStorage.getItem('tenant_id') ?? '',
   };
 
   // validation

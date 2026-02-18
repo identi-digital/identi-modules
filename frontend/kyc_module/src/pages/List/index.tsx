@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Paper,
-  Button,
+  // Button,
   Table,
   TableBody,
   TableCell,
@@ -12,38 +12,39 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { Cancel, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+// import { AxiosResponse } from 'axios';
+import { KycService } from '../../services/kyc_service';
+import DateCell from '@/ui/components/atoms/DateCell/DateCell';
+
+interface KycResult {
+  created_at: string;
+  dni: string;
+  first_name: string;
+  is_approved: boolean;
+  last_name: string;
+  probability: number;
+}
 
 const ListPage = () => {
-  const [prospectRecords, setProspectRecords] = useState([
-    {
-      id: 1,
-      lat: -8.3435,
-      lng: -76.3123,
-      producer: 'Ernesto Perez',
-      region: 'San Martín',
-      status: 'Visitado',
-      date: '2024-05-10',
-    },
-    {
-      id: 2,
-      lat: -8.4512,
-      lng: -76.4201,
-      producer: 'Lucía Méndez',
-      region: 'Ucayali',
-      status: 'En Proceso',
-      date: '2024-05-11',
-    },
-    {
-      id: 3,
-      lat: -8.3398,
-      lng: -76.6055,
-      producer: 'Jorge Rojas',
-      region: 'San Martín',
-      status: 'Pendiente',
-      date: '2024-05-12',
-    },
-  ]);
+  const [prospectRecords, setProspectRecords] = useState<KycResult[]>([]);
+
+  const onLoad = useCallback(async () => {
+    try {
+      const data = await KycService.getAll();
+      if (data && data.length > 0) {
+        setProspectRecords(data);
+      }
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching KYC results:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    onLoad();
+  }, []);
+
   return (
     <Box>
       <Box
@@ -66,7 +67,6 @@ const ListPage = () => {
           Nueva Validación
         </Button> */}
       </Box>
-
       <TableContainer
         component={Paper}
         variant="outlined"
@@ -80,7 +80,7 @@ const ListPage = () => {
               <TableCell>Fecha Validación</TableCell>
               <TableCell align="right">% Coincidencia</TableCell>
               <TableCell align="center">Estado Biométrico</TableCell>
-              <TableCell align="right">Acciones</TableCell>
+              {/* <TableCell align="right">Acciones</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -88,27 +88,43 @@ const ListPage = () => {
               <TableRow key={i}>
                 <TableCell>
                   <Typography variant="body2" fontWeight="bold">
-                    {r.producer}
+                    {r?.first_name ?? ''} {r?.last_name ?? ''}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  {/* <Typography variant="caption" color="text.secondary">
                     {r.region}
-                  </Typography>
+                  </Typography> */}
                 </TableCell>
-                <TableCell>4587****</TableCell>
-                <TableCell>{r.date}</TableCell>
+                <TableCell>{r?.dni ?? ''}</TableCell>
+                <TableCell>
+                  {r.created_at ? (
+                    <>
+                      <DateCell date={r?.created_at ?? ''} />{' '}
+                    </>
+                  ) : (
+                    <>...</>
+                  )}
+                </TableCell>
                 <TableCell align="right">
                   <Typography fontWeight="bold" color="success.main">
-                    98.2%
+                    {r?.probability
+                      ? (Math.floor(r.probability * 1000) / 10).toFixed(1) + '%'
+                      : '...'}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Tooltip title="Validación Facial Exitosa">
-                    <CheckCircleIcon color="success" fontSize="small" />
-                  </Tooltip>
+                  {r?.probability ? (
+                    <Tooltip title="Validación Exitosa">
+                      <CheckCircleIcon color="success" fontSize="small" />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="Sin validación">
+                      <Cancel color="error" fontSize="small" />
+                    </Tooltip>
+                  )}
                 </TableCell>
-                <TableCell align="right">
+                {/* <TableCell align="right">
                   <Button size="small">Ver Reporte</Button>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

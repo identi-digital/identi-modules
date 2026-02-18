@@ -1,31 +1,48 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Grid,
   Card,
   CardContent,
-  Button,
+  // Button,
   Avatar,
   TextField,
   MenuItem,
   Tab,
   Tabs,
-  Stack,
+  // Stack,
 } from '@mui/material';
 import {
-  FilterAlt as FilterIcon,
+  // FilterAlt as FilterIcon,
   LocationOn as LocationIcon,
   TrendingUp as TrendingUpIcon,
   Assignment as AssignmentIcon,
 } from '@mui/icons-material';
+import { ProspectionService } from '../../services/prospection';
+import { showMessage } from '@/ui/utils/Messages';
+import MapComponent from '@/ui/components/molecules/MapComponent/Map';
+
+interface ProspectionMetrics {
+  prospection_count: number;
+  suivis_count: number;
+  suivis_pct: number;
+  visit_field_count: number;
+  visit_pct: number;
+}
 
 const DashboardPage = () => {
   const [currentView, setCurrentView] = useState('dashboard');
-
+  const [metrics, setMetrics] = useState<ProspectionMetrics | null>(null);
+  const [featureCollection, setFeatureCollection] = useState<any>(null);
   // --- MOCK DATA ---
-  const technicians = ['Juan Pérez', 'María García', 'Carlos Rodríguez'];
-  const regions = ['San Martín', 'Ucayali', 'Huánuco'];
+  const [forms] = useState<string[]>([
+    'Prospecciones',
+    'Visitas',
+    'Seguimientos',
+  ]);
+  const [form, setForm] = useState<string>('Prospecciones');
+  // const regions = ['San Martín', 'Ucayali', 'Huánuco'];
 
   //   const prospectRecords = [
   //     {
@@ -57,6 +74,90 @@ const DashboardPage = () => {
   //     },
   //   ];
 
+  const loadData = useCallback(async () => {
+    try {
+      const metrics = await ProspectionService.getMetrics();
+      console.log('Métricas de Prospección:', metrics);
+      setMetrics(metrics);
+    } catch (error) {
+      showMessage('', 'Error al cargar métricas de prospección', 'error');
+    }
+  }, []);
+
+  function buildFeatureCollection(data: any[]) {
+    const features: any[] = [];
+
+    data.forEach((group: any) => {
+      group.forEach((field: any) => {
+        if (field.type_value === 'geojson' && field.value) {
+          try {
+            const parsed =
+              typeof field.value === 'string'
+                ? JSON.parse(field.value)
+                : field.value;
+
+            // Si ya es Feature
+            if (parsed.type === 'Feature') {
+              features.push(parsed);
+            }
+
+            // Si es solo geometry
+            if (
+              parsed.type === 'Point' ||
+              parsed.type === 'Polygon' ||
+              parsed.type === 'LineString'
+            ) {
+              features.push({
+                type: 'Feature',
+                geometry: parsed,
+                properties: {},
+              });
+            }
+          } catch (error) {
+            console.warn('GeoJSON inválido:', field.value);
+          }
+        }
+      });
+    });
+
+    return {
+      type: 'FeatureCollection',
+      features,
+    };
+  }
+
+  const loadPolygons = useCallback(async () => {
+    try {
+      setFeatureCollection(null);
+      if (!form) return;
+      let id = 'f0b565fd-ac9a-45c0-b263-e1ee57376d6e';
+      if (form === 'Prospecciones') {
+        id = '4dfb8bb2-4bab-4462-9f5a-3fdba3e624a6';
+      }
+      if (form === 'Visitas') {
+        id = 'f0b565fd-ac9a-45c0-b263-e1ee57376d6e';
+      }
+      if (form === 'Seguimientos') {
+        id = '7dc4cc1d-4c5c-44c1-a316-84734cb7a65b';
+      }
+      const polygons = await ProspectionService.getPolygonsByFormId(id);
+
+      const featureCollection = buildFeatureCollection(polygons);
+      setFeatureCollection(featureCollection);
+      console.log(featureCollection);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [form]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    loadPolygons();
+  }, [form]);
+
   return (
     <Box>
       <Box
@@ -70,7 +171,7 @@ const DashboardPage = () => {
         {/* <Typography variant="h5" fontWeight={800}>
           Prospección
         </Typography> */}
-        <Tabs value={currentView} onChange={(e, v) => setCurrentView(v)}>
+        <Tabs value={currentView} onChange={(_e, v) => setCurrentView(v)}>
           <Tab value="dashboard" label="Resumen" />
           <Tab value="mapa" label="Mapa de Campo" />
         </Tabs>
@@ -95,7 +196,7 @@ const DashboardPage = () => {
                       PROSPECCIONES
                     </Typography>
                     <Typography variant="h4" fontWeight={800}>
-                      1,240
+                      {metrics ? metrics.prospection_count : '...'}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -118,7 +219,7 @@ const DashboardPage = () => {
                       VISITAS DE PARCELA
                     </Typography>
                     <Typography variant="h4" fontWeight={800}>
-                      850
+                      {metrics ? metrics.visit_field_count : '...'}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -138,10 +239,10 @@ const DashboardPage = () => {
                       color="text.secondary"
                       fontWeight="bold"
                     >
-                      TASA DE CONVERSIÓN
+                      SEGUIMIENTO
                     </Typography>
                     <Typography variant="h4" fontWeight={800}>
-                      68%
+                      {metrics ? metrics.suivis_count : '...'}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -185,7 +286,7 @@ const DashboardPage = () => {
                   variant="caption"
                   sx={{ position: 'absolute', right: -100, color: '#666' }}
                 >
-                  1,240 leads
+                  {metrics ? metrics.prospection_count : '...'} leads
                 </Typography>
               </Box>
               <Box
@@ -200,13 +301,13 @@ const DashboardPage = () => {
                 }}
               >
                 <Typography variant="body2" fontWeight="bold">
-                  Visita de Parcela (70%)
+                  Visita de Parcela ({metrics ? metrics.visit_pct : '...'}%)
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{ position: 'absolute', right: -100, color: '#666' }}
                 >
-                  868 visitas
+                  {metrics ? metrics.visit_field_count : '...'} visitas
                 </Typography>
               </Box>
               <Box
@@ -221,13 +322,13 @@ const DashboardPage = () => {
                 }}
               >
                 <Typography variant="body2" fontWeight="bold">
-                  Seguimiento y Docs (30%)
+                  Seguimiento y Docs ({metrics ? metrics.suivis_pct : '...'}%)
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{ position: 'absolute', right: -100, color: '#666' }}
                 >
-                  372 en proceso
+                  {metrics ? metrics.suivis_count : '...'} en proceso
                 </Typography>
               </Box>
             </Box>
@@ -235,7 +336,7 @@ const DashboardPage = () => {
             <Grid container spacing={2} sx={{ mt: 6, textAlign: 'center' }}>
               <Grid size={{ xs: 4 }}>
                 <Typography
-                  variant="caption"
+                  variant="body2"
                   color="text.secondary"
                   fontWeight="bold"
                 >
@@ -247,26 +348,26 @@ const DashboardPage = () => {
               </Grid>
               <Grid size={{ xs: 4 }}>
                 <Typography
-                  variant="caption"
+                  variant="body2"
                   color="text.secondary"
                   fontWeight="bold"
                 >
                   Actual
                 </Typography>
                 <Typography variant="h6" fontWeight={800}>
-                  1,240
+                  {metrics ? metrics.prospection_count : '...'}
                 </Typography>
               </Grid>
               <Grid size={{ xs: 4 }}>
                 <Typography
-                  variant="caption"
+                  variant="body2"
                   color="text.secondary"
                   fontWeight="bold"
                 >
                   Pendientes
                 </Typography>
                 <Typography variant="h6" fontWeight={800}>
-                  260
+                  {1500 - (metrics?.prospection_count ?? 0)}
                 </Typography>
               </Grid>
             </Grid>
@@ -276,7 +377,7 @@ const DashboardPage = () => {
         <Box>
           <Card variant="outlined" sx={{ p: 2, borderRadius: 3, mb: 2 }}>
             <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 3 }}>
+              {/* <Grid size={{ xs: 3 }}>
                 <TextField
                   select
                   fullWidth
@@ -291,24 +392,25 @@ const DashboardPage = () => {
                     </MenuItem>
                   ))}
                 </TextField>
-              </Grid>
+              </Grid> */}
               <Grid size={{ xs: 3 }}>
                 <TextField
                   select
                   fullWidth
                   size="small"
-                  label="Técnico"
-                  defaultValue="all"
+                  label="Conversiones"
+                  value={form}
+                  onChange={(e) => setForm(e.target.value)}
                 >
-                  <MenuItem value="all">Todos</MenuItem>
-                  {technicians.map((t) => (
+                  {/* <MenuItem value="all">Todos</MenuItem> */}
+                  {forms.map((t) => (
                     <MenuItem key={t} value={t}>
                       {t}
                     </MenuItem>
                   ))}
                 </TextField>
               </Grid>
-              <Grid size={{ xs: 4 }}>
+              {/* <Grid size={{ xs: 4 }}>
                 <Stack direction="row" spacing={1}>
                   <TextField
                     type="date"
@@ -337,10 +439,16 @@ const DashboardPage = () => {
                 >
                   Filtrar
                 </Button>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Card>
-          <p>Mapa</p>
+          {featureCollection && (
+            <MapComponent
+              value={featureCollection}
+              zoom={4}
+              sx={{ borderRadius: '10px' }}
+            />
+          )}
           {/* <LeafletMap markers={prospectRecords} /> */}
         </Box>
       )}

@@ -627,6 +627,7 @@ function DeforestPage({ config }: FarmersListProps) {
           position: 'absolute',
           top: '-9999px',
           left: '-9999px',
+          width: '794px',
         }}
       >
         <Grid size={12} px={2}>

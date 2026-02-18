@@ -117,16 +117,16 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           <img src={IdentiLogo} alt="logo" style={{ width: '100px' }} />
         </Box>
       </HeaderStyle>
-      <Box mt={2}>
+      <Box mt={1}>
         <Typography
           variant="body1"
-          sx={{ color: 'primary.main', fontWeight: 600 }}
+          sx={{ color: 'primary.main', fontWeight: 600, mb: 1 }}
         >
           Datos de origen
         </Typography>
         <Divider sx={{ borderWidth: '1px', borderColor: 'primary.main' }} />
       </Box>
-      <Box display="flex" flexWrap="wrap">
+      <Box display="flex" flexWrap="wrap" paddingInline={1}>
         {[
           {
             label: 'Agricultor',
@@ -138,7 +138,7 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           <Box
             key={index}
             width={{ xs: '100%', sm: '33.33%' }}
-            p={1}
+            p={0.5}
             boxSizing="border-box"
           >
             <Typography variant="caption">{item.label}</Typography>
@@ -152,16 +152,16 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           </Box>
         ))}
       </Box>
-      <Box mt={2}>
+      <Box mt={1}>
         <Typography
           variant="body1"
-          sx={{ color: 'primary.main', fontWeight: 600 }}
+          sx={{ color: 'primary.main', fontWeight: 600, mb: 1 }}
         >
           Detalle de parcela
         </Typography>
         <Divider sx={{ borderWidth: '1px', borderColor: 'primary.main' }} />
       </Box>
-      <Box display="flex" flexWrap="wrap">
+      <Box display="flex" flexWrap="wrap" paddingInline={1}>
         {[
           { label: 'Parcela', value: farm.farm_name || '-', fontSize: '16px' },
 
@@ -178,16 +178,16 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
             fontSize: '14px',
           },
           { label: 'País', value: farm.country || '-' },
-          {
-            label: 'Fecha de registro',
-            value: farm.date || '-',
-            fontSize: '14px',
-          },
+          // {
+          //   label: 'Fecha de registro',
+          //   value: farm.date || '-',
+          //   fontSize: '14px',
+          // },
         ].map((item, index) => (
           <Box
             key={index}
             width={{ xs: '100%', sm: '33.33%' }}
-            p={1}
+            p={0.5}
             boxSizing="border-box"
           >
             <Typography variant="caption">{item.label}</Typography>
@@ -201,9 +201,9 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
           </Box>
         ))}
       </Box>
-      <Box mt={2}>
+      <Box mt={1}>
         {/* aquí el mapa */}
-        <MapComponent value={farm.polygon} zoom={16} />
+        <MapComponent value={farm.polygon} zoom={16} sx={{ height: '330px' }} />
       </Box>
       <Box
         mt={2}
@@ -255,17 +255,17 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
         })}
         <Typography
           color="GrayText"
-          sx={{ fontSize: '0.7rem', marginTop: '8px' }}
+          sx={{ fontSize: '0.7rem' }}
           textAlign={'end'}
         >
           <em>*Información generada por Global Forest Watch</em>
         </Typography>
         <LegendDeforest showTitle={true} />
 
-        <Box mt={2}>
+        <Box>
           <Typography
             variant="body1"
-            sx={{ color: 'primary.main', fontWeight: 600 }}
+            sx={{ color: 'primary.main', fontWeight: 600, mb: 1 }}
           >
             Conclusión del informe
           </Typography>

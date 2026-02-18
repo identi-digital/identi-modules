@@ -38,7 +38,7 @@ import {
 // import { useContextAuth } from '~/ui/contexts/AuthContext';
 // import { BSON } from 'realm-web';
 import { EntityDetail } from '../../models/entities';
-// import { sortEntityDetailByOrder } from '@ui/utils/EntityUtils';
+import { sortEntityDetailByOrder } from '@ui/utils/EntityUtils';
 import DateRange from '@ui/components/atoms/DateField/DateRange';
 import { showMessage } from '@ui/utils/Messages';
 import { saveAs } from '@ui/utils/dowloadExcel';
@@ -51,7 +51,6 @@ import MapComponent from '@ui/components/molecules/MapComponent';
 import { getListRoute } from '@/modules/forms';
 import { FormService } from '../../services/forms';
 import { ModuleConfig } from '@/core/moduleLoader';
-// import { StorageService } from '@/services/storage';
 
 // const ChipSelectedStyled = styled(Box)<TypographyProps>(({ theme }) => ({
 //   display: 'flex',
@@ -150,83 +149,83 @@ export default function RecordsPage({ config }: RecordsPageProps) {
 
   const _processingData = useCallback(async (data: any[]) => {
     try {
-      console.log(data);
+      //// console.log(data);
       // const headers: HeaderType[] = [];
       const newArrElements: any[] = data.map((entity: any) => {
-        // const entityDetail: EntityDetail[] = sortEntityDetailByOrder(
-        //   entity.detail ?? [],
-        // );
-        // console.log(entity.detail);
-        // console.log(entity);
+        const entityDetail: EntityDetail[] = sortEntityDetailByOrder(
+          entity.detail,
+        );
+        //// console.log(entityDetail);
+        //// console.log(entity);
         const newDataRow: any = {
           id: entity._id,
           disabled_at: entity.disabled_at ?? null,
         };
-        entity.detail.forEach((detail: EntityDetail) => {
-          if (detail.type_value !== 'geojson') {
-            // si esta en la lista de headers no lo agrego
-            // if (headers.findIndex((item) => item.name === detail.name) === -1) {
-            //   headers.push({
-            //     name: detail.name,
-            //     display_name: detail.display_name,
-            //     header_type:
-            //       typeof detail.value === 'string' &&
-            //       detail.value.includes('geojson')
-            //         ? 'geojson'
-            //         : detail.type_value,
-            //     header_type_media: detail.type_media,
-            //     options: detail.option,
-            //   });
+        entityDetail.forEach((detail: EntityDetail) => {
+          // if (detail.type_value !== 'geojson') {
+          // si esta en la lista de headers no lo agrego
+          // if (headers.findIndex((item) => item.name === detail.name) === -1) {
+          //   headers.push({
+          //     name: detail.name,
+          //     display_name: detail.display_name,
+          //     header_type:
+          //       typeof detail.value === 'string' &&
+          //       detail.value.includes('geojson')
+          //         ? 'geojson'
+          //         : detail.type_value,
+          //     header_type_media: detail.type_media,
+          //     options: detail.option,
+          //   });
+          // }
+          if (detail.type_value === 'entity') {
+            //// console.log(detail);
+            let str = '-';
+            if (typeof detail.value === 'object') {
+              str = detail?.value?.display_name ?? '-';
+            }
+            if (Array.isArray(detail.value)) {
+              str =
+                detail?.value?.map((v: any) => v.display_name).join(', ') ??
+                '-';
+            }
+
+            newDataRow[detail.name] = str;
+            // const relation =
+            //   entity.entity_relations &&
+            //   entity.entity_relations.find(
+            //     (value: any) => value.detail_id === detail.id,
+            //   );
+            // if (relation) {
+            //   newDataRow[detail.name] = relation.representative_value;
             // }
-            if (detail.type_value === 'entity') {
-              // console.log(detail);
-              let str = '-';
-              if (typeof detail.value === 'object') {
-                str = detail?.value?.display_name ?? '-';
-              }
-              if (Array.isArray(detail.value)) {
-                str =
-                  detail?.value?.map((v: any) => v.display_name).join(', ') ??
-                  '-';
-              }
-
-              newDataRow[detail.name] = str;
-              // const relation =
-              //   entity.entity_relations &&
-              //   entity.entity_relations.find(
-              //     (value: any) => value.detail_id === detail.id,
-              //   );
-              // if (relation) {
-              //   newDataRow[detail.name] = relation.representative_value;
-              // }
-            } else if (detail.type_value === 'date') {
-              // formateo la fecha a dd-mm-yyyy si es de tipo date
-              if (!detail.value) {
-                newDataRow[detail.name] = '';
-              } else {
-                const date = new Date(detail.value).toLocaleDateString('es-ES');
-
-                if (date !== 'Invalid Date') {
-                  newDataRow[detail.name] = date.split('/').join('-');
-                } else {
-                  newDataRow[detail.name] = detail.value ?? '';
-                }
-              }
+          } else if (detail.type_value === 'date') {
+            // formateo la fecha a dd-mm-yyyy si es de tipo date
+            if (!detail.value) {
+              newDataRow[detail.name] = '';
             } else {
-              // quiero qu si puede ser un array el value se muestre separado por , los valores sino el valor
-              // para eso el value ,lo deserializo como array
-              try {
-                const value = JSON.parse(detail.value);
-                if (value && Array.isArray(value)) {
-                  newDataRow[detail.name] = value.join(', ');
-                } else {
-                  newDataRow[detail.name] = detail.value ?? '';
-                }
-              } catch {
+              const date = new Date(detail.value).toLocaleDateString('es-ES');
+
+              if (date !== 'Invalid Date') {
+                newDataRow[detail.name] = date.split('/').join('-');
+              } else {
                 newDataRow[detail.name] = detail.value ?? '';
               }
             }
+          } else {
+            // quiero qu si puede ser un array el value se muestre separado por , los valores sino el valor
+            // para eso el value ,lo deserializo como array
+            try {
+              const value = JSON.parse(detail.value);
+              if (value && Array.isArray(value)) {
+                newDataRow[detail.name] = value.join(', ');
+              } else {
+                newDataRow[detail.name] = detail.value ?? '';
+              }
+            } catch {
+              newDataRow[detail.name] = detail.value ?? '';
+            }
           }
+          // }
         });
         if (entity.created_at) {
           newDataRow['Fecha de creación'] = formatInTimeZone(
@@ -248,13 +247,12 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       // if (data.length > 0) {
       //   headers.push(headerDate);
       // }
-      // console.log(headers);
+      //// console.log(headers);
 
       // setHeaderNames(headers);
-      console.log(newArrElements);
       return newArrElements;
     } catch (error) {
-      console.log(error);
+      //// console.log(error);
       return [];
     }
   }, []);
@@ -274,7 +272,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
 
       let start = '';
       let end = '';
-      // console.log(dateRange);
+      //// console.log(dateRange);
       if (dateRange) {
         const startDate = new Date(
           dateRange?.startDate || new Date(new Date().getFullYear(), 0, 1),
@@ -284,20 +282,20 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         // al startDate le pongo el inicio del día
         if (startDate && dateRange?.startDate) {
           startDate.setHours(0, 0, 0, 0);
-          // console.log(startDate);
+          //// console.log(startDate);
         }
         // al endDate le pongo el final del día
         if (endDate && dateRange?.endDate) {
           endDate.setHours(23, 59, 59, 999);
-          // console.log(endDate);
+          //// console.log(endDate);
         }
 
         start = startDate.toISOString().slice(0, 10);
         end = endDate.toISOString().slice(0, 10);
-        // console.log(start);
-        // console.log(end);
+        //// console.log(start);
+        //// console.log(end);
       }
-      // console.log(filters);
+      //// console.log(filters);
 
       const get = await FormService.getRegistersByFormId(
         form_id ?? '',
@@ -310,11 +308,10 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         end,
       );
       const { items, total } = get;
-      console.log(items);
       if (items) {
         let newItems = [];
         newItems = await _processingData(items);
-        // console.log(newItems);
+        //// console.log(newItems);
         return {
           data: {
             data: {
@@ -328,7 +325,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       }
       // _processingData,
 
-      // console.log(get);
+      //// console.log(get);
       return get;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -339,29 +336,27 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   //   if (!key) return '';
   //   return new Promise<string>((resolve, reject) => {
   //     resolve('');
-  //     StorageService.presignedDownload(`${key}`, false)
-  //       .then((response) => {
-  //         console.log(response);
-  //         const { url_presigned } = response?.data?.data;
-  //         resolve(url_presigned);
-  //       })
-  //       .catch((error) => {
-  //         reject(error);
-  //       });
+  //     // getPresignedFile(`${key}`, true)
+  //     //   .then((response) => {
+  //     //     const { url_presigned, _expire } = response?.data?.data;
+  //     //     resolve(url_presigned);
+  //     //   })
+  //     //   .catch((error) => {
+  //     //     reject(error);
+  //     //   });
   //   });
   // };
 
   // const loadImageUrl = useCallback(async (element: any) => {
   //   try {
   //     if (!element?.value) return '';
-  //     const media = await StorageService.getMediaById(element?.value);
-  //     console.log(media);
-  //     // return '';
-  //     if (media && media.path) {
-  //       // setMedia(media);
-  //       const url: string = await getSignedUrl(media.path);
-  //       return url;
-  //     }
+  //     // const media = await getMediaById(element?.value);
+  //     return '';
+  //     // if (media && media.path) {
+  //     //   // setMedia(media);
+  //     //   const url: string = await getSignedUrl(media.path);
+  //     //   return url;
+  //     // }
   //   } catch (error) {
   //     return '';
   //   }
@@ -381,7 +376,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       50,
     )
       .then((resp: any) => {
-        // console.log(resp);
+        //// console.log(resp);
         if (resp) {
           const disposition = resp.headers['content-disposition'];
           let filename = 'export.xlsx';
@@ -395,7 +390,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
             type:
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           });
-          // console.log(blob);
+          //// console.log(blob);
 
           saveAs(blob, filename);
         }
@@ -409,14 +404,14 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   }, []);
   // const handleDownloadData = useCallback(async () => {
   //   setIsLoadingDownload(true);
-  //   // console.log(headers);
+  ////   // console.log(headers);
   //   const totalHeaders = headers.map(
   //     (element: TableHeadColumn) => element.text,
   //   );
   //   const mediaHeaders: any[] = headers.filter(
   //     (element: any) => element.header_type === 'media',
   //   );
-  //   // console.log(mediaHeaders);
+  ////   // console.log(mediaHeaders);
   //   const colsWch: any[] = [];
   //   const newHeaders = totalHeaders.map((element: any) => {
   //     colsWch.push({ wch: `${element ?? ''}`.toString().length + 8 });
@@ -474,11 +469,11 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   //       return values;
   //     }),
   //   );
-  //   // console.log(newHeaders);
-  //   // console.log(newRows);
+  ////   // console.log(newHeaders);
+  ////   // console.log(newRows);
   //   const sheetName = (module?.name ?? '').substring(0, 25);
-  //   console.log('newHeaders', newHeaders);
-  //   console.log('newRows', newRows);
+  ////   console.log('newHeaders', newHeaders);
+  ////   console.log('newRows', newRows);
   //   // downloadExcel(
   //   //   sheetName ?? '',
   //   //   `${sheetName ?? ''}.xlsx`,
@@ -491,7 +486,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   // const handleDelete = useCallback(
   //   async (row: DataRow) => {
   //     const { id } = row;
-  //     // console.log(row);
+  ////     // console.log(row);
   //     const result: boolean = await showYesNoQuestion(
   //       '¿Está seguro de que desea eliminar el registro?',
   //       '',
@@ -500,7 +495,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   //       ['Cancelar', 'Eliminar'],
   //     );
   //     if (result && id) {
-  //       console.log('disabledEntity', id);
+  ////       console.log('disabledEntity', id);
   //       // disabledEntity(id)
   //       //   .then(() => {
   //       //     // deshabilitar movimiento
@@ -532,7 +527,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   //       ['Cancelar', 'Restaurar'],
   //     );
   //     if (result && id) {
-  //       console.log('restoreEntity', id);
+  ////       console.log('restoreEntity', id);
   //       // restoreEntity(id)
   //       //   .then(() => {
   //       //     // habilitar movimiento
@@ -568,7 +563,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
     if (form_id) {
       FormService.getById(form_id)
         .then((resp: any) => {
-          console.log(resp);
+          //console.log(resp);
           const headers: HeaderType[] = [];
           // crear los headers a partir del schema
           // recorro el schema y las instructions
@@ -594,7 +589,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
               order: -1,
             };
             headers.push(headerDate);
-            console.log('newHeaders', headers);
+            //// console.log('newHeaders', headers);
             const sorted = headers.sort((a, b) => {
               const getPriority = (item: any) => {
                 if (item.order === -1) return 3; // último siempre
@@ -617,7 +612,6 @@ export default function RecordsPage({ config }: RecordsPageProps) {
 
               return 0;
             });
-            console.log(sorted);
             setHeaderNames(sorted);
           }
           setModule(resp);
@@ -631,7 +625,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
   }, [form_id]);
 
   useEffect(() => {
-    // console.log(headerNames);
+    //// console.log(headerNames);
     // crear los headers de la tabla según los datos que vengan( sera dinámico , si no tienen datos sera nulo)
     if (headerNames.length === 0) {
       const _setHeaders: any = [
@@ -646,7 +640,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       setHeaders(_setHeaders);
     } else {
       const _setHeaders: any = headerNames.map((header: HeaderType) => {
-        // console.log(header);
+        //console.log(header);
         if (header.header_type === 'geojson') {
           return {
             sorteable: true,
@@ -660,9 +654,10 @@ export default function RecordsPage({ config }: RecordsPageProps) {
               try {
                 if (row[header.name]) {
                   const parseValue = JSON.parse(row[header.name]);
+                  //// console.log(typeof parseValue);
                   let value = null;
-                  if (parseValue?.geojson) {
-                    value = parseValue.geojson;
+                  if (parseValue) {
+                    value = parseValue;
                   }
 
                   return (
@@ -689,8 +684,8 @@ export default function RecordsPage({ config }: RecordsPageProps) {
                 }
                 return <></>;
               } catch (error) {
-                // console.log(row);
-                // console.log(error);
+                //// console.log(row);
+                //// console.log(error);
                 return <></>;
               }
 
@@ -758,7 +753,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
                 if (option) {
                   return option?.value ?? '';
                 }
-                // console.log(row);
+                //// console.log(row);
               }
               return row[header.name];
             },
@@ -773,7 +768,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
             header_type: header.header_type,
             padding: 'none',
             render: (row: any) => {
-              // console.log(row);
+              //// console.log(row);
               // const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
               // // valido si el row[header.name] es un uuid
               // if (regex.test(row[header.name]) && header.options) {
@@ -784,7 +779,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
               //   if (option) {
               //     return option?.value ?? '';
               //   }
-              //   // console.log(row);
+              ////   // console.log(row);
               // }
 
               return row[header.name];
@@ -808,7 +803,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       //   padding: 'none',
       //   value: 'actions',
       //   render: (row: any) => {
-      //     // console.log(row);
+      ////     // console.log(row);
       //     return (
       //       <>
       //         {row?.disabled_at === null ? (

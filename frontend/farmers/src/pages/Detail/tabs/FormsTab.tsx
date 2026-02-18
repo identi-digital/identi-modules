@@ -9,6 +9,7 @@ import { MediaViewerProps } from '@/models/media';
 import MediaViewer from '@/ui/components/molecules/MediaComponent/MediaViewer';
 import DateCell from '@/ui/components/atoms/DateCell/DateCell';
 import { ScheduleRounded } from '@mui/icons-material';
+import MapComponent from '@ui/components/molecules/MapComponent';
 
 type FormsTabProps = {
   farmer: any;
@@ -26,8 +27,14 @@ const FormsTab: React.FC<FormsTabProps> = ({ farmerId }) => {
   const [mediaToShow, setMediaToShow] = useState<MediaViewerProps | null>(null);
   const [isOpenViewer, setIsOpenViewer] = useState<boolean>(false);
 
+  const [mapToShow, setMapToShow] = useState<any>(null);
+  const [isOpenMapViewer, setIsOpenMapViewer] = useState<boolean>(false);
+
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  const handleCloseMapViewer = useCallback((value: boolean) => {
+    setIsOpenMapViewer(value);
+  }, []);
   const handleCloseViewer = useCallback((value: boolean) => {
     setIsOpenViewer(value);
   }, []);
@@ -124,41 +131,76 @@ const FormsTab: React.FC<FormsTabProps> = ({ farmerId }) => {
           </Box>
 
           <Grid container spacing={2}>
-            {form.detail.map((element: EntityDetail) => (
-              <Grid size={{ xs: 12, md: 4 }} key={element.name}>
-                <CaptionStyled>{element.display_name ?? ''}</CaptionStyled>
+            {form.detail.map((element: EntityDetail) => {
+              // console.log(element);
+              let value = null;
+              if (element.type_value === 'geojson' && element.value) {
+                try {
+                  value = JSON.parse(element.value);
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+              return (
+                <Grid size={{ xs: 12, md: 4 }} key={element.name}>
+                  <CaptionStyled>{element.display_name ?? ''}</CaptionStyled>
 
-                {element.type_value === 'media' ? (
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <Link
-                      onClick={() => {
-                        setMediaToShow({
-                          value: element.value,
-                          type_media: element?.type_media ?? '',
-                        });
-                        setIsOpenViewer(true);
-                      }}
+                  {element.type_value === 'media' ? (
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      sx={{ cursor: 'pointer' }}
                     >
-                      Ver
-                    </Link>
-                  </Box>
-                ) : element.type_value === 'entity' ? (
-                  <FieldValueStyled>
-                    {Array.isArray(element?.value)
-                      ? element.value.map((v: any) => v.display_name).join(', ')
-                      : String(element?.value?.display_name ?? '-')}
-                  </FieldValueStyled>
-                ) : (
-                  <FieldValueStyled>
-                    {String(element.value ?? '-')}
-                  </FieldValueStyled>
-                )}
-              </Grid>
-            ))}
+                      <Link
+                        onClick={() => {
+                          setMediaToShow({
+                            value: element.value,
+                            type_media: element?.type_media ?? '',
+                          });
+                          setIsOpenViewer(true);
+                        }}
+                      >
+                        Ver
+                      </Link>
+                    </Box>
+                  ) : element.type_value === 'entity' ? (
+                    <FieldValueStyled>
+                      {Array.isArray(element?.value)
+                        ? element.value
+                            .map((v: any) => v.display_name)
+                            .join(', ')
+                        : String(element?.value?.display_name ?? '-')}
+                    </FieldValueStyled>
+                  ) : element.type_value === 'geojson' && value !== null ? (
+                    <>
+                      <Box
+                        display={'flex'}
+                        sx={{
+                          '&:hover': {
+                            cursor: 'pointer',
+                          },
+                        }}
+                        justifyContent={'flex-start'}
+                        alignItems={'center'}
+                      >
+                        <Link
+                          onClick={() => {
+                            setMapToShow(value);
+                            setIsOpenMapViewer(true);
+                          }}
+                        >
+                          Ver mapa
+                        </Link>
+                      </Box>
+                    </>
+                  ) : (
+                    <FieldValueStyled>
+                      {String(element.value ?? '-')}
+                    </FieldValueStyled>
+                  )}
+                </Grid>
+              );
+            })}
           </Grid>
         </Paper>
       ))}
@@ -177,6 +219,13 @@ const FormsTab: React.FC<FormsTabProps> = ({ farmerId }) => {
           element={mediaToShow}
           open={isOpenViewer}
           handleClose={handleCloseViewer}
+        />
+      )}
+      {isOpenMapViewer && (
+        <MapComponent
+          handleClose={handleCloseMapViewer}
+          open={isOpenMapViewer}
+          value={mapToShow}
         />
       )}
     </>

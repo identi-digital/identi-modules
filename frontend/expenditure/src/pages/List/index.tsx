@@ -10,6 +10,7 @@ import { ModuleConfig } from '@/core/moduleLoader';
 import { TableHeadColumn } from '@/ui/components/molecules/TableHead/TableHead';
 import { Transfer } from '../../models/transfer';
 import { fCurrency } from '@/ui/utils/formatNumber';
+import DateCell from '@/ui/components/atoms/DateCell/DateCell';
 // import { Visibility } from '@mui/icons-material';
 
 interface ExpenditureListProps {
@@ -17,10 +18,22 @@ interface ExpenditureListProps {
 }
 
 const statusNames: any = {
-  TO_DO: 'En proceso',
-  PENDING: 'Pendiente',
-  COMPLETED: 'Completado',
-  FAILED: 'Fallido',
+  TO_DO: {
+    display_name: 'En proceso',
+    color: 'default',
+  },
+  PENDING: {
+    display_name: 'Pendiente',
+    color: 'warning',
+  },
+  COMPLETED: {
+    display_name: 'Completado',
+    color: 'success',
+  },
+  FAILED: {
+    display_name: 'Fallido',
+    color: 'error',
+  },
 };
 
 const ListPage: React.FC<ExpenditureListProps> = ({ config }) => {
@@ -36,9 +49,8 @@ const ListPage: React.FC<ExpenditureListProps> = ({ config }) => {
       order: string,
       search: string,
     ): Promise<AxiosResponse<any>> => {
-      console.log(page, perPage, orderBy, order, search);
+      // console.log(page, perPage, orderBy, order, search);
       const data = await ExpenditureService.getTransfers(
-        // 'TO_DO',
         page,
         perPage,
         orderBy || 'created_at',
@@ -92,12 +104,28 @@ const ListPage: React.FC<ExpenditureListProps> = ({ config }) => {
       {
         sorteable: false,
         align: 'left',
+        text: 'Fecha',
+        value: 'created_at',
+        padding: 'none',
+        render: (row: Transfer) => (
+          <Typography>
+            {row.created_at ? <DateCell date={row.created_at} /> : '...'}
+          </Typography>
+        ),
+      },
+      {
+        sorteable: false,
+        align: 'left',
         text: 'Estado',
         value: 'status',
         padding: 'none',
         render: (row: Transfer) => (
           <>
-            <Chip label={statusNames[row.status] ?? 'Sin estado'} />
+            <Chip
+              label={statusNames[row.status].display_name ?? 'Sin estado'}
+              color={statusNames[row.status].color}
+              variant="outlined"
+            />
           </>
         ),
       },

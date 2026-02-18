@@ -16,6 +16,7 @@ export interface Agent {
 
 export interface AgentCreate extends Agent {
   username: string;
+  tenant_id: string;
 }
 
 export interface AgentList extends Agent {

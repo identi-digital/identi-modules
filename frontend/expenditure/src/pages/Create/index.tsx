@@ -21,11 +21,11 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ModuleConfig } from '@/core/moduleLoader';
-import { useCallback, useEffect, useState } from 'react';
-import { Farmer, FarmerGet } from '@/modules/farmers/src/models/farmer';
+import { useCallback, useState } from 'react';
+import { FarmerGet } from '@/modules/farmers/src/models/farmer';
 import { TransferCreate } from '../../models/transfer';
 import { ExpenditureService } from '../../services/expenditure';
-import { getListRoute, getModuleRoute } from '@/modules/expenditure';
+import { getListRoute } from '@/modules/expenditure';
 import { FarmerService } from '@/modules/farmers/src/services/farmer';
 import useDebounce from '@/ui/hooks/use_debounce';
 import React from 'react';
@@ -47,17 +47,12 @@ const CreatePage: React.FC<CreatePageProps> = ({ config }) => {
   const textDebounce = useDebounce(search, 500);
   const [selectedFarmer, setSelectedFarmer] = useState<FarmerGet | null>(null);
   const [amount, setAmount] = useState<number>(0);
-  const [cci, setCci] = useState<string>('');
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
 
   const handleChangeAmount = (value: number) => {
     setAmount(value);
-  };
-
-  const handleChangeCci = (value: string) => {
-    setCci(value);
   };
 
   const handleCreateTransfer = async () => {
@@ -69,7 +64,7 @@ const CreatePage: React.FC<CreatePageProps> = ({ config }) => {
           first_name: selectedFarmer.first_name,
           last_name: selectedFarmer.last_name,
           amount: amount,
-          cci: cci,
+          cci: selectedFarmer.bank_cci ?? '',
         };
         await ExpenditureService.createTransfer(transfer);
 
@@ -275,13 +270,13 @@ const CreatePage: React.FC<CreatePageProps> = ({ config }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2">Banco</Typography>
                   <Typography variant="body2" fontWeight="bold">
-                    BCP
+                    {selectedFarmer?.bank_name || 'BCP'}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2">Cuenta</Typography>
                   <Typography variant="body2" fontWeight="bold">
-                    191-98745632-0-88
+                    {selectedFarmer?.bank_cc || '***-****-****-****'}
                   </Typography>
                 </Box>
                 <Box
@@ -300,7 +295,7 @@ const CreatePage: React.FC<CreatePageProps> = ({ config }) => {
                     fontWeight="bold"
                     color="#f37021"
                   >
-                    002-191-0098745632088-54
+                    {selectedFarmer?.bank_cci || '***-****-****-****-****'}
                   </Typography>
                 </Box>
               </Stack>
