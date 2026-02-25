@@ -164,7 +164,7 @@ class StorageS3Manager(StorageInterface):
     
     def post_presigned_url(
         self,
-        object_name: str,
+        file_name: str,
         expiration: int = 3600,
         bucket: Optional[str] = None,
         file_type: Optional[str] = None,
@@ -172,13 +172,13 @@ class StorageS3Manager(StorageInterface):
         """Genera una URL pre-firmada para acceso temporal al archivo
         
         Args:
-            object_name: Ruta y nombre del archivo
+            file_name: Ruta y nombre del archivo
             expiration: Tiempo de expiraci??n en segundos
             is_download: Si es True, genera URL para descargar (GET), si es False para subir (PUT)
             bucket: Bucket a usar (opcional)
         """
         bucket = bucket or self.AWS_BUCKET
-        key_url = self._get_full_path(object_name)
+        key_url = self._get_full_path(file_name)
         
         try:
             # URL para subir
@@ -200,8 +200,7 @@ class StorageS3Manager(StorageInterface):
             key: str,
             expiration: int = 3600,
             is_download: bool = True,
-            bucket: Optional[str] = None,
-            **kwargs
+            bucket: Optional[str] = None
         ) -> str:
             """Genera una URL pre-firmada para acceso temporal al archivo
             

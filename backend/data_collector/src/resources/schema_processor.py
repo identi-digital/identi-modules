@@ -37,9 +37,10 @@ def process_schema_add_data_input_to_metadata(schema: Dict[str, Any]) -> Dict[st
                 instruction["metadata"] = {}
             
             # Unificar schema_input y schema_input_advanced, luego procesar a data_input
-            data_input = _process_inputs_to_data_input(instruction)
-            if data_input:
-                instruction["metadata"]["data_input"] = data_input
+            if not instruction.get("metadata", {}).get("data_input"):
+                data_input = _process_inputs_to_data_input(instruction)
+                if data_input:
+                    instruction["metadata"]["data_input"] = data_input
         except Exception as e:
             # Si hay un error procesando una instrucción, continuar con las demás
             print(f"⚠️  Error procesando instrucción para data_input: {e}")

@@ -339,14 +339,6 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
           top: '-9999px',
           left: '-9999px',
           width: '794px',
-          // position: 'fixed',
-          // top: 0,
-          // left: 0,
-          // width: '800px', // 👈 ancho fijo real
-          // backgroundColor: '#fff',
-          // zIndex: -1,
-          // opacity: 0,
-          // pointerEvents: 'none',
         }}
       >
         <Grid size={12} px={1}>

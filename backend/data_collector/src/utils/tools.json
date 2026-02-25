@@ -129,65 +129,6 @@
   },
   {
     "category_name": "canal identi connect",
-    "sub_category_name": "Punto georeferencial",
-    "name": "Punto georeferencial",
-    "place_holder": "Punto georeferencial",
-    "description": "Permite al usuario ingresar un punto georeferencial",
-    "color": "#BBF7D0",
-    "icon": "all_inclusive",
-    "on_action": null,
-    "schema_variables": null,
-    "schema_input": [
-      {
-        "name": "title",
-        "display_name": "Pregunta",
-        "place_holder": "Escribe el texto aquí",
-        "description": "",
-        "type_input": "text",
-        "is_increasing": false,
-        "is_optional": false,
-        "is_gather_name": true,
-        "is_representative": true,
-        "is_condition": false,
-        "options": [],
-        "schema_input": [],
-        "rules": {}
-      },
-      {
-        "name": "description",
-        "display_name": "Descripción",
-        "place_holder": "Descripción opcional",
-        "description": "",
-        "type_input": "text",
-        "is_increasing": false,
-        "is_optional": true,
-        "is_gather_name": false,
-        "is_representative": false,
-        "is_condition": false,
-        "options": [],
-        "schema_input": [],
-        "rules": {}
-      },
-      {
-        "name": "type",
-        "type_input": "text",
-        "is_hidden": true,
-        "value": "location"
-      }
-    ],
-    "config_form": {
-      "is_gather": true,
-      "is_channel": true,
-      "condition": null,
-      "is_unhappy_cond": false,
-      "is_success": true
-    },
-    "created_at": "2024-04-18T11:42:00",
-    "disabled_at": null,
-    "updated_at": "2024-04-18T11:42:00"
-  },
-  {
-    "category_name": "canal identi connect",
     "sub_category_name": "Fecha",
     "name": "Fecha",
     "place_holder": "Escoge la fecha",

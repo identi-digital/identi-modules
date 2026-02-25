@@ -27,9 +27,6 @@ export interface FarmerGet extends Farmer {
   department: EntityRel;
   province: EntityRel;
   district: EntityRel;
-  bank_name?: string;
-  bank_cc?: string;
-  bank_cci?: string;
 }
 
 export interface FarmerLocation {

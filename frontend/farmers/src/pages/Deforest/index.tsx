@@ -334,6 +334,7 @@ function DeforestPage({ config }: FarmersListProps) {
                       handleDownloadPDF();
                     }}
                     size="small"
+                    loading={isLoadingReport && row.id === dataSelected?.id}
                     //   variant="contained"
                     // color="error"
                     //   style={{ width: '140px', height: '30px' }}
@@ -349,7 +350,7 @@ function DeforestPage({ config }: FarmersListProps) {
       },
     ];
     setHeaders(_setHeaders);
-  }, []);
+  }, [isLoadingReport]);
 
   useEffect(() => {
     _handleGetDeforestMetrics();
@@ -646,8 +647,11 @@ function DeforestPage({ config }: FarmersListProps) {
               district: dataSelected?.district?.description ?? '',
               polygon: dataSelected?.geometry ?? DEFAULT_GEOJSON,
               natural_forest_coverage:
-                dataSelected?.natural_forest_coverage_ha ?? 0,
-              natural_forest_lost: dataSelected?.natural_forest_loss_ha ?? 0,
+                dataSelected?.deforestation_request
+                  ?.natural_forest_coverage_ha ?? 0,
+              natural_forest_lost:
+                dataSelected?.deforestation_request?.natural_forest_loss_ha ??
+                0,
               date: new Date(dataSelected?.created_at ?? '').toLocaleDateString(
                 'es-ES',
               ),
@@ -671,8 +675,11 @@ function DeforestPage({ config }: FarmersListProps) {
             departamento: dataSelected?.department?.description ?? '',
             district: dataSelected?.district?.description ?? '',
             polygon: dataSelected?.geometry ?? DEFAULT_GEOJSON,
-            natural_forest_coverage: 0,
-            natural_forest_lost: dataSelected?.natural_forest_loss_ha ?? 0,
+            natural_forest_coverage:
+              dataSelected?.deforestation_request?.natural_forest_coverage_ha ??
+              0,
+            natural_forest_lost:
+              dataSelected?.deforestation_request?.natural_forest_loss_ha ?? 0,
             date: new Date(dataSelected?.created_at ?? '').toLocaleDateString(
               'es-ES',
             ),

@@ -57,7 +57,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
     viewMode,
     entityValuesArray,
     updateEntityFieldValue,
-    loadMoreEntityValues,
+    // loadMoreEntityValues,
     isEdit,
     entityDetail,
     itemValue,

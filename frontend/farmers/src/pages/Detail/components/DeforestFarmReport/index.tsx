@@ -59,6 +59,7 @@ const DeforestFarm: React.FC<DeforestFarmProps> = (
   props: DeforestFarmProps,
 ) => {
   const { farm } = props;
+  console.log(farm);
   // let value = 0;
   // if (
   //   !isNaN(farm.natural_forest_coverage) &&

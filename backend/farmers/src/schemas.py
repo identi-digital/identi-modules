@@ -178,7 +178,7 @@ class FarmResponse(BaseModel):
     department: Optional[DepartmentInfo] = None
     province: Optional[ProvinceInfo] = None
     district: Optional[DistrictInfo] = None
-    crops: list[CropResponse] = []  # Lista de cultivos asociados a la parcela
+    crops: Optional[list[CropResponse]] = []  # Lista de cultivos asociados a la parcela
     deforestation_request: Optional[DeforestationRequestInfo] = None  # Información de deforestación
     created_at: datetime
     updated_at: datetime

@@ -15,7 +15,7 @@ import { Module, ModuleDefault } from '../../models/forms';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import ModuleNameTab from './Tabs/ModuleNameTab';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // import routes from '~/routes/routes';
 import { v4 as uuidv4 } from 'uuid';
 import { showMessage, showYesNoQuestion } from '@ui/utils/Messages';
@@ -42,7 +42,7 @@ export default function FormsCreatePage({ config }: FormsCreateProps) {
   // eslint-disable-next-line
   // @ts-ignore
   const { id_module, type_entity } = useParams();
-  const { state } = useLocation();
+  // const { state } = useLocation();
   // console.log(state?.type ?? '');
   const [activeStep, setActiveStep] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -109,8 +109,8 @@ export default function FormsCreatePage({ config }: FormsCreateProps) {
             instruction_start: '',
           };
           // agregar la imagen del modulo
-          console.log('createModuleSchema', newSchema);
-          console.log('createModule', moduleObj);
+          // console.log('createModuleSchema', newSchema);
+          // console.log('createModule', moduleObj);
           delete moduleObj['schema_id'];
           setIsCreating(true);
           FormService.createForm(moduleObj)

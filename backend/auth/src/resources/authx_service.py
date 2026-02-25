@@ -61,6 +61,8 @@ class AuthXService:
         data = {
             "grant_type": "client_credentials",
             "scope": "identi_scopes",
+            "tenant_id": self.TENANT,
+            "application_context_id": self.APP_CONTEXT_ID
         }
 
         response = requests.post(url, headers=headers, json=data)
@@ -151,11 +153,11 @@ class AuthXService:
             'cell_number': cell_number,
             'sms_number': sms_number,
             'email': email,
-            'organization_tenant_id': self.TENANT,
             'country': country,
+            'organization_tenant_id': self.TENANT,
             'application_context_id': self.APP_CONTEXT_ID
         }
-        print(data)
+        
         response = requests.post(url, headers=headers , data=json.dumps(data))
         if response.status_code // 100 == 2:
             return response.json()

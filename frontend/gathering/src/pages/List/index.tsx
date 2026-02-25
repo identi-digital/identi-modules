@@ -39,19 +39,19 @@ import { Module } from '@/modules/forms/src/models/forms';
 import RegisterFormDialog from '@/modules/forms/src/components/RegisterFormDialog';
 import { saveAs } from '@/ui/utils/dowloadExcel';
 
-type DataRow = {
-  id?: string;
-  idRef: string;
-  entity_name: string;
-  lot_count: number;
-  gathering_count: number;
-  balance: number;
-  product_sum: number;
-  expenses_sum: number;
-  date: string;
-  relations?: any[];
-  name_detail?: any;
-};
+// type DataRow = {
+//   id?: string;
+//   idRef: string;
+//   entity_name: string;
+//   lot_count: number;
+//   gathering_count: number;
+//   balance: number;
+//   product_sum: number;
+//   expenses_sum: number;
+//   date: string;
+//   relations?: any[];
+//   name_detail?: any;
+// };
 
 type GatheringPageProps = {
   config?: ModuleConfig;
@@ -68,7 +68,7 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
   // console.log(config);
   // const [moduleGatheringId, setModuleGatheringId] = useState<string>('');
   const [headers, setHeaders] = useState<TableHeadColumn[]>([]);
-  const [dataRows, setDataRows] = useState<DataRow[]>([]);
+  // const [dataRows, setDataRows] = useState<DataRow[]>([]);
   // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadData, setIsLoadData] = useState<boolean>(false);
   const [rowSelected, setRowSelected] = useState<any>(null);

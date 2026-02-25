@@ -142,7 +142,7 @@ class Funcionalities:
                 sms_number=identity_data.sms_number,
                 eid=identity_data.eid,
                 first_name=identity_data.first_name,
-                last_name=identity_data.last_name,
+                last_name=identity_data.last_name
             )
             identity_dict['sub'] = register_response['entity_id']
             # Los claims se pueden generar aquí o dejar vacíos para que authz los complete

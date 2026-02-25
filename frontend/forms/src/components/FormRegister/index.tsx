@@ -256,7 +256,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   };
 
   const updateEntityDetail = (id: string, value: any) => {
-    // console.log(id, value);
+    console.log(id, value);
     setEntityDetail((prevItems: EntityDetailMetadata[]) =>
       prevItems.map((item: EntityDetailMetadata) => {
         if (item.id === id) {
@@ -349,6 +349,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
 
   const updateEntityFieldValue = useCallback(
     (id: string, name: string, value: any) => {
+      console.log(id, name, value);
       handleUpdateArrayEntitiesValues(id, name, value);
       // filtro para parcelas por productor
       // if (
@@ -868,14 +869,26 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
       const fieldsToValidate = arrayToEvaluate.filter(Boolean);
       for (const field of fieldsToValidate) {
         if (field) {
-          const validateResponse = await FormService.validateUniqueField({
-            field_name: field.name,
-            entity_name: module.entity_name,
-            entity_field: {
-              [field.name]: field.value,
-            },
-            ...field,
-          });
+          let validateResponse = null;
+          if (module?.form_purpose === 'complementary') {
+            validateResponse = await FormService.validateUniqueFieldComplementary(
+              {
+                entity_field: {
+                  [field.name]: field.value,
+                },
+                form_id: module.id ?? '',
+              },
+            );
+          } else {
+            validateResponse = await FormService.validateUniqueField({
+              field_name: field.name,
+              entity_name: module.entity_name,
+              entity_field: {
+                [field.name]: field.value,
+              },
+              ...field,
+            });
+          }
 
           if (validateResponse?.exist) {
             newErrors = {

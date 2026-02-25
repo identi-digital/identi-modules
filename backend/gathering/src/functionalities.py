@@ -3,7 +3,6 @@ from typing import Optional, List, Literal
 from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case, cast, Date
-
 from .models.lots import LotModel
 from .models.gatherers import GathererModel
 from .models.gathering_centers import GatheringCenterModel
@@ -2185,19 +2184,19 @@ class Funcionalities:
         ).all()
         
         # Calcular balance total
-        total_balance = sum(float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount) for m in movements)
+        total_balance = sum(float(m.ammount) for m in movements)
         today = datetime.today().date()
         first_day_month = today.replace(day=1)
         return BalanceSummaryGatherersResponse(
                     total_balance=total_balance,
                     average_balance=total_balance / len(movements) if movements else 0,
                     daily_amount=sum(
-                        float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount)
+                        float(m.ammount)
                         for m in movements
                         if m.created_at.date() == today
                     ),
                     monthly_amount=sum(
-                        float(m.ammount) if m.type_movement == BalanceMovementTypeEnum.RECHARGE else -float(m.ammount)
+                        float(m.ammount)
                         for m in movements
                         if m.created_at.date() >= first_day_month
                     )

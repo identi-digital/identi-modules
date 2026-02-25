@@ -13,7 +13,7 @@ class PresignedUploadResponse(BaseModel):
     success: bool
     url: str
     expiration: int
-    object_name: str
+    key: str
 
 
 class PresignedDownloadResponse(BaseModel):

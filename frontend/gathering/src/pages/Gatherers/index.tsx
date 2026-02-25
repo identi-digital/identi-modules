@@ -195,6 +195,13 @@ export default function GatherersList({ config }: GatherersListProps) {
         ),
       },
       {
+        sorteable: false,
+        align: 'left',
+        text: 'DNI',
+        value: 'dni',
+        padding: 'none',
+      },
+      {
         sorteable: true,
         align: 'center',
         text: 'Estado',

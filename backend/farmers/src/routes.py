@@ -118,6 +118,9 @@ def update_farm(
     farm = svc.patch_farms(farm_id, farm_data, token=token)
     if not farm:
         raise HTTPException(status_code=404, detail="Farm no encontrada")
+    
+    return farm
+
 @router.post("/farms/{farm_id}/geometry", response_model=FarmGeometryResponse)
 def upload_farm_geometry(
     farm_id: UUID,

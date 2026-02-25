@@ -153,8 +153,15 @@ export default function AgentsList({ config }: AgentsListProps) {
         ),
       },
       {
-        sorteable: true,
-        align: 'center',
+        sorteable: false,
+        align: 'left',
+        text: 'DNI',
+        value: 'dni',
+        padding: 'none',
+      },
+      {
+        sorteable: false,
+        align: 'left',
         text: 'Estado',
         padding: 'none',
         value: 'active',
@@ -168,7 +175,7 @@ export default function AgentsList({ config }: AgentsListProps) {
         },
       },
       {
-        sorteable: true,
+        sorteable: false,
         align: 'left',
         text: 'Última visita',
         padding: 'none',
