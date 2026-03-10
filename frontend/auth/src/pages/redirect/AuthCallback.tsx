@@ -21,16 +21,10 @@ import {
   Typography,
 } from '@mui/material';
 import { Business } from '@mui/icons-material';
-// import { getCredentials } from '~/service/parse';
-// import Parse from 'parse';
 import ILoading from '@ui/components/molecules/IdentiLoading';
-// import { JWT_PREFIX } from '~/config/environment';
-// import { useFeaturesContext } from '~/ui/contexts/FeaturesContext';
-
-// const JWT_PREFIX = 'Bearer';
 
 const AuthCallback: React.FC = () => {
-  const { setUser } = useAuth();
+  const { setUser, setOrganizationTenant } = useAuth();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [continueLoading, setContinueLoading] = useState<boolean>(false);
@@ -58,12 +52,6 @@ const AuthCallback: React.FC = () => {
           const authx_user = await getEntity();
           // console.log(authx_user);
           if (authx_user && authx_user.status === 200) {
-            // obtengo las features
-            // const assignFeatures = await assignFeaturesData();
-
-            // if (!assignFeatures) {
-            //   throw new Error('No se pudo asignar las features');
-            // }
             const data = authx_user?.data;
             if (data) {
               // console.log(data);
@@ -130,6 +118,7 @@ const AuthCallback: React.FC = () => {
           }
           if (tenants.length === 1) {
             localStorage.setItem('tenant_id', tenants[0].tenant_id);
+            setOrganizationTenant && setOrganizationTenant(tenants[0]);
             const authx_resp = await exchangeToken(tenants[0].tenant_id);
             const { access_token } = authx_resp;
             localStorage.setItem('token', access_token);
@@ -137,35 +126,11 @@ const AuthCallback: React.FC = () => {
             const authx_user = await getEntity();
             console.log(authx_user);
             if (authx_user) {
-              // obtengo las features
-              // const assignFeatures = await assignFeaturesData();
-              // console.log('assignFeatures', assignFeatures);
-              // if (!assignFeatures) {
-              //   throw new Error('No tienes permisos para acceder a esta plataforma.');
-              // }
               const data = authx_user;
               if (data) {
-                // if (data['identi_roles'].includes('userChild') || data['identi_roles'].includes('userParent')) {
-                // console.log(data);
-                // console.log(data);
                 setUser && setUser(data);
-                // obtengo credenciales de parse server
-                // const respCredentials = await getCredentials();
-                // const { appId, javascriptKey, serverURL } = respCredentials?.data?.payload?.keys;
-                // Parse.initialize(appId, javascriptKey);
-                // Parse.serverURL = serverURL;
-                // Parse.CoreManager.set('authorization', `${JWT_PREFIX} ${access_token}`);
                 setLoading(false);
                 navigate('/farmers');
-                // } else {
-                //   alertMessage('No tiene permisos para acceder a esta organización.');
-                //   setLoading(false);
-                //   localStorage.clear();
-                //   sessionStorage.clear();
-                //   navigate('/');
-                //   return;
-                //   // navigate('/');
-                // }
               }
             }
           } else {
@@ -195,10 +160,6 @@ const AuthCallback: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
-
-  // useEffect(() => {
-  //   console.log('ejecutando callback');
-  // }, []);
 
   return (
     <Box
@@ -265,7 +226,11 @@ const AuthCallback: React.FC = () => {
                     <ListItem key={tenant.tenant_id} disablePadding divider>
                       <ListItemButton
                         selected={tenantSelected === tenant.tenant_id}
-                        onClick={() => handleSelectTenant(tenant.tenant_id)}
+                        onClick={() => {
+                          handleSelectTenant(tenant.tenant_id);
+                          setOrganizationTenant &&
+                            setOrganizationTenant(tenant);
+                        }}
                         sx={
                           tenantSelected === tenant.tenant_id
                             ? {
@@ -278,10 +243,6 @@ const AuthCallback: React.FC = () => {
                                 '&.Mui-selected:hover': {
                                   background: 'rgba(255, 107, 53, 0.04)',
                                 },
-
-                                // '&:hover': {
-                                //   background: 'rgba(255, 107, 53, 0.04)'
-                                // }
                               }
                             : {
                                 '&:hover': {

@@ -322,3 +322,21 @@ class UniqueFieldValidationRequest(BaseModel):
 class UniqueFieldValidationResponse(BaseModel):
     """Respuesta de validación de campo único"""
     exist: bool  # True si el valor ya existe, False si no existe
+
+# Unique Field Complementary Validation Schemas
+class UniqueFieldComplementaryValidationRequest(BaseModel):
+    """Request para validar si un campo es único en un registro complementario"""
+    entity_field: Dict[str, Any]  # Campo y valor a validar (ej: {"dni": "12345678"})
+    form_id: UUID  # ID del formulario en el que se encuentra el registro complementario
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "entity_field": {"dni": "12345678"},
+                "form_id": "uuid..."
+            }
+        }
+
+class UniqueFieldComplementaryValidationResponse(BaseModel):
+    """Respuesta de validación de campo único en registro complementario"""
+    exist: bool  # True si el valor ya existe, False si no existe

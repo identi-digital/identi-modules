@@ -90,8 +90,8 @@ const SalesTable: React.FC<SalesTableProps> = ({ rows, headers }) => {
                               {head.parse === 'date' && (
                                 <DateCell
                                   date={new Date(row[head['value']])}
-                                  showTime={true}
-                                  inline
+                                  showTime={false}
+                                  // inline
                                 />
                               )}
                             </>

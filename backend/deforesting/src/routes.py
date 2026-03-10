@@ -101,8 +101,8 @@ def get_farms_deforestation_paginated(
     
     **Estados de deforestación basados en pérdida de bosque natural:**
     - **baja/nula**: natural_forest_loss_ha === 0
-    - **parcial**: 0 < natural_forest_loss_ha <= 0.2
-    - **crítica**: natural_forest_loss_ha > 0.2
+    - **parcial**: 0 < natural_forest_loss_ha <= 0.4
+    - **crítica**: natural_forest_loss_ha > 0.4
     
     **Respuesta incluye:**
     - Código/nombre de la parcela
@@ -139,10 +139,10 @@ def get_farm_deforestation_metrics(
     - **baja_nula**: Parcelas con deforestación baja/nula (loss === 0)
       - count: Cantidad de parcelas
       - percentage: Porcentaje del total
-    - **parcial**: Parcelas con deforestación parcial (0 < loss <= 0.2)
+    - **parcial**: Parcelas con deforestación parcial (0 < loss <= 0.4)
       - count: Cantidad de parcelas
       - percentage: Porcentaje del total
-    - **critica**: Parcelas con deforestación crítica (loss > 0.2)
+    - **critica**: Parcelas con deforestación crítica (loss > 0.4)
       - count: Cantidad de parcelas
       - percentage: Porcentaje del total
     """
@@ -165,8 +165,8 @@ def get_farmer_deforestation_metrics(
     Para cada productor, se calcula el promedio de natural_forest_loss_ha de todas 
     sus parcelas evaluadas, y se clasifica en:
     - **baja/nula**: promedio === 0
-    - **parcial**: 0 < promedio <= 0.2
-    - **crítica**: promedio > 0.2
+    - **parcial**: 0 < promedio <= 0.4
+    - **crítica**: promedio > 0.4
     
     **Métricas incluidas:**
     - **total_farmers_evaluated**: Total de productores evaluados

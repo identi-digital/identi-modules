@@ -1,4 +1,5 @@
 import { getModuleApi, getServiceApi } from '@/core/apiRegistry';
+import { ValidateUniqueFieldComplementaryRequest } from '../models/forms_api';
 const api = () => getModuleApi('forms');
 const planeApi = () => getServiceApi('plane');
 
@@ -41,6 +42,12 @@ export const FormService = {
 
   validateUniqueField(data: any) {
     return api().post('/validate-unique-field', data);
+  },
+
+  validateUniqueFieldComplementary(
+    data: ValidateUniqueFieldComplementaryRequest,
+  ) {
+    return api().post('/validate-unique-field-complementary', data);
   },
 
   getListEntities(

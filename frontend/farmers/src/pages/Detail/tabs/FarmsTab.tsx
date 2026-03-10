@@ -1,6 +1,11 @@
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CaptionStyled, FieldValueStyled, TitleSectionStyled } from '..';
+import {
+  BoxIconButton,
+  CaptionStyled,
+  FieldValueStyled,
+  TitleSectionStyled,
+} from '..';
 import Paper from '@/ui/components/atoms/Paper/Paper';
 import Button from '@/ui/components/atoms/Button/Button';
 import PolygonDialog from '../components/PolygonDialog';
@@ -11,6 +16,13 @@ import UploadGeoFile from '../components/UploadGeoFile';
 import { FarmService } from '../../../services/farm';
 import { showMessage } from '@/ui/utils/Messages';
 import { FarmerGet } from '../../../models/farmer';
+import { BorderColorOutlined } from '@mui/icons-material';
+import FarmEditDialog from '../components/FarmEditDialog';
+import {
+  trackFarmEdit,
+  trackFarmUploadPolygon,
+  trackFarmViewPolygon,
+} from '../../../analytics/farms/track';
 
 type FarmsTabProps = {
   // farmerId: string;
@@ -29,36 +41,63 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [uploadingPolygon, setUploadingPolygon] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
+  const [openFarmEditDialog, setOpenFarmEditDialog] = useState<boolean>(false);
+  // const [refresh, setRefresh] = useState<boolean>(false);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  const handleFarmEditDialog = () => {
+    setOpenFarmEditDialog((prev: boolean) => !prev);
+  };
+
+  const handlePatchFarm = useCallback((id: string, data: any) => {
+    FarmService.patchFarm(id, data)
+      .then(() => {
+        showMessage('', 'Información guardada correctamente.', 'success');
+        setFarms([]);
+        setPage(1);
+        setTotal(0);
+        setHasMore(true);
+        setOpenFarmEditDialog(false);
+        trackFarmEdit({
+          farm_id: id,
+        });
+      })
+      .catch(() => {
+        showMessage(
+          '',
+          'Problemas al guardar información, inténtelo nuevamente.',
+          'error',
+        );
+      });
+  }, []);
+
   const loadFarms = useCallback(async () => {
-    if (loading) return;
+    if (loading || !hasMore) return;
     if (total && farms.length >= total) return;
 
     setLoading(true);
+    try {
+      const res = await FarmerService.getFarmsByFarmerId(
+        farmer.id,
+        page,
+        perPage,
+      );
 
-    const res = await FarmerService.getFarmsByFarmerId(
-      farmer.id,
-      page,
-      perPage,
-    );
+      if (res.items.length === 0) {
+        setHasMore(false);
+        return;
+      }
+      setFarms((prev) => {
+        const map = new Map(prev.map((f: FarmGet) => [f.id, f]));
+        res.items.forEach((f: FarmGet) => map.set(f.id, f));
+        return Array.from(map.values());
+      });
 
-    if (res.items.length === 0) {
-      setHasMore(false);
+      setTotal(res.total);
+      setPage((prev) => prev + 1);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setFarms((prev) => {
-      const map = new Map(prev.map((f: FarmGet) => [f.id, f]));
-      res.items.forEach((f: FarmGet) => map.set(f.id, f));
-      return Array.from(map.values());
-    });
-
-    setTotal(res.total);
-    setPage((prev) => prev + 1);
-    setLoading(false);
   }, [loading, total, farms.length, page, farmer.id, perPage]);
 
   const handlePolygonDialog = () => {
@@ -101,6 +140,9 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
               setPage(1);
               setTotal(0);
               setHasMore(true);
+              trackFarmUploadPolygon({
+                farm_id: farm.id,
+              });
               // console.log(resp);
             })
             .catch((err: any) => {
@@ -130,24 +172,26 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
     setHasMore(true);
     setFarmSelected(null);
   }, [farmer.id]);
-  const hasMounted = useRef(false);
 
   useEffect(() => {
     if (!observerRef.current || !hasMore) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !loading) {
-        if (!hasMounted.current) {
-          hasMounted.current = true;
-          return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !loading) {
+          loadFarms();
         }
-        loadFarms();
-      }
-    });
+      },
+      {
+        rootMargin: '100px',
+        threshold: 0,
+      },
+    );
 
     observer.observe(observerRef.current);
+
     return () => observer.disconnect();
-  }, [hasMore, loading, loadFarms]);
+  }, [loadFarms, loading, hasMore]);
 
   return (
     <>
@@ -166,7 +210,22 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
         farms.map((farm) => {
           return (
             <Paper key={farm.id} sx={{ mt: 1 }}>
-              <TitleSectionStyled>{farm.name ?? 'Parcela'}</TitleSectionStyled>
+              <Box display={'flex'} alignItems={'flex-start'}>
+                <TitleSectionStyled>
+                  {farm.name ?? 'Parcela'}
+                </TitleSectionStyled>
+                &nbsp;
+                <Tooltip title="Editar">
+                  <BoxIconButton
+                    onClick={() => {
+                      setFarmSelected(farm);
+                      handleFarmEditDialog();
+                    }}
+                  >
+                    <BorderColorOutlined color="primary" />
+                  </BoxIconButton>
+                </Tooltip>
+              </Box>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 4 }}>
                   <CaptionStyled>Area total (Ha)</CaptionStyled>
@@ -223,6 +282,9 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
                     text="Ver polígono"
                     variant="contained"
                     onClick={() => {
+                      trackFarmViewPolygon({
+                        farm_id: farm.id,
+                      });
                       setFarmSelected(farm);
                       handlePolygonDialog();
                     }}
@@ -245,6 +307,8 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
           Cargando parcelas...
         </Typography>
       )}
+      {/* SENTINEL DEL INFINITE SCROLL */}
+      <div ref={observerRef} style={{ height: 1 }} />
       {openPolygonDialog && farmSelected && (
         <PolygonDialog
           handleCloseDialog={handlePolygonDialog}
@@ -255,8 +319,16 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
           handleOnUploadFile={handleOnUploadFile}
         />
       )}
+      {openFarmEditDialog && farmSelected && (
+        <FarmEditDialog
+          farm={farmSelected}
+          open={openFarmEditDialog}
+          handleClose={handleFarmEditDialog}
+          handleSave={handlePatchFarm}
+        />
+      )}
     </>
   );
 };
 
-export default FarmsTab;
+export default React.memo(FarmsTab);

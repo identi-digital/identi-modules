@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ModuleConfig } from '@/core/moduleLoader';
 import Button from '@/ui/components/atoms/Button/Button';
 import FilterComponent from '@/ui/components/molecules/FilterComponent';
@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { TableHeadColumn } from '@/ui/components/molecules/TableHead/TableHead';
 import { AxiosResponse } from 'axios';
-import useDebounce from '@/ui/hooks/use_debounce';
+// import useDebounce from '@/ui/hooks/use_debounce';
 // import { FarmerService } from '../../services/farmer';
 import {
   // CheckCircle,
@@ -74,9 +74,9 @@ function DeforestPage({ config }: FarmersListProps) {
   const [statusSelected, setStatusSelected] = useState<any>('baja/nula');
   const [isRefresh, setIsRefresh] = useState<boolean>(true);
   const [headers, setHeaders] = useState<TableHeadColumn[]>([]);
-  const [search, setSearch] = useState<string>('');
+  // const [search, setSearch] = useState<string>('');
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  const textDebounce = useDebounce(search, 500);
+  // const textDebounce = useDebounce(search, 500);
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
   const [deforestMetrics, setDeforestMetrics] = useState<DeforestMetrics>({
     farm_georefrence_count: 0,
@@ -144,7 +144,7 @@ function DeforestPage({ config }: FarmersListProps) {
         statusSelected,
         sort,
         orderBy,
-        textDebounce,
+        '',
       );
       // const data = await api.get('/forms');
       console.log(data);
@@ -161,7 +161,7 @@ function DeforestPage({ config }: FarmersListProps) {
         config: {} as any,
       };
     },
-    [textDebounce, statusSelected],
+    [statusSelected],
   );
 
   const _handleGetDeforestMetrics = useCallback(async () => {
@@ -318,6 +318,7 @@ function DeforestPage({ config }: FarmersListProps) {
                 <Tooltip title="Ver reporte">
                   <IconButton
                     onClick={() => {
+                      console.log(row);
                       setDataSelected(row);
                       handleCloseDialog();
                     }}
@@ -333,6 +334,7 @@ function DeforestPage({ config }: FarmersListProps) {
                       handleDownloadPDF();
                     }}
                     size="small"
+                    loading={isLoadingReport && row.id === dataSelected?.id}
                     //   variant="contained"
                     // color="error"
                     //   style={{ width: '140px', height: '30px' }}
@@ -348,7 +350,7 @@ function DeforestPage({ config }: FarmersListProps) {
       },
     ];
     setHeaders(_setHeaders);
-  }, []);
+  }, [isLoadingReport]);
 
   useEffect(() => {
     _handleGetDeforestMetrics();
@@ -626,6 +628,7 @@ function DeforestPage({ config }: FarmersListProps) {
           position: 'absolute',
           top: '-9999px',
           left: '-9999px',
+          width: '794px',
         }}
       >
         <Grid size={12} px={2}>
@@ -643,8 +646,12 @@ function DeforestPage({ config }: FarmersListProps) {
               departamento: dataSelected?.department?.description ?? '',
               district: dataSelected?.district?.description ?? '',
               polygon: dataSelected?.geometry ?? DEFAULT_GEOJSON,
-              natural_forest_coverage: 0,
-              natural_forest_lost: dataSelected?.natural_forest_loss_ha ?? 0,
+              natural_forest_coverage:
+                dataSelected?.deforestation_request
+                  ?.natural_forest_coverage_ha ?? 0,
+              natural_forest_lost:
+                dataSelected?.deforestation_request?.natural_forest_loss_ha ??
+                0,
               date: new Date(dataSelected?.created_at ?? '').toLocaleDateString(
                 'es-ES',
               ),
@@ -668,8 +675,11 @@ function DeforestPage({ config }: FarmersListProps) {
             departamento: dataSelected?.department?.description ?? '',
             district: dataSelected?.district?.description ?? '',
             polygon: dataSelected?.geometry ?? DEFAULT_GEOJSON,
-            natural_forest_coverage: 0,
-            natural_forest_lost: dataSelected?.natural_forest_loss_ha ?? 0,
+            natural_forest_coverage:
+              dataSelected?.deforestation_request?.natural_forest_coverage_ha ??
+              0,
+            natural_forest_lost:
+              dataSelected?.deforestation_request?.natural_forest_loss_ha ?? 0,
             date: new Date(dataSelected?.created_at ?? '').toLocaleDateString(
               'es-ES',
             ),

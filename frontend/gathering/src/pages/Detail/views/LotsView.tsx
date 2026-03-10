@@ -26,7 +26,7 @@ import SalesTable from '../../../components/SalesTable';
 // import { ChangeHistory, Entity, EntityDetail } from '~/models/entities';
 import SelectField from '@ui/components/atoms/SelectField/SelectField';
 // import { modulesConfig } from '~/atlas/modules/modulesConfig';
-import EditEntityDetail from '../../../components/AssignNetWeight';
+import AssignNetWeight from '../../../components/AssignNetWeight';
 import EditNameDialog from '../../../components/EditNameDialog';
 // import useEntity from '~/atlas/entities';
 // import { schemaNamesEntities } from '~/atlas';
@@ -453,48 +453,6 @@ const LotsView: React.FC<LotsViewProps> = (props: LotsViewProps) => {
     [],
   );
 
-  // const getPurchaseStats = (purchases: any) => {
-  //   const now = new Date();
-  //   if (purchases.length === 0) return { totalLatestPurchase: 0, totalDayPurchase: 0, totalMonthPurchase: 0 };
-  //   // Obtener la fecha de hoy (sin horas, minutos ni segundos)
-  //   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  //   const tomorrowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-
-  //   // Obtener el primer día del mes y el último día del mes
-  //   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  //   const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-  //   // Última compra
-  //   const latestPurchase = purchases.reduce((latest: any, current: any) =>
-  //     new Date(current.date) > new Date(latest.date) ? current : latest
-  //   );
-
-  //   // Compras de hoy
-  //   const purchasesToday = purchases.filter((p: any) => {
-  //     const purchaseDate = new Date(p.date);
-  //     return purchaseDate >= todayStart && purchaseDate < tomorrowStart;
-  //   });
-
-  //   // Compras de este mes
-  //   const purchasesThisMonth = purchases.filter((p: any) => {
-  //     const purchaseDate = new Date(p.date);
-  //     return purchaseDate >= monthStart && purchaseDate < nextMonthStart;
-  //   });
-
-  //   const totalLatestPurchase = latestPurchase.total_amount;
-  //   const totalDayPurchase = purchasesToday.reduce((total: number, current: any) => total + current.total_amount, 0);
-  //   const totalMonthPurchase = purchasesThisMonth.reduce(
-  //     (total: number, current: any) => total + current.total_amount,
-  //     0
-  //   );
-
-  //   return {
-  //     totalLatestPurchase,
-  //     totalDayPurchase,
-  //     totalMonthPurchase
-  //   };
-  // };
-
   useEffect(() => {
     const _setHeaders: any = [
       {
@@ -707,7 +665,7 @@ const LotsView: React.FC<LotsViewProps> = (props: LotsViewProps) => {
                         <Tooltip title="Editar nombre">
                           <IconButton
                             onClick={() => {
-                              setLotIdToChange(row.objectId ?? '');
+                              setLotIdToChange(row.id ?? '');
                               setNameDetail(row.nameDetail);
                               setOpenChangeNameDetail(true);
                             }}
@@ -1140,35 +1098,21 @@ const LotsView: React.FC<LotsViewProps> = (props: LotsViewProps) => {
           handleSelects={handleSelects}
           onLoad={onLoad}
         />
-        {/* <DataTable
-          headers={headers}
-          // items={filteredDataRows}
-          // searchSize="small"
-          // loading={isLoading}
-          isCollapsible
-          schema={''} // searchFullWidth
-
-          // isSelect
-          // checkValidateField={(row: any) => !row.status || (row.status && row.status !== 'SUCCESSFUL')}
-          // handleSelects={(items: any[]) => {
-          //   setSelectedItems(items);
-          // }}
-          // refreshSelect={refreshSelect}
-        /> */}
       </Paper>
       {openChangeDetail && (
-        <EditEntityDetail
+        <AssignNetWeight
           currentValue={lotSelected?.net_weight}
+          open={openChangeDetail}
           idLot={lotIdToChange}
           // entityDetail={headers}
           handleChangeNetWeight={handleChangeNetWeight}
           userId={user?.user?.uuid ?? ''}
-          handleCloseDialog={(isRefresh?: boolean) => {
+          handleClose={(isRefresh?: boolean) => {
             if (isRefresh) {
               handleRefresh();
             }
             setLotIdToChange('');
-            lotSelected(null);
+            setLotSelected(null);
             setOpenChangeDetail(false);
           }}
         />

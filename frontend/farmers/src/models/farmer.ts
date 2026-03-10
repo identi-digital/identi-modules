@@ -28,3 +28,11 @@ export interface FarmerGet extends Farmer {
   province: EntityRel;
   district: EntityRel;
 }
+
+export interface FarmerLocation {
+  id: string;
+  country_id: string;
+  department_id: string;
+  province_id: string;
+  district_id: string;
+}

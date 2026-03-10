@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
 from sqlalchemy.orm import Session
-
 from .models.agent import AgentModel
 from .models.agent_assignment import AgentAssignmentModel
 from .schemas import (

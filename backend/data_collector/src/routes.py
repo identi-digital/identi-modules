@@ -14,7 +14,7 @@ from .schemas import (
     ReferencableEntityResponse, PaginatedReferencableEntityResponse,
     PaginatedEntityListItemResponse,
     PaginatedEntityDataResponse,
-    UniqueFieldValidationRequest, UniqueFieldValidationResponse
+    UniqueFieldValidationRequest, UniqueFieldValidationResponse, UniqueFieldComplementaryValidationRequest, UniqueFieldComplementaryValidationResponse
 )
 
 router = APIRouter(
@@ -478,6 +478,43 @@ def validate_unique_field(
             entity_name=validation_data.entity_name,
             entity_field=validation_data.entity_field,
             entity_exclude_id=validation_data.entity_exclude_id
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/validate-unique-field-complementary", response_model=UniqueFieldComplementaryValidationResponse)
+def validate_unique_field_complementary(
+    validation_data: UniqueFieldComplementaryValidationRequest,
+    svc=Depends(get_funcionalities)
+):
+    """
+    Valida si un valor es único para un campo específico en un registro complementario.
+    
+    Args:
+        validation_data: Datos de validación (entity_field, form_id)
+        
+    Returns:
+        UniqueFieldComplementaryValidationResponse con resultado de validación
+        
+    Example:
+        POST /data-collector/validate-unique-field-complementary
+        {
+            "entity_field": {"dni": "12345678"},
+            "form_id": "uuid..."
+        }
+        
+        Response:
+        {
+            "exist": false
+        }
+        
+        Si exist=true, el valor ya existe en registros previos del formulario.
+        Si exist=false, el valor está disponible (no existe).
+    """
+    try:
+        return svc.validate_unique_field_complementary(
+            entity_field=validation_data.entity_field,
+            form_id=validation_data.form_id
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

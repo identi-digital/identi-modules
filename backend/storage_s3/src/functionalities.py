@@ -11,7 +11,7 @@ class Funcionalities:
 
     def _get_db(self) -> Session:
         """Obtiene la sesión de base de datos del contenedor"""
-        return self.container.get(self.database_key)
+        return self.container.get(self.database_key, "databases")
 
     def create_media(self, media_data: MediaCreate) -> MediaResponse:
         """

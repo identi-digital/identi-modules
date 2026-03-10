@@ -94,8 +94,8 @@ class Funcionalities:
         
         El estado se determina basado en natural_forest_loss_ha:
         - "baja/nula": loss === 0
-        - "parcial": 0 < loss <= 0.2
-        - "crítica": loss > 0.2
+        - "parcial": 0 < loss <= 0.4
+        - "crítica": loss > 0.4
         
         Args:
             page: Número de página
@@ -154,13 +154,15 @@ class Funcionalities:
             elif status == "parcial":
                 query = query.filter(
                     and_(
+                        DeforestationRequestModel.natural_forest_loss_ha.isnot(None),
                         DeforestationRequestModel.natural_forest_loss_ha > 0,
-                        DeforestationRequestModel.natural_forest_loss_ha <= 0.2
+                        DeforestationRequestModel.natural_forest_loss_ha <= 0.4
                     )
                 )
             elif status == "crítica":
                 query = query.filter(
-                    DeforestationRequestModel.natural_forest_loss_ha > 0.2
+                    DeforestationRequestModel.natural_forest_loss_ha.isnot(None),
+                    DeforestationRequestModel.natural_forest_loss_ha > 0.4
                 )
         
         # Aplicar ordenamiento
@@ -201,14 +203,15 @@ class Funcionalities:
             # siempre tendremos un deforestation_request válido
             loss = float(deforestation_request.natural_forest_loss_ha) if deforestation_request.natural_forest_loss_ha is not None else 0
             natural_forest_loss_ha = loss
-            
+
             if loss == 0:
                 state_deforesting = DeforestationStateEnum.BAJA_NULA
-            elif 0 < loss <= 0.2:
+            elif 0 < loss <= 0.4:
                 state_deforesting = DeforestationStateEnum.PARCIAL
-            else:  # loss > 0.2
+            else:  # loss > 0.4
                 state_deforesting = DeforestationStateEnum.CRITICA
             
+            print('deforestation_request', deforestation_request.__dict__)
             # Obtener descripción del distrito
             district_description = district.description if district else None
             # obtengo la provinvincia
@@ -228,7 +231,9 @@ class Funcionalities:
                 district_description=district_description,
                 state_deforesting=state_deforesting,
                 natural_forest_loss_ha=natural_forest_loss_ha,
-                deforestation_request=deforestation_request,
+                deforestation_request=DeforestationRequestResponse.model_validate(
+                    deforestation_request
+                ),
                 created_at=farm.created_at
             ))
         
@@ -293,9 +298,9 @@ class Funcionalities:
                     
                     if loss == 0:
                         count_baja_nula += 1
-                    elif 0 < loss <= 0.2:
+                    elif 0 < loss <= 0.4:
                         count_parcial += 1
-                    else:  # loss > 0.2
+                    else:  # loss > 0.4
                         count_critica += 1
             
             # Calcular porcentajes
@@ -398,9 +403,9 @@ class Funcionalities:
                     # Clasificar al productor según el promedio
                     if avg_loss == 0:
                         count_baja_nula += 1
-                    elif 0 < avg_loss <= 0.2:
+                    elif 0 < avg_loss <= 0.4:
                         count_parcial += 1
-                    else:  # avg_loss > 0.2
+                    else:  # avg_loss > 0.4
                         count_critica += 1
             
             # Calcular porcentajes
@@ -506,12 +511,12 @@ class Funcionalities:
                     query = query.filter(
                         and_(
                             DeforestationRequestModel.natural_forest_loss_ha > 0,
-                            DeforestationRequestModel.natural_forest_loss_ha <= 0.2
+                            DeforestationRequestModel.natural_forest_loss_ha <= 0.4
                         )
                     )
                 elif status == "crítica":
                     query = query.filter(
-                        DeforestationRequestModel.natural_forest_loss_ha > 0.2
+                        DeforestationRequestModel.natural_forest_loss_ha > 0.4
                     )
             
             # Aplicar ordenamiento
@@ -574,7 +579,7 @@ class Funcionalities:
                 
                 if loss == 0:
                     state_deforesting = "baja/nula"
-                elif 0 < loss <= 0.2:
+                elif 0 < loss <= 0.4:
                     state_deforesting = "parcial"
                 else:
                     state_deforesting = "crítica"

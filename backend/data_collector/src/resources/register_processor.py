@@ -10,10 +10,33 @@ from pathlib import Path
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from core.models.base_class import Model as BaseModel
+import time
+import random
 
 if TYPE_CHECKING:
     from ..schemas import DetailArray, DetailItem
 
+def _generar_numero_recibo_fecha_timestamp_aleatorio() -> str:
+    fecha = datetime.now()
+
+    anio = str(fecha.year)[-2:]
+    mes = str(fecha.month).zfill(2)
+    dia = str(fecha.day).zfill(2)
+
+    fecha_formateada = f"{anio}{mes}{dia}"
+
+    timestamp_str = str(int(time.time() * 1000))
+
+    digitos_aleatorios = ""
+    indices_aleatorios = set()
+
+    while len(indices_aleatorios) < 6:
+        indice = random.randint(0, len(timestamp_str) - 1)
+        indices_aleatorios.add(indice)
+
+    for indice in sorted(indices_aleatorios):
+        digitos_aleatorios += timestamp_str[indice]
+    return f"{fecha_formateada}{digitos_aleatorios.zfill(6)}"
 
 def find_model_by_entity_name(entity_name: str) -> Optional[Any]:
     """
@@ -670,6 +693,10 @@ def process_register_to_entity(
         # Crear un nuevo registro en la entidad
         # Nota: Si no hay filtered_data pero sí hay m2m_data, igual crear la entidad vacía
         new_entity = model_class(**filtered_data) if filtered_data else model_class()
+        # si es una compra, crear el ticket_number
+        if (getattr(new_entity, 'ticket_number', None) is None) and entity_name == 'purchases':
+            new_entity.ticket_number = _generar_numero_recibo_fecha_timestamp_aleatorio()
+        
         db.add(new_entity)
         db.flush()  # Flush para obtener el ID antes de commit
         

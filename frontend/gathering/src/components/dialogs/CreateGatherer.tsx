@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
-import { Grid, InputLabel } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Grid, InputLabel, Typography } from '@mui/material';
 import Dialog from '@ui/components/molecules/Dialog/Dialog';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -9,6 +9,7 @@ import PhoneTextField from '@ui/components/atoms/PhoneTextField/PhoneTextField';
 import { inputRemoveAllASCII } from '@ui/utils/inputs';
 import { GathererCreate } from '../../models/gatherer';
 import { MODULE_ACTOR_DISPLAY_NAME } from '../../../';
+import { AuthService } from '@/modules/auth/src/services/auth';
 
 type GathererDialogProps = {
   gatherer?: GathererCreate;
@@ -17,11 +18,19 @@ type GathererDialogProps = {
   clearFields: boolean;
 };
 
+type usernameStatus = {
+  detail: string;
+  type: 'success' | 'warning' | 'error';
+};
+
 const GathererDialog: React.FC<GathererDialogProps> = (
   props: GathererDialogProps,
 ) => {
   const { gatherer, closeAction, saveAction, clearFields } = props;
-
+  const [needUsername, setNeedUsername] = useState<boolean>(false);
+  const [usernameStatus, setUsernameStatus] = useState<usernameStatus | null>(
+    null,
+  );
   const newGatherer: GathererCreate = {
     id: gatherer?.id ?? '',
     eid: gatherer?.dni ?? '',
@@ -54,44 +63,53 @@ const GathererDialog: React.FC<GathererDialogProps> = (
     initialValues: newGatherer,
     onSubmit: (value: GathererCreate) => {
       //Verifica Phone
-      const errors: any = {};
-      if (
-        formik?.values?.call_number?.slice(0, 2) === '51' &&
-        formik?.values?.call_number?.length > 2 &&
-        formik?.values?.call_number?.length !== 11
-      ) {
-        errors['call_number'] = 'El número de celular debe tener 9 caracteres.';
-      }
-      if (
-        formik?.values?.sms_number?.slice(0, 2) === '51' &&
-        formik?.values?.sms_number?.length > 2 &&
-        formik?.values?.sms_number?.length !== 11
-      ) {
-        errors['sms_number'] = 'El número de celular debe tener 9 caracteres.';
-      }
-      if (
-        formik?.values?.wsp_number?.slice(0, 2) === '51' &&
-        formik?.values?.wsp_number?.length > 2 &&
-        formik?.values?.wsp_number?.length !== 11
-      ) {
-        errors['wsp_number'] = 'El número de celular debe tener 9 caracteres.';
-      }
+      try {
+        const errors: any = {};
+        if (
+          formik?.values?.call_number?.slice(0, 2) === '51' &&
+          formik?.values?.call_number?.length > 2 &&
+          formik?.values?.call_number?.length !== 11
+        ) {
+          errors['call_number'] =
+            'El número de celular debe tener 9 caracteres.';
+        }
+        if (
+          formik?.values?.sms_number?.slice(0, 2) === '51' &&
+          formik?.values?.sms_number?.length > 2 &&
+          formik?.values?.sms_number?.length !== 11
+        ) {
+          errors['sms_number'] =
+            'El número de celular debe tener 9 caracteres.';
+        }
+        if (
+          formik?.values?.wsp_number?.slice(0, 2) === '51' &&
+          formik?.values?.wsp_number?.length > 2 &&
+          formik?.values?.wsp_number?.length !== 11
+        ) {
+          errors['wsp_number'] =
+            'El número de celular debe tener 9 caracteres.';
+        }
 
-      const prevUser = Object.assign({}, value);
-      const phone = prevUser.call_number ? prevUser.call_number : '';
-      if (!phone.includes('+')) {
-        prevUser['call_number'] = phone.length > 5 ? '+' + phone : '';
+        const prevUser = Object.assign({}, value);
+        const phone = prevUser.call_number ? prevUser.call_number : '';
+        if (!phone.includes('+')) {
+          prevUser['call_number'] = phone.length > 5 ? '+' + phone : '';
+        }
+        const sms_phone = prevUser.sms_number ? prevUser.sms_number : '';
+        if (!sms_phone.includes('+')) {
+          prevUser['sms_number'] = sms_phone.length > 5 ? '+' + sms_phone : '';
+        }
+        const wsp_phone = prevUser.wsp_number ? prevUser.wsp_number : '';
+        if (!wsp_phone.includes('+')) {
+          prevUser['wsp_number'] = wsp_phone.length > 5 ? '+' + wsp_phone : '';
+        }
+        prevUser.eid = prevUser.dni;
+        saveAction(prevUser);
+      } catch (error) {
+        closeAction();
+      } finally {
+        formik.setSubmitting(false);
       }
-      const sms_phone = prevUser.sms_number ? prevUser.sms_number : '';
-      if (!sms_phone.includes('+')) {
-        prevUser['sms_number'] = sms_phone.length > 5 ? '+' + sms_phone : '';
-      }
-      const wsp_phone = prevUser.wsp_number ? prevUser.wsp_number : '';
-      if (!wsp_phone.includes('+')) {
-        prevUser['wsp_number'] = wsp_phone.length > 5 ? '+' + wsp_phone : '';
-      }
-      prevUser.eid = prevUser.dni;
-      saveAction(prevUser);
     },
     validationSchema,
   });
@@ -112,6 +130,30 @@ const GathererDialog: React.FC<GathererDialogProps> = (
     (event: any) => {
       const { name, value } = event.target;
       formik.setFieldValue(name, inputRemoveAllASCII(value)?.toLowerCase());
+    },
+    [formik],
+  );
+
+  const handleVerifyEid = useCallback(
+    async (eid: string) => {
+      try {
+        const resp = await AuthService.getIdentityByEid(eid);
+        if (resp) {
+          formik.setFieldValue('username', resp.username);
+          // indico que el dni ya existe en el sistema y que se va a registrar el mismo username y que puede usar ese username para utilizar las capacidades de acopiador
+          setUsernameStatus({
+            detail: `El DNI ya existe en el sistema su usuario es " ${resp.username} ", podrá ingresar con ese nombre de usuario para utilizar las capacidades de ${MODULE_ACTOR_DISPLAY_NAME}, puede continuar con el registro.`,
+            type: 'success',
+          });
+        }
+      } catch (error) {
+        // console.error(error);
+        setNeedUsername(true);
+        setUsernameStatus({
+          detail: 'Se requiere ingresar un username para el usuario.',
+          type: 'warning',
+        });
+      }
     },
     [formik],
   );
@@ -139,15 +181,22 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             text="Cancelar"
             sx={{ marginInline: 1 }}
           />
-
-          <Button
-            onClick={() => onSubmit()}
-            color="primary"
-            variant="contained"
-            disabled={formik.isSubmitting}
-            isLoading={formik.isSubmitting}
-            text="Registrar"
-          />
+          {formik.values.id === '' && (
+            <Button
+              onClick={() => {
+                if (formik.values.username !== '') {
+                  onSubmit();
+                } else {
+                  handleVerifyEid(formik.values.dni);
+                }
+              }}
+              color="primary"
+              variant="contained"
+              disabled={formik.isSubmitting}
+              isLoading={formik.isSubmitting}
+              text={formik.values.username === '' ? 'Validar DNI' : 'Registrar'}
+            />
+          )}
         </>
       }
     >
@@ -263,24 +312,34 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             disabled={formik.isSubmitting}
           />
         </Grid>
-        <Grid size={12}>
-          <InputLabel id={'username'} shrink={true}>
-            Nombre de usuario
-          </InputLabel>
-          <TextField
-            id="username"
-            name="username"
-            type="text"
-            variant="outlined"
-            size="small"
-            label=""
-            value={formik.values.username}
-            onChange={handleOnChangeUsernameInput}
-            disabled={formik.isSubmitting}
-            errors={formik.errors}
-            touched={formik.touched}
-          />
-        </Grid>
+
+        {needUsername && (
+          <Grid size={12}>
+            <InputLabel id={'username'} shrink={true}>
+              Nombre de usuario
+            </InputLabel>
+            <TextField
+              id="username"
+              name="username"
+              type="text"
+              variant="outlined"
+              size="small"
+              label=""
+              value={formik.values.username}
+              onChange={handleOnChangeUsernameInput}
+              disabled={formik.isSubmitting}
+              errors={formik.errors}
+              touched={formik.touched}
+            />
+          </Grid>
+        )}
+        {usernameStatus && (
+          <Grid size={12}>
+            <Typography color={usernameStatus.type}>
+              {usernameStatus.detail}
+            </Typography>
+          </Grid>
+        )}
       </Grid>
     </Dialog>
   );

@@ -29,10 +29,17 @@ export interface Crop {
   disabled_at?: string;
 }
 
+export interface DeforestationRequest {
+  natural_forest_coverage_ha: number;
+  natural_forest_loss_ha: number;
+  status: string;
+}
+
 export interface FarmGet extends Farm {
   country: EntityRel;
   department: EntityRel;
   province: EntityRel;
   district: EntityRel;
   crops: Crop[];
+  deforestation_request?: DeforestationRequest;
 }

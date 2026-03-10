@@ -15,7 +15,7 @@ from .schemas import (
     CoreRegisterCreate, CoreRegisterUpdate, CoreRegisterResponse, PaginatedCoreRegisterResponse,
     ReferencableEntityResponse, PaginatedReferencableEntityResponse,
     EntityDataItemResponse, PaginatedEntityDataResponse,
-    UniqueFieldValidationResponse
+    UniqueFieldValidationResponse, UniqueFieldComplementaryValidationResponse
 )
 from .models.schema_forms import SchemaFormModel
 from .resources.schema_processor import process_schema_add_data_input_to_metadata
@@ -2009,6 +2009,80 @@ class Funcionalities:
             
             # Retornar si existe o no
             return UniqueFieldValidationResponse(
+                exist=existing_entity is not None
+            )
+                
+        except Exception as e:
+            print(f"Error al validar campo único: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+
+    def validate_unique_field_complementary(
+        self, 
+        entity_field: dict, 
+        form_id: UUID
+    ) -> UniqueFieldComplementaryValidationResponse:
+        """
+        Valida si un valor es único en un registro complementario.
+        
+        Busca en el campo JSONB 'detail' de core_registers.
+
+        Args:
+            entity_field: Diccionario con el campo y valor a validar (ej: {"dni": "12345678"})
+            form_id: ID del formulario en el que se encuentra el registro complementario
+            
+        Returns:
+            UniqueFieldComplementaryValidationResponse con resultado de validación (exist: bool)
+        
+        """
+        db = self._get_db()
+        
+        try:
+            # Validar que entity_field tenga exactamente un campo
+            if not entity_field or len(entity_field) != 1:
+                raise ValueError("entity_field debe contener exactamente un campo")
+            
+            # Extraer el nombre del campo y su valor
+            field_name = list(entity_field.keys())[0]
+            field_value = entity_field[field_name]
+            
+            # Caso 1: Buscar en detail (JSONB)
+            if not hasattr(CoreRegisterModel, 'detail'):
+                raise ValueError(f"El campo '{field_name}' no existe en el registro y no hay campo 'detail' para atributos dinámicos")
+                
+            # Buscar en el campo JSONB detail
+            # Convertir el valor a string para comparación JSON
+            if isinstance(field_value, str):
+                value_str = field_value
+            else:
+                import json
+                value_str = json.dumps(field_value)
+                
+            # Query usando el operador ->> para acceder a la clave del JSONB
+            from sqlalchemy import text
+                
+            query = db.query(CoreRegisterModel).filter(
+                CoreRegisterModel.form_id == form_id,
+                CoreRegisterModel.disabled_at.is_(None),
+                text("""
+                    EXISTS (
+                        SELECT 1
+                        FROM unnest(detail) AS d
+                        WHERE d->>'name' = :field_name
+                        AND d->>'value' = :field_value
+                    )
+                """).bindparams(
+                    field_name=field_name,
+                    field_value=value_str
+                )
+            )
+            
+            # Ejecutar la query - verificar si existe algún registro
+            existing_entity = query.first()
+            
+            # Retornar si existe o no
+            return UniqueFieldComplementaryValidationResponse(
                 exist=existing_entity is not None
             )
                 

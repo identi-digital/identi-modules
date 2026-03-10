@@ -38,16 +38,16 @@ export default function FarmersList({ config }: FarmersListProps) {
   // ✅ ACCEDER A VARIABLES DEL MÓDULO DESDE CONFIG.YAML
   const moduleVariables = config?.variables || {};
   const idFormFarmers = moduleVariables.idFormFarmers;
-  const apiTimeout = moduleVariables.apiTimeout || 3000;
-  const enableCache = moduleVariables.enableCache !== false;
+  // const apiTimeout = moduleVariables.apiTimeout || 3000;
+  // const enableCache = moduleVariables.enableCache !== false;
 
-  console.log('📦 Variables del módulo farmers:', {
-    idFormFarmers,
-    apiTimeout,
-    enableCache,
-  });
+  //// console.log('📦 Variables del módulo farmers:', {
+  //   idFormFarmers,
+  //   apiTimeout,
+  //   enableCache,
+  // });
 
-  console.log(config);
+  //// console.log(config);
   const theme = useTheme();
   const isActiveDesktop = useMediaQuery(theme.breakpoints.down('md'));
   const isActiveButtons = useMediaQuery(theme.breakpoints.up('md'));
@@ -67,8 +67,8 @@ export default function FarmersList({ config }: FarmersListProps) {
     async (
       page: number,
       perPage: number,
-      sortBy: string,
-      order: string,
+      _sortBy: string,
+      _order: string,
       _search: string,
     ): Promise<AxiosResponse<any>> => {
       let orderBy = 'created_at';
@@ -89,7 +89,7 @@ export default function FarmersList({ config }: FarmersListProps) {
         status,
       );
       // const data = await api.get('/forms');
-      console.log(data);
+      //console.log(data);
       return {
         data: {
           data: {
@@ -139,7 +139,7 @@ export default function FarmersList({ config }: FarmersListProps) {
         padding: 'none',
         value: 'status',
         render: (row: any) => {
-          // console.log(row);
+          //// console.log(row);
           // si la fecha de la ultima transacción tiene al menos 15 días de antigüedad, entonces es activo
           if (row?.status === 'activo') {
             return <Chip label="Activo" color="success" variant="outlined" />;
@@ -184,7 +184,7 @@ export default function FarmersList({ config }: FarmersListProps) {
                 </Tooltip>
                 <Tooltip title="Eliminar">
                   <IconButton
-                    onClick={() => console.log(row)}
+                    //onClick={() => console.log(row)}
                     size="small"
                     //   variant="contained"
                     // color="error"

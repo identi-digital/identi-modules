@@ -920,6 +920,10 @@ class Funcionalities:
             farm.updated_at = datetime.utcnow()
             db.commit()
             db.refresh(farm)
+            if farm.geometry:
+                farm.geometry = geometry_to_geojson(farm.geometry, db)
+            else: 
+                farm.geometry = None
             return FarmResponse.model_validate(farm)
         except Exception as e:
             db.rollback()
