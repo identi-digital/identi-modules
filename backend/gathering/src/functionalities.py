@@ -657,7 +657,19 @@ class Funcionalities:
             
             if not lot:
                 return None
-            
+        
+            # Subconsulta para identity_id
+            if identity_id is not None:
+                from modules.auth.src.models.identities import IdentityModel
+                identity_query = db.query(IdentityModel).filter(
+                    IdentityModel.sub == str(identity_id),
+                    IdentityModel.disabled_at.is_(None)
+                ).first()
+                identity_exists = identity_query is not None
+                if not identity_exists:
+                    print(f"⚠️ Identity {identity_id} from token not found in identities table; saving register without identity_id")
+                    raise ValueError("Identidad no encontrada")
+
             # Guardar valores anteriores para historial
             old_status = lot.current_status
             old_process = lot.current_process
@@ -700,7 +712,7 @@ class Funcionalities:
                     lot_id=lot_id,
                     last_net_weight=old_net_weight,
                     new_net_weight=update_data['net_weight'],
-                    identity_id=identity_id
+                    identity_id=identity_query.id
                 )
                 db.add(weight_history)
                 print(f"✓ Registro de historial de peso creado: {old_net_weight} kg → {update_data['net_weight']} kg")
@@ -1155,6 +1167,46 @@ class Funcionalities:
             db.rollback()
             raise e
     
+    def disable_gathering_center(self, center_id: UUID) -> str:
+        """Deshabilita un centro de acopio"""
+        db = self._get_db()
+        try:
+            center = db.query(GatheringCenterModel).filter(
+                GatheringCenterModel.id == center_id
+            ).first()
+            
+            if not center:
+                return None
+            
+            center.disabled_at = datetime.now()
+            center.updated_at = datetime.utcnow()
+            
+            db.commit()
+            db.refresh(center)
+            return "Centro de acopio deshabilitado"
+        except Exception as e:
+            db.rollback()
+            raise e
+    def enable_gathering_center(self, center_id: UUID) -> str:
+        """Habilita un centro de acopio"""
+        db = self._get_db()
+        try:
+            center = db.query(GatheringCenterModel).filter(
+                GatheringCenterModel.id == center_id
+            ).first()
+            
+            if not center:
+                return None
+            
+            center.disabled_at = None
+            center.updated_at = datetime.utcnow()
+            
+            db.commit()
+            db.refresh(center)
+            return "Centro de acopio habilitado"
+        except Exception as e:
+            db.rollback()
+            raise e
     def get_gathering_summary(
         self,
         gathering_center_id: Optional[UUID] = None
@@ -1932,6 +1984,18 @@ class Funcionalities:
         db = self._get_db()
         
         try:
+            identity_id_to_use = data.identity_id
+            if identity_id_to_use is not None:
+                from modules.auth.src.models.identities import IdentityModel
+                identity_query = db.query(IdentityModel).filter(
+                    IdentityModel.sub == str(identity_id_to_use),
+                    IdentityModel.disabled_at.is_(None)
+                ).first()
+                identity_exists = identity_query is not None
+                if not identity_exists:
+                    print(f"⚠️ Identity {identity_id_to_use} from token not found in identities table; saving register without identity_id")
+                    raise ValueError("Identidad no encontrada")
+            data.identity_id = identity_query.id
             balance = BalanceMovementModel(**data.dict())
             db.add(balance)
             db.commit()
@@ -1947,8 +2011,8 @@ class Funcionalities:
                 "type_movement": balance.type_movement,
                 "purchase_id": balance.purchase_id,
                 "ammount": balance.ammount,
-                "identity_id": balance.identity_id,
-                "identity": self._load_identity(db, balance.identity_id),
+                "identity_id": identity_query.id,
+                "identity": self._load_identity(db, identity_query.id),
                 "created_at": balance.created_at,
                 "disabled_at": balance.disabled_at
             }
@@ -2455,6 +2519,18 @@ class Funcionalities:
         db = self._get_db()
         
         try:
+            # Verificar que el identity_id existe en el sistema
+            if identity_id is not None:
+                from modules.auth.src.models.identities import IdentityModel
+                identity_query = db.query(IdentityModel).filter(
+                    IdentityModel.sub == str(identity_id),
+                    IdentityModel.disabled_at.is_(None)
+                ).first()
+                identity_exists = identity_query is not None
+                if not identity_exists:
+                    print(f"⚠️ Identity {identity_id} from token not found in identities table; saving register without identity_id")
+                    raise ValueError("Identidad no encontrada")
+
             # Obtener TODOS los lotes en una sola consulta (optimizado para listas largas)
             lots = db.query(LotModel).filter(
                 LotModel.id.in_(dispatch_data.lot_ids),
@@ -2488,7 +2564,7 @@ class Funcionalities:
                     store_center_id=dispatch_data.store_center_id,
                     type_movement=StoreMovementTypeEnum.INGRESO,
                     weight_kg=lot.net_weight,
-                    identity_id=identity_id
+                    identity_id=identity_query.id
                 )
                 db.add(store_movement)
                 

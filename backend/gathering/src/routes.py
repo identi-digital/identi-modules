@@ -222,7 +222,22 @@ def update_gathering_center(
         raise HTTPException(status_code=404, detail="Centro de acopio no encontrado")
     return center
 
+# api para desabiliar y habilitar un centro de acopio
+@router.delete("/gathering-centers/{center_id}", response_model=str)
+def disable_gathering_center(center_id: UUID, svc=Depends(get_funcionalities)):
+    """Deshabilita un centro de acopio"""
+    result = svc.disable_gathering_center(center_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Centro de acopio no encontrado")
+    return "Centro de acopio deshabilitado"
 
+@router.patch("/gathering-centers/{center_id}/restore", response_model=str)
+def enable_gathering_center(center_id: UUID, svc=Depends(get_funcionalities)):
+    """Habilita un centro de acopio"""
+    result = svc.enable_gathering_center(center_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Centro de acopio no encontrado")
+    return "Centro de acopio habilitado"
 
 # ========== GATHERERS ROUTES ==========
 @router.post("/gatherers", response_model=GathererResponse, status_code=201)

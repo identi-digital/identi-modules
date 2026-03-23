@@ -41,7 +41,7 @@ class PurchaseModel(Model):
     payment_method = Column(SQLEnum(PaymentMethodEnum, name='purchase_payment_method_enum', values_callable=lambda x: [e.value for e in x]), nullable=False, info={"display_name": "Método de Pago", "description": "método de pago"})
     purchase_date = Column(TIMESTAMP, nullable=False, info={"display_name": "Fecha de Compra", "description": "fecha de la compra"})
     ticket_number: str = Column(String(100), nullable=True, info={"display_name": "Número de Ticket", "description": "número de ticket de la compra"})
-    gathering_center_id = Column(UUID(as_uuid=True), ForeignKey('public.gathering_centers.id'), nullable=True, info={"display_name": "Centro de Acopio", "description": "id del centro de acopio"})
+    gathering_center_id = Column(UUID(as_uuid=True), ForeignKey('public.gathering_centers.id'), nullable=False, info={"display_name": "Centro de Acopio", "description": "id del centro de acopio"})
     identity_id = Column(UUID(as_uuid=True), ForeignKey('public.identities.id'), nullable=False, info={"display_name": "Identidad", "description": "id de la identidad asociada"})
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp())

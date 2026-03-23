@@ -1,25 +1,17 @@
-"""
-Schemas Pydantic para el módulo sync.
-"""
+"""Schemas Pydantic para el módulo sync."""
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Optional, Any
 
 
-class SyncStatusResponse(BaseModel):
-    """Respuesta con el estado de un cliente Parse."""
-    database_key: str
-    server_url: Optional[str]
-    app_id: Optional[str]
-    initialized: bool
-    connected: bool
+class SchemaClassesUpdate(BaseModel):
+    classNames: list[str]
 
 
-class SyncObjectRequest(BaseModel):
-    """Request para sincronizar un objeto."""
-    object_data: Dict[str, Any]
+class ParseQueryParams(BaseModel):
+    limit: int = 100
+    skip: int = 0
+    where: Optional[dict] = None  # JSON where clause
 
 
-class SyncObjectResponse(BaseModel):
-    """Respuesta de sincronización de objeto."""
-    success: bool
-    data: Optional[Dict[str, Any]] = None
+# Body para crear/actualizar en Parse es genérico (dict)
+# No definimos schema estricto para permitir cualquier campo de Parse

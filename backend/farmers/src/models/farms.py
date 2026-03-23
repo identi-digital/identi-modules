@@ -16,10 +16,10 @@ class FarmModel(Model):
                  server_default=text('uuid_generate_v4()'),
                  unique=True,
                  nullable=False)
-  farmer_id: str = Column(UUID(as_uuid=True), ForeignKey('public.farmers.id'), info={"display_name": "Productor", "description": "productor de la parcela"})
-  name: str = Column(String(50), info={"display_name": "Nombre", "description": "nombre de la parcela"})
-  total_area: float = Column(Numeric(10,2), info={"display_name": "Área Total", "description": "area total de la parcela"})
-  cultivated_area: float = Column(Numeric(10,2), info={"display_name": "Área Cultivada", "description": "area cultivada de la parcela"})
+  farmer_id: str = Column(UUID(as_uuid=True), ForeignKey('public.farmers.id'), nullable=False, info={"display_name": "Productor", "description": "productor de la parcela"})
+  name: str = Column(String(50), nullable=False, info={"display_name": "Nombre", "description": "nombre de la parcela"})
+  total_area: float = Column(Numeric(10,2), nullable=False, info={"display_name": "Área Total", "description": "area total de la parcela"})
+  cultivated_area: float = Column(Numeric(10,2), nullable=False, info={"display_name": "Área Cultivada", "description": "area cultivada de la parcela"})
   geometry = Column(Geometry('MULTIPOLYGON', srid=4326), info={"display_name": "Geometría", "description": "geometria de la parcela"})
   latitude: float = Column(Numeric(10,2), info={"display_name": "Latitud", "description": "latitud de la parcela"})
   longitude: float = Column(Numeric(10,2), info={"display_name": "Longitud", "description": "longitud de la parcela"})

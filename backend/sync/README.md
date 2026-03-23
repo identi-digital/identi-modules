@@ -1,140 +1,76 @@
-# Módulo Sync - Sincronización Offline con Parse Server
+# Módulo sync (backend)
 
-Este módulo proporciona funcionalidades de sincronización offline usando Parse Server como backend. Está diseñado para ser usado por el loader y otros módulos core del sistema.
+APIs del backend para integrarse con el **servicio sync** (Parse Server): actualizar schemas y **subir, actualizar y traer** datos en Parse.
 
-## 📁 Estructura de Carpetas
+## Variables de entorno
 
-```
-backend/modules/sync/
-├── __init__.py                 # Exporta el módulo y registra servicios
-├── src/
-│   ├── __init__.py
-│   ├── resources/             # Recursos (clientes y servicios)
-│   │   ├── __init__.py
-│   │   ├── parse_client.py           # Cliente Parse individual
-│   │   ├── parse_client_factory.py   # Factory para crear clientes por BD
-│   │   ├── parser_client.py          # Cliente HTTP del Parser Service
-│   │   ├── sync_manager.py           # Gestor principal de sincronización
-│   │   └── parser_service.py         # Orquestador del Parser Service
-│   ├── functionalities.py     # Funcionalidades principales del módulo
-│   ├── routes.py              # Rutas API del módulo
-│   └── schemas.py             # Schemas Pydantic
-└── README.md
-```
+| Variable | Descripción |
+|---------|-------------|
+| `SYNC_SERVICE_URL` | URL base del servicio sync (ej. `http://sync:1337` o `http://localhost:1337`) |
+| `SYNC_SCHEMA_API_SECRET` | Secret para `PUT /api/schema/classes` en el sync (mismo que en el sync) |
+| `PARSE_MASTER_KEY` | Master key de Parse (para llamar a la API Parse desde el backend) |
+| `PARSE_APP_ID` o `APP_ID` | App ID de Parse |
+| `SYNC_HTTP_TIMEOUT` | Timeout en segundos para peticiones HTTP al sync (default: 30) |
 
-## 🏗️ Arquitectura
+## Rutas (integración con la API Parse del sync)
 
-### Cliente Parse por Base de Datos
+### Schema (clases)
 
-Cada base de datos configurada en `config.yaml` puede tener su propio cliente Parse:
+- **GET /sync/schema/classes** – Lista clases registradas en sync.
+- **PUT /sync/schema/classes** – Actualiza clases en sync (body: `{ "classNames": ["ClaseA", "ClaseB"] }`). Útil tras migraciones.
 
-- **ParseClient**: Cliente individual para una base de datos específica
-- **ParseClientFactory**: Factory que mantiene un singleton de clientes Parse (uno por BD)
+### Traer datos (Parse)
 
-### Cliente del Parser Service
+- **GET /sync/parse/classes/{class_name}** – Lista objetos de una clase. Query: `limit`, `skip`, `where` (JSON).
+- **GET /sync/parse/classes/{class_name}/{object_id}** – Obtiene un objeto por `objectId`.
 
-- **ParserClient**: Cliente HTTP que consume el servicio parser (stateless)
+### Subir datos (Parse)
 
-### SyncManager
+- **POST /sync/parse/classes/{class_name}** – Crea **un** objeto (body: campos del objeto).
+- **POST /sync/parse/classes/{class_name}/bulk** – Sube **varios** objetos (body: lista de objetos, máx. 100).
 
-El `SyncManager` es la interfaz principal que el loader y otros módulos core usarán:
+### Actualizar / eliminar (Parse)
 
-- Coordina todos los clientes Parse
-- Proporciona métodos unificados para sincronización
-- Se inicializa automáticamente leyendo la configuración de `config.yaml`
+- **PUT /sync/parse/classes/{class_name}/{object_id}** – Actualiza un objeto (body: campos a actualizar).
+- **DELETE /sync/parse/classes/{class_name}/{object_id}** – Elimina un objeto.
 
-## ⚙️ Configuración
+Las rutas pasan por el middleware de autenticación del backend (salvo que el módulo sea público en config).
 
-En `config.yaml`, cada base de datos puede tener configuración de Parse:
+## Ejemplos
 
-```yaml
-databases:
-  core_db:
-    baseUri: 'postgresql://dbuser:dbpass@local-db:5432/agros-local'
-    sync: true  # Habilitar sincronización para esta BD
-    parse:
-      server_url: 'http://parse-server:1337/parse'
-      app_id: 'your-app-id'
-      master_key: 'your-master-key'
-      rest_api_key: 'your-rest-api-key'  # Opcional
+**Traer lista (con filtro):**
+```http
+GET /sync/parse/classes/PersonEntity?limit=20&skip=0&where={"name":"Juan"}
 ```
 
-## 💾 Persistencia en app_config
-
-Al levantar el módulo, el `SyncManager` registra en `app_config` la ubicación del Parse Server y el `app_id`
-del cliente creado. Esto permite reutilizar la configuración desde la base de datos.
-
-Claves guardadas (por cada base de datos):
-
-- `parser-<db>-host` → `client.server_url`
-- `parser-<db>-app-id` → `client.app_id`
-
-## 🔌 Uso desde el Loader/Core
-
-El loader puede usar el módulo sync de la siguiente manera:
-
-```python
-from core.container import Container
-
-# Obtener el SyncManager desde el container
-container = Container()
-sync_manager = container.get("sync", "modules")
-
-# Sincronizar un objeto
-result = sync_manager.sync_object(
-    database_key="core_db",
-    class_name="Farmers",
-    object_data={
-        "name": "Juan Pérez",
-        "dni": "12345678"
-    }
-)
-
-# Consultar objetos
-objects = sync_manager.query_objects(
-    database_key="core_db",
-    class_name="Farmers",
-    filters={"dni": "12345678"}
-)
-
-# Obtener estado de todos los clientes
-status = sync_manager.get_all_clients_status()
+**Traer uno:**
+```http
+GET /sync/parse/classes/PersonEntity/abc123objectId
 ```
 
-## 📦 Dependencias
+**Subir uno:**
+```http
+POST /sync/parse/classes/PersonEntity
+Content-Type: application/json
 
-El módulo requiere el SDK de Parse Server para Python:
-
-```bash
-pip install parse-rest
+{"name": "Juan", "email": "juan@example.com"}
 ```
 
-O si prefieres usar el SDK oficial de Parse:
+**Subir varios (bulk):**
+```http
+POST /sync/parse/classes/PersonEntity/bulk
+Content-Type: application/json
 
-```bash
-pip install parse
+[
+  {"name": "Juan", "email": "juan@example.com"},
+  {"name": "María", "email": "maria@example.com"}
+]
 ```
 
-## 🚀 Inicialización
+**Actualizar:**
+```http
+PUT /sync/parse/classes/PersonEntity/abc123objectId
+Content-Type: application/json
 
-El módulo se inicializa automáticamente cuando se carga desde `config.yaml`:
-
-1. El `Module.register_services()` registra el `SyncManager` en el container
-2. El `SyncManager` lee la configuración de `config.yaml`
-3. Para cada BD con `sync: true`, crea un cliente Parse
-4. Los clientes se mantienen como singletons en el `ParseClientFactory`
-
-## 🔄 Flujo de Sincronización
-
-1. **Objeto creado/modificado en BD local** → Se dispara evento
-2. **Loader/Sync detecta cambio** → Llama a `sync_manager.sync_object()`
-3. **SyncManager obtiene cliente Parse** → `ParseClientFactory.get_client(database_key)`
-4. **Cliente Parse sincroniza** → Envía a Parse Server
-5. **Parse Server almacena** → Disponible para sincronización offline
-
-## 📝 Notas
-
-- Cada base de datos tiene su propio cliente Parse independiente
-- Los clientes se crean bajo demanda (lazy initialization)
-- El factory mantiene singletons para evitar múltiples conexiones
-- El módulo puede funcionar sin Parse instalado (modo mock para desarrollo)
+{"name": "Juan Pérez", "updated": true}
+```

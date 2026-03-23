@@ -78,7 +78,7 @@ class Funcionalities:
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
         search: str = "",
-        country_id: Optional[int] = None
+        country_id: Optional[str] = None
     ) -> PaginatedDepartmentResponse:
         """Obtiene departments paginados (solo los no deshabilitados)"""
         db = self._get_db()
@@ -150,7 +150,7 @@ class Funcionalities:
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
         search: str = "",
-        department_id: Optional[int] = None
+        department_id: Optional[str] = None
     ) -> PaginatedProvinceResponse:
         """Obtiene provinces paginados (solo los no deshabilitados)"""
         db = self._get_db()
@@ -222,7 +222,7 @@ class Funcionalities:
         sort_by: Optional[str] = None,
         order: Optional[str] = "asc",
         search: str = "",
-        province_id: Optional[int] = None
+        province_id: Optional[str] = None
     ) -> PaginatedDistrictResponse:
         """Obtiene districts paginados (solo los no deshabilitados)"""
         db = self._get_db()

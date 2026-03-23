@@ -331,10 +331,10 @@ class Funcionalities:
         last_lot_query = query.order_by(LotModel.created_at.desc()).first()
         
         # Sumatoria de kilos (net_weight)
-        kg_total_result = query.with_entities(
-            func.coalesce(func.sum(LotModel.net_weight), 0)
-        ).scalar()
-        kg_total = float(kg_total_result) if kg_total_result else 0.0
+        # kg_total_result = query.with_entities(
+        #     func.coalesce(func.sum(LotModel.net_weight), 0)
+        # ).scalar()
+        # kg_total = float(kg_total_result) if kg_total_result else 0.0
         
         # Total de costos de los lotes (sumatoria del costo de las compras)
         # Importar PurchaseModel para calcular el costo total
@@ -346,21 +346,25 @@ class Funcionalities:
         
         # Calcular el costo total de las compras de esos lotes
         total_cost = 0.0
+        total_quantity = 0.0
         if lot_ids:
-            cost_result = db.query(
-                func.coalesce(func.sum(PurchaseModel.quantity * PurchaseModel.price), 0)
+            result = db.query(
+                func.coalesce(func.sum(PurchaseModel.quantity * PurchaseModel.price), 0).label("total_cost"),
+                func.coalesce(func.sum(PurchaseModel.quantity), 0).label("total_quantity")
             ).filter(
                 PurchaseModel.lot_id.in_(lot_ids),
                 PurchaseModel.disabled_at.is_(None)
-            ).scalar()
-            total_cost = float(cost_result) if cost_result else 0.0
+            ).one()
+
+            total_cost = float(result.total_cost)
+            total_quantity = float(result.total_quantity)
         
         return WarehouseSummaryResponse(
             active_lots=active_lots,
             last_lot=last_lot_query,
             stock_lots=stock_lots,
             total_lots=total_lots,
-            kg_total=kg_total,
+            kg_total=total_quantity,
             total=total_cost
         )
     

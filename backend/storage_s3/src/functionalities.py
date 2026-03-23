@@ -66,6 +66,39 @@ class Funcionalities:
             return None
             
         return MediaResponse.model_validate(media)
+    
+    def get_url_by_media_id(self, media_id: UUID, expiration: int = 3600) -> Optional[str]:
+        """
+        Obtiene la url firmada de descarga por el media ID.
+        
+        Args:
+            media_id: UUID del media
+            expiration: Tiempo de expiración en segundos (por defecto 1 hora)
+            
+        Returns:
+            url de descarga si se encuentra, None si no existe
+        """
+        db = self._get_db()
+        
+        media = db.query(MediaModel).filter(
+            MediaModel.id == media_id,
+            MediaModel.disabled_at.is_(None)
+        ).first()
+        
+        if not media:
+            return None
+        
+        # obtengo la url firmada para descargar el archivo
+        storage_service = self.container.get("storage")
+        url = storage_service.get_presigned_url(
+            key=media.path,
+            expiration=expiration,
+            is_download=True
+        )
+        if not url:
+            return None
+        
+        return url
 
     def get_medias_paginated(
         self, 

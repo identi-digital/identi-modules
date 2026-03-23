@@ -1,74 +1,151 @@
 """
-Rutas API para el módulo sync.
+Rutas del módulo sync: integración con el servicio sync (schemas + Parse CRUD).
 """
-from fastapi import APIRouter, Depends, Request
-from typing import Dict, Any, Optional, List
-from .schemas import SyncStatusResponse, SyncObjectRequest, SyncObjectResponse
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from typing import Any, Optional
+
+from modules.sync.src.service import SyncService, SyncServiceError
+from modules.sync.src.schemas import SchemaClassesUpdate
 
 router = APIRouter(prefix="/sync", tags=["sync"])
 
 
-def get_sync_manager(request: Request):
-    """
-    Dependency para obtener el SyncManager desde el container.
-    """
-    container = request.app.state.container
-    return container.get("sync", "modules")
+def get_sync_service(request: Request) -> SyncService:
+    """Obtiene el servicio sync desde el container (app.state.container)."""
+    container = getattr(request.app.state, "container", None)
+    if not container:
+        raise HTTPException(status_code=503, detail="Container no disponible")
+    try:
+        return container.get("sync", "modules")
+    except ValueError:
+        raise HTTPException(status_code=503, detail="Servicio sync no registrado")
 
 
-def get_auth_token(request: Request) -> Optional[str]:
-    """
-    Extrae el token de autenticación del header Authorization.
-    
-    Returns:
-        Token de autenticación o None si no está presente
-    """
-    authorization = request.headers.get("Authorization")
-    if not authorization:
-        return None
-    
-    # Soporta tanto "Bearer <token>" como "Identi <token>"
-    if authorization.startswith("Bearer "):
-        return authorization.replace("Bearer ", "").strip()
-    elif authorization.startswith("Identi "):
-        return authorization.replace("Identi ", "").strip()
-    
-    return None
+# --- Schema (actualizar / listar clases) ---
+
+@router.get("/schema/classes", summary="Lista clases registradas en sync")
+def get_schema_classes(service: SyncService = Depends(get_sync_service)):
+    """Obtiene la lista de clases actualmente registradas en el servicio sync."""
+    try:
+        return service.get_schema_classes()
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
 
 
-@router.get("/status", response_model=Dict[str, SyncStatusResponse])
-async def get_sync_status(sync_manager=Depends(get_sync_manager)):
+@router.put("/schema/classes", summary="Actualizar clases en sync")
+def update_schema_classes(body: SchemaClassesUpdate, service: SyncService = Depends(get_sync_service)):
     """
-    Obtiene el estado de todos los clientes Parse.
+    Notifica al servicio sync las clases a registrar (p. ej. tras migraciones).
+    El sync registrará beforeSave para las nuevas clases.
     """
-    status = sync_manager.get_all_clients_status()
-    return status
+    try:
+        return service.update_schema_classes(body.classNames)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
 
 
-@router.post("/{database_key}/{class_name}", response_model=SyncObjectResponse)
-async def sync_object(
-    database_key: str,
+# --- Parse: leer / escribir / actualizar datos ---
+
+@router.get(
+    "/parse/classes/{class_name}",
+    summary="Listar objetos de una clase Parse",
+)
+def parse_list(
     class_name: str,
-    request: SyncObjectRequest,
-    sync_manager=Depends(get_sync_manager),
-    token: Optional[str] = Depends(get_auth_token)
+    limit: int = Query(100, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    where: Optional[str] = Query(None, description="JSON where clause"),
+    service: SyncService = Depends(get_sync_service),
 ):
-    """
-    Sincroniza un objeto con Parse Server usando token de autenticación.
-    """
-    result = sync_manager.sync_object(database_key, class_name, request.object_data, token=token)
-    return SyncObjectResponse(success=result is not None, data=result)
+    """Lista objetos de la clase Parse (query con where, limit, skip)."""
+    import json
+    where_dict = json.loads(where) if where else None
+    try:
+        return service.parse_get_class(class_name, where=where_dict, limit=limit, skip=skip)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="'where' debe ser JSON válido")
 
 
-@router.get("/{database_key}/{class_name}", response_model=List[Dict[str, Any]])
-async def query_objects(
-    database_key: str,
+@router.get(
+    "/parse/classes/{class_name}/{object_id}",
+    summary="Obtener un objeto Parse por id",
+)
+def parse_get_one(
     class_name: str,
-    filters: Optional[Dict[str, Any]] = None,
-    sync_manager=Depends(get_sync_manager),
-    token: Optional[str] = Depends(get_auth_token)
+    object_id: str,
+    service: SyncService = Depends(get_sync_service),
 ):
-    """
-    Consulta objetos desde Parse Server usando token de autenticación.
-    """
-    return sync_manager.query_objects(database_key, class_name, filters, token=token)
+    """Obtiene un objeto de Parse por class name y objectId."""
+    try:
+        return service.parse_get_one(class_name, object_id)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
+
+
+@router.post(
+    "/parse/classes/{class_name}",
+    summary="Crear objeto en Parse",
+)
+def parse_create(
+    class_name: str,
+    body: dict[str, Any],
+    service: SyncService = Depends(get_sync_service),
+):
+    """Crea un nuevo objeto en la clase Parse."""
+    try:
+        return service.parse_create(class_name, body)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
+
+
+@router.post(
+    "/parse/classes/{class_name}/bulk",
+    summary="Subir varios objetos a Parse (crear en lote)",
+)
+def parse_bulk_create(
+    class_name: str,
+    body: list[dict[str, Any]],
+    service: SyncService = Depends(get_sync_service),
+):
+    """Crea varios objetos en la clase Parse. Body: lista de objetos (cada uno con sus campos)."""
+    if not isinstance(body, list) or len(body) > 100:
+        raise HTTPException(status_code=400, detail="Body debe ser una lista de hasta 100 objetos")
+    try:
+        return service.parse_bulk_create(class_name, body)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
+
+
+@router.put(
+    "/parse/classes/{class_name}/{object_id}",
+    summary="Actualizar objeto en Parse",
+)
+def parse_update(
+    class_name: str,
+    object_id: str,
+    body: dict[str, Any],
+    service: SyncService = Depends(get_sync_service),
+):
+    """Actualiza un objeto en Parse (campos enviados en body)."""
+    try:
+        return service.parse_update(class_name, object_id, body)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)
+
+
+@router.delete(
+    "/parse/classes/{class_name}/{object_id}",
+    summary="Eliminar objeto en Parse",
+)
+def parse_delete(
+    class_name: str,
+    object_id: str,
+    service: SyncService = Depends(get_sync_service),
+):
+    """Elimina un objeto en Parse."""
+    try:
+        return service.parse_delete(class_name, object_id)
+    except SyncServiceError as e:
+        raise HTTPException(status_code=e.status_code or 502, detail=e.message)

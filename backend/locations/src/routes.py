@@ -33,7 +33,7 @@ def get_departments(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
-    country_id: Optional[int] = Query(None, description="Id del país"),
+    country_id: Optional[str] = Query(None, description="Id del país"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de departments"""
@@ -46,7 +46,7 @@ def get_provinces(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
-    department_id: Optional[int] = Query(None, description="Id del departamento"),
+    department_id: Optional[str] = Query(None, description="Id del departamento"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de provinces"""
@@ -58,7 +58,7 @@ def get_districts(
     sort_by: Optional[str] = Query(None, description="Campo por el cual ordenar"),
     order: Optional[str] = Query("asc", description="Orden: 'asc' o 'desc'"),
     search: str = Query("", description="Texto de búsqueda"),
-    province_id: Optional[int] = Query(None, description="Id de la provincia"),
+    province_id: Optional[str] = Query(None, description="Id de la provincia"),
     svc=Depends(get_funcionalities)
 ):
     """Obtiene una lista paginada de districts"""
