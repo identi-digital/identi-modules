@@ -160,7 +160,53 @@ class Funcionalities:
         except Exception as e:
             db.rollback()
             raise e
+
     
+    def disable_agent(self, agent_id: UUID) -> Optional[AgentResponse]:
+        """Deshabilita un agente"""
+        db = self._get_db()
+        try:
+            agent = db.query(AgentModel).filter(
+                AgentModel.id == agent_id,
+                AgentModel.disabled_at.is_(None)
+            ).first()
+            
+            if not agent:
+                return None
+            
+            agent.disabled_at = datetime.now()
+            agent.updated_at = datetime.utcnow()
+            
+            db.commit()
+            db.refresh(agent)
+            return AgentResponse.model_validate(agent)
+        except Exception as e:
+            db.rollback()
+            raise e
+    
+    def restore_agent(self, agent_id: UUID) -> Optional[AgentResponse]:
+        """Restaura un agente deshabilitado"""
+        db = self._get_db()
+        try:
+            agent = db.query(AgentModel).filter(
+                AgentModel.id == agent_id,
+                AgentModel.disabled_at.isnot(None)
+            ).first()
+            
+            if not agent:
+                return None
+            
+            agent.disabled_at = None
+            agent.updated_at = datetime.utcnow()
+            
+            db.commit()
+            db.refresh(agent)
+            return AgentResponse.model_validate(agent)
+        except Exception as e:
+            db.rollback()
+            raise e
+            
+
     # ========== AGENT ASSIGNMENT METHODS ==========
     def assign_farmer_to_agent(self, assignment_data: AgentAssignmentCreate) -> AgentAssignmentResponse:
         """Asigna un farmer a un agente"""

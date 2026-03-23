@@ -452,6 +452,62 @@ def _create_and_populate_intermediate_table(
         traceback.print_exc()
 
 
+def _is_valid_uuid_string(s: str) -> bool:
+    """Comprueba si el string tiene formato UUID válido."""
+    if not isinstance(s, str) or len(s) != 36:
+        return False
+    try:
+        UUID(s)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
+def _resolve_fk_strings_to_uuids(db: Session, model_class, filtered_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Si una columna FK tiene un valor string que no es UUID (ej: DNI "72117500"),
+    intenta buscar la entidad referenciada por dni/code/name y reemplazar con el UUID.
+    """
+    result = dict(filtered_data)
+    inspector = inspect(model_class)
+    for col in inspector.columns:
+        if col.name not in result:
+            continue
+        val = result[col.name]
+        if not isinstance(val, str):
+            continue
+        if _is_valid_uuid_string(val):
+            continue
+        # Es string pero no UUID - puede ser identificador lógico (DNI, code, etc.)
+        fks = [fk for fk in col.foreign_keys if fk.target_column is not None]
+        if not fks:
+            continue
+        fk = fks[0]
+        target_table = fk.column.table.name if hasattr(fk.column, 'table') else None
+        if not target_table:
+            continue
+        target_model = find_model_by_entity_name(target_table)
+        if not target_model:
+            continue
+        val_str = str(val).strip()
+        found = None
+        for attr in ("dni", "code", "name"):
+            if hasattr(target_model, attr):
+                try:
+                    found = db.query(target_model).filter(getattr(target_model, attr) == val_str).first()
+                    if found:
+                        break
+                except Exception:
+                    try:
+                        db.rollback()
+                    except Exception:
+                        pass
+                    continue
+        if found:
+            result[col.name] = found.id
+    return result
+
+
 def extract_entity_data_from_detail(detail: "DetailArray") -> tuple[Dict[str, Any], Dict[str, list]]:
     """
     Extrae los datos de la entidad desde el array detail del registro.
@@ -572,17 +628,25 @@ def process_register_to_entity(
             print(f"⚠️  No se encontró modelo para entidad '{entity_name}'")
             return None
         
+        sys.stderr.write(f"    [register_processor] Extrayendo entity_data del detail...\n")
+        sys.stderr.flush()
         # Extraer los datos del detail
         # Ahora devuelve: (entity_data, many_to_many_data)
         entity_data, many_to_many_data = extract_entity_data_from_detail(register.detail or [])
+        sys.stderr.write(f"    [register_processor] entity_data keys: {list(entity_data.keys())}\n")
+        sys.stderr.flush()
         
         if not entity_data and not many_to_many_data:
             print(f"⚠️  No se encontraron datos en el detail del registro {register.id}")
             return None
         
+        sys.stderr.write(f"    [register_processor] Inspeccionando modelo {model_class.__name__}...\n")
+        sys.stderr.flush()
         # Obtener los atributos del modelo para validar qué campos podemos usar
         model_inspector = inspect(model_class)
         model_columns = {col.name for col in model_inspector.columns}
+        sys.stderr.write(f"    [register_processor] Creando/actualizando entidad...\n")
+        sys.stderr.flush()
         
         # Obtener relationships many-to-many del modelo
         model_relationships = {}
@@ -606,6 +670,9 @@ def process_register_to_entity(
             # Si es una columna del modelo (incluye foreign keys)
             if key in model_columns:
                 filtered_data[key] = value
+
+        # Resolver valores string en columnas FK: si farmer_id="72117500" (DNI), buscar farmer por dni
+        filtered_data = _resolve_fk_strings_to_uuids(db, model_class, filtered_data)
         
         # Heredar identity_id del core_register si la tabla destino tiene ese campo
         if 'identity_id' in model_columns and register.identity_id:
@@ -692,13 +759,19 @@ def process_register_to_entity(
         
         # Crear un nuevo registro en la entidad
         # Nota: Si no hay filtered_data pero sí hay m2m_data, igual crear la entidad vacía
+        sys.stderr.write(f"    [register_processor] Instanciando {model_class.__name__} con filtered_data...\n")
+        sys.stderr.flush()
         new_entity = model_class(**filtered_data) if filtered_data else model_class()
         # si es una compra, crear el ticket_number
         if (getattr(new_entity, 'ticket_number', None) is None) and entity_name == 'purchases':
             new_entity.ticket_number = _generar_numero_recibo_fecha_timestamp_aleatorio()
         
+        sys.stderr.write(f"    [register_processor] db.add + flush...\n")
+        sys.stderr.flush()
         db.add(new_entity)
         db.flush()  # Flush para obtener el ID antes de commit
+        sys.stderr.write(f"    [register_processor] flush OK, commit...\n")
+        sys.stderr.flush()
         
         # Establecer relaciones many-to-many
         pending_m2m_data = {}  # Para procesar después del commit
@@ -748,4 +821,4 @@ def process_register_to_entity(
         print(f"❌ Error al procesar registro {register.id} a entidad: {e}")
         import traceback
         traceback.print_exc()
-        return None
+        raise

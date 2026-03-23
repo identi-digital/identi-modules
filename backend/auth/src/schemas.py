@@ -55,6 +55,32 @@ class PaginatedIdentityResponse(BaseModel):
     page_size: int
     total_pages: int
 
+class GetOrganizationResponse(BaseModel):
+    eid: str
+    name: str
+    short_name: str
+    logo_path: Optional[str] = None
+    country_id: Optional[str] = None
+    department_id: Optional[str] = None
+    province_id: Optional[str] = None
+    district_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    disabled_at: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
+
+class PatchOrganizationResponse(BaseModel):
+    message: str
+
+class PatchOrganization(BaseModel):
+    logo_path: Optional[str] = None
+    country_id: Optional[str] = None
+    department_id: Optional[str] = None
+    province_id: Optional[str] = None
+    district_id: Optional[str] = None
+
 # Auth Session Schemas
 class AuthSessionCreate(BaseModel):
     identity_id: UUID

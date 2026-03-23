@@ -73,15 +73,15 @@ def get_job_headers(job_id: UUID, svc=Depends(get_funcionalities)):
     return result
 
 
-@router.get("/jobs/{job_id}/errors", response_model=PaginatedJobRowsResponse)
-def get_job_errors(
+@router.get("/jobs/{job_id}/rows", response_model=PaginatedJobRowsResponse)
+def get_job_rows(
     job_id: UUID,
-    page: int = Query(1, ge=1),
-    per_page: int = Query(10, ge=1, le=500),
-    errors_only: bool = Query(False, description="Si true, solo filas que tienen al menos un error"),
+    page: int = Query(1, ge=1, description="Página (1-based)"),
+    per_page: int = Query(25, ge=1, le=100, description="Filas por página (máx 100)"),
+    errors_only: bool = Query(False, description="Si true, solo filas con al menos un error"),
     svc=Depends(get_funcionalities),
 ):
-    """Filas del job paginadas. Cada fila incluye por columna: valor y columna_error (mensaje si hay error)."""
+    """Filas del job paginadas. Cada fila incluye valor y columna_error por columna. Útil para jobs con muchas filas (hasta 10.000)."""
     result = svc.get_job_rows(job_id, page=page, per_page=per_page, errors_only=errors_only)
     if result is None:
         raise HTTPException(status_code=404, detail="Job no encontrado")
@@ -90,65 +90,52 @@ def get_job_errors(
 
 @router.get("/jobs/{job_id}/errors/excel")
 def get_job_errors_excel(job_id: UUID, svc=Depends(get_funcionalities)):
-    """Descarga reporte de errores en Excel (fila, columna, mensaje, valor)."""
-    from openpyxl import Workbook
-    from openpyxl.styles import Font, PatternFill, Border, Side
-    from io import BytesIO
-
-    job = svc.get_job_by_id(job_id)
-    if not job:
-        raise HTTPException(status_code=404, detail="Job no encontrado")
-    if not job.errors:
-        raise HTTPException(status_code=404, detail="No hay errores para este job")
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Errores"[:31]
-    headers = ["Fila", "Columna", "Mensaje", "Valor"]
-    for c, h in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=c, value=h)
-        cell.fill = PatternFill(start_color="C00000", end_color="C00000", fill_type="solid")
-        cell.font = Font(bold=True, color="FFFFFF")
-    thin = Side(style="thin")
-    for row_idx, err in enumerate(job.errors, 2):
-        ws.cell(row=row_idx, column=1, value=err.get("row_index"))
-        ws.cell(row=row_idx, column=2, value=err.get("column_name", ""))
-        ws.cell(row=row_idx, column=3, value=err.get("message", ""))
-        ws.cell(row=row_idx, column=4, value=err.get("value"))
-    bio = BytesIO()
-    wb.save(bio)
-    bio.seek(0)
+    """Descarga Excel solo con filas que tienen errores. Columnas: Fila, Col1, Col1_error, Col2, Col2_error, ..."""
+    try:
+        bio, filename = svc.get_job_errors_excel(job_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     return StreamingResponse(
         bio,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="errores_carga_{job_id}.xlsx"'},
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
-@router.post("/upload", response_model=UploadAcceptedResponse, status_code=202)
-def upload_file(
+@router.post("/upload/{form_id}", response_model=UploadAcceptedResponse, status_code=202)
+async def upload_file(
+    form_id: UUID,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    form_id: Optional[UUID] = Query(None),
-    entity_name: Optional[str] = Query(None),
     svc=Depends(get_funcionalities),
 ):
-    """Acepta archivo Excel y encola procesamiento en segundo plano. Límite 10.000 filas. Requiere form_id o entity_name."""
+    """Acepta archivo Excel y encola procesamiento en segundo plano. Límite 10.000 filas. Requiere form_id. El entity_name se obtiene automáticamente del formulario."""
     if not file.filename or not file.filename.lower().endswith(".xlsx"):
         raise HTTPException(status_code=400, detail="Se requiere un archivo .xlsx")
     data_collector = svc.container.get("data_collector")
-    form_with_schema = None
-    if form_id:
-        form_with_schema = data_collector.get_form_by_id(form_id)
-    elif entity_name:
-        form_with_schema = data_collector.get_form_by_entity_name(entity_name)
+    form_with_schema = data_collector.get_form_by_id(form_id)
     if not form_with_schema:
-        raise HTTPException(status_code=400, detail="Formulario no encontrado. Indique form_id o entity_name válido.")
-    content = file.read()
+        raise HTTPException(status_code=400, detail="Formulario no encontrado. Indique un form_id válido.")
+    content = await file.read()
     from openpyxl import load_workbook
-    wb = load_workbook(BytesIO(content), read_only=True, data_only=True)
+    wb = load_workbook(BytesIO(content), data_only=True)
     ws = wb.active
-    data_rows = max(0, (ws.max_row - 2))
+    # max_row puede fallar en algunos Excel; iterar para hallar la última fila con datos
+    max_row = ws.max_row if ws.max_row is not None else 0
+    if max_row <= 1:
+        actual_last = 0
+        for row in ws.iter_rows(min_row=1, max_row=10002):
+            if any(cell.value is not None for cell in row):
+                actual_last = row[0].row
+        max_row = max(max_row, actual_last)
+    # Plantilla: fila 1=cabeceras, fila 2=hints, fila 3+=datos. O fila 1=cabeceras, fila 2+=datos (sin hints)
+    data_rows = max(0, max_row - 2) if max_row >= 3 else max(0, max_row - 1)
     wb.close()
+    if data_rows == 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El archivo parece no tener filas de datos (max_row={max_row}). Fila 1=cabeceras; si usa hints, fila 2=hints y desde fila 3 los datos.",
+        )
     if data_rows > 10000:
         raise HTTPException(status_code=400, detail="Máximo 10.000 filas de datos permitidas.")
     job = svc.create_job(
@@ -158,4 +145,7 @@ def upload_file(
         total_rows=data_rows,
     )
     background_tasks.add_task(svc.process_upload_background, job.id, content)
-    return UploadAcceptedResponse(job_id=job.id)
+    return UploadAcceptedResponse(
+        job_id=job.id,
+        message=f"Carga aceptada. Procesando {data_rows} filas en segundo plano. Consulte GET /bulk-upload/jobs/{job.id} para ver el progreso (processed_rows, success_count, error_count).",
+    )

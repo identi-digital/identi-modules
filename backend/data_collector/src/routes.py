@@ -52,7 +52,7 @@ def get_identity_from_token(request: Request) -> Optional[UUID]:
         # El 'sub' (subject) del token contiene el identity_id
         sub = decoded.get("sub")
         if sub:
-            return UUID(sub)
+            return sub
         return None
     except Exception as e:
         print(f"⚠️  Error al decodificar token para obtener identity_id: {e}")

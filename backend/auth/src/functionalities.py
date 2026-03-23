@@ -9,7 +9,7 @@ from ..environment import (
     AUTHX_BASE_URL, AUTH_APP_ID, AUTH_APP_ACCESS_TOKEN,
     AUTH_APP_CONTEXT_ID, TENANT)
 from .schemas import (
-    IdentityCreate, IdentityUpdate, IdentityResponse, PaginatedIdentityResponse
+    IdentityCreate, IdentityUpdate, IdentityResponse, PaginatedIdentityResponse, PatchOrganization, PatchOrganizationResponse, GetOrganizationResponse
 )
 
 
@@ -145,6 +145,7 @@ class Funcionalities:
                 last_name=identity_data.last_name
             )
             identity_dict['sub'] = register_response['entity_id']
+            identity_dict["id"] = register_response['entity_id']
             # Los claims se pueden generar aquí o dejar vacíos para que authz los complete
             if 'claims' not in identity_dict:
                 identity_dict['claims'] = {}
@@ -180,4 +181,22 @@ class Funcionalities:
             return IdentityResponse.model_validate(identity)
         except Exception as e:
             db.rollback()
+            raise e
+
+    def patch_organization(self, tenant_id: UUID, organization_data: PatchOrganization) -> Optional[PatchOrganizationResponse]:
+        """Actualiza una organización existente"""
+        authx_service = self.authx_service
+        try:
+            organization = authx_service.patch_organization(tenant_id,  **organization_data.model_dump(exclude_unset=True))
+            return PatchOrganizationResponse.model_validate(organization)
+        except Exception as e:
+            raise e
+        
+    def get_organization(self, tenant_id: UUID) -> Optional[GetOrganizationResponse]:
+        """Obtiene una organización por tenant"""
+        authx_service = self.authx_service
+        try:
+            organization = authx_service.get_organization(tenant_id)
+            return GetOrganizationResponse.model_validate(organization)
+        except Exception as e:
             raise e

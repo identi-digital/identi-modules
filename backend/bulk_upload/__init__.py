@@ -13,7 +13,7 @@ class Module:
     def __init__(self, container, **kwargs):
         self.container = container
         self.options = kwargs
-
+        print("hi")
     def register_services(self):
         self.log("registrando servicios")
         from .src.functionalities import Funcionalities

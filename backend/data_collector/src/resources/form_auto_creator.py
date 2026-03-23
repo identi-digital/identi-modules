@@ -200,11 +200,22 @@ def get_model_relationships(model_class) -> List[Dict[str, Any]]:
                 
                 # Solo procesar relaciones many-to-many (tienen secondary table)
                 if hasattr(relationship_obj, 'secondary') and relationship_obj.secondary is not None:
+                    # Obtener la tabla intermedia (many-to-many / secondary)
+                    many_to_many_table = None
+                    secondary = relationship_obj.secondary
+                    if isinstance(secondary, str):
+                        # Puede ser "public.farm_crops" o "farm_crops"
+                        many_to_many_table = secondary.split('.')[-1] if '.' in secondary else secondary
+                    elif hasattr(secondary, 'name'):
+                        many_to_many_table = getattr(secondary, 'name', None)
+                    if not many_to_many_table and hasattr(secondary, 'key'):
+                        many_to_many_table = getattr(secondary, 'key', None)
+
                     # Obtener la tabla destino
                     target_table = None
                     display_name = None
                     description = None
-                    
+
                     # Intentar obtener el nombre de la tabla de diferentes formas
                     try:
                         if hasattr(relationship_obj, 'mapper') and hasattr(relationship_obj.mapper, 'class_'):
@@ -233,6 +244,7 @@ def get_model_relationships(model_class) -> List[Dict[str, Any]]:
                         "name": rel_name,  # Nombre de la relación (ej: "crops")
                         "type_value": "entity",
                         "is_many_to_many": True,
+                        "many_to_many_table": many_to_many_table,  # Tabla intermedia (ej: farm_crops)
                         "is_foreign_key": True,  # Para que se trate como entidad
                         "foreign_key_table": target_table,
                         "nullable": True,  # Las relaciones m2m suelen ser opcionales
@@ -241,7 +253,7 @@ def get_model_relationships(model_class) -> List[Dict[str, Any]]:
                         "primary_key": False,
                         "unique": False
                     })
-                    print(f"      🔗 Many-to-Many detectado: {rel_name} -> {target_table}")
+                    print(f"      🔗 Many-to-Many detectado: {rel_name} -> {target_table} (tabla: {many_to_many_table})")
                     print(f"         display_name: {display_name}")
         
         print(f"      📊 Total relaciones many-to-many encontradas: {len(relationships)}")
@@ -397,10 +409,12 @@ def get_model_attributes(model_class) -> List[Dict[str, Any]]:
                 "enum_values": enum_values
             }
             
-            # Si es ForeignKey, usar type_value "entity"
+            # Si es ForeignKey, usar type_value "entity" y marcar que NO es many-to-many
             if is_foreign_key:
                 col_info["type_value"] = "entity"
-                print(f"        🏷️  type_value establecido como 'entity' para ForeignKey")
+                col_info["is_many_to_many"] = False
+                col_info["many_to_many_table"] = None
+                print(f"        🏷️  type_value establecido como 'entity' para ForeignKey (is_many_to_many: False)")
             # Si es ENUM, usar type_value "options"
             elif is_enum:
                 col_info["type_value"] = "options"
@@ -1080,8 +1094,16 @@ def create_instruction_from_tool(tool: Dict[str, Any], attr: Dict[str, Any], gro
         "is_unique": attr.get("unique", False),
         "is_optional": attr["nullable"],
         "is_representative": False,
+        "is_logical_identifier": False,  # Usuario lo configura en UI; solo uno por formulario
         "visual_table": group_index + 1
     }
+    # Para campos entity (FK), incluir foreign_key_table, is_many_to_many y many_to_many_table
+    if attr.get("type_value") == "entity":
+        if attr.get("foreign_key_table"):
+            gather_item["foreign_key_table"] = attr["foreign_key_table"]
+        gather_item["is_many_to_many"] = attr.get("is_many_to_many", False)
+        if attr.get("many_to_many_table"):
+            gather_item["many_to_many_table"] = attr["many_to_many_table"]
     
     # Si es un campo ENUM, agregar option al schema_gather
     if is_enum_field and enum_values:
@@ -1124,6 +1146,14 @@ def create_instruction_from_tool(tool: Dict[str, Any], attr: Dict[str, Any], gro
         gather_item["type_list_value"] = gather_config["type_list_value"]
     
     schema_gather = gather_item
+    
+    # Si entityMap.inputs tiene schema_gather, hacer merge (heredar): las propiedades del config
+    # sobrescriben o agregan a las existentes, sin reemplazar el schema_gather completo
+    if entity_map_inputs and "schema_gather" in entity_map_inputs:
+        config_schema_gather = entity_map_inputs["schema_gather"]
+        if isinstance(config_schema_gather, dict):
+            schema_gather = {**schema_gather, **config_schema_gather}
+            print(f"      ✓ schema_gather heredado desde entityMap.inputs: {list(config_schema_gather.keys())}")
     
     # Procesar schema_advanced de la tool (si existe) y convertirlo a schema_input_advanced
     # schema_advanced en las tools se convierte en schema_input_advanced en las instrucciones
@@ -1233,6 +1263,9 @@ def generate_schema_from_model(model_class, form_name: str, container, entity_ma
     # Las relaciones many-to-many se agregan al final de los atributos
     all_attributes = attributes + relationships
     print(f"    📋 Total de campos (columnas + relaciones): {len(all_attributes)}")
+
+    # Diccionario de relaciones many-to-many por nombre (para enriquecer atributos sintéticos)
+    relationships_by_name = {r["name"]: r for r in relationships}
     
     # Crear un diccionario de mapeo por nombre de campo para acceso rápido
     field_map_dict = {}
@@ -1242,6 +1275,31 @@ def generate_schema_from_model(model_class, form_name: str, container, entity_ma
             if field_name:
                 field_map_dict[field_name] = field_map
     
+    def _attr_from_entity_map_or_synthetic(field_name: str, field_map: Dict[str, Any]) -> Dict[str, Any]:
+        """Obtiene el attr del modelo o crea sintético, enriqueciendo con m2m si coincide con una relación."""
+        attr = next((a for a in all_attributes if a["name"] == field_name), None)
+        if attr:
+            return attr
+        # Verificar si hay una relación many-to-many con este nombre (en replace/merge el modelo podría no exponerla en all_attributes)
+        rel = relationships_by_name.get(field_name)
+        if rel:
+            # Usar la relación como base y aplicar display/description del entityMap
+            attr_enriched = dict(rel)
+            attr_enriched["display_name"] = field_map.get("displayName", rel.get("display_name", field_name))
+            attr_enriched["description"] = field_map.get("description", rel.get("description", ""))
+            print(f"      🔗 Campo '{field_name}' enriquecido desde relación m2m: many_to_many_table={rel.get('many_to_many_table')}")
+            return attr_enriched
+        # Crear atributo sintético genérico
+        print(f"      ⚠️  Campo '{field_name}' no existe en el modelo, creando atributo sintético")
+        return {
+            "name": field_name,
+            "type_value": "text",  # Tipo por defecto
+            "display_name": field_map.get("displayName", field_name),
+            "description": field_map.get("description", ""),
+            "is_optional": True,
+            "is_unique": False
+        }
+    
     # Determinar qué atributos procesar según el mode
     if entity_map_mode == "replace":
         # Modo replace: usar solo los items definidos en entityMap, respetando el orden
@@ -1250,21 +1308,8 @@ def generate_schema_from_model(model_class, form_name: str, container, entity_ma
         for field_map in entity_map:
             field_name = field_map.get("name")
             if field_name:
-                # Buscar el atributo en el modelo (columnas + relaciones)
-                attr = next((a for a in all_attributes if a["name"] == field_name), None)
-                if attr:
-                    attributes_to_process.append(attr)
-                else:
-                    # Si no existe en el modelo, crear un atributo sintético
-                    print(f"      ⚠️  Campo '{field_name}' no existe en el modelo, creando atributo sintético")
-                    attributes_to_process.append({
-                        "name": field_name,
-                        "type_value": "text",  # Tipo por defecto
-                        "display_name": field_map.get("displayName", field_name),
-                        "description": field_map.get("description", ""),
-                        "is_optional": True,
-                        "is_unique": False
-                    })
+                attr = _attr_from_entity_map_or_synthetic(field_name, field_map)
+                attributes_to_process.append(attr)
     else:
         # Modo merge: empezar con atributos del modelo (columnas + relaciones), luego actualizar/agregar según entityMap
         print(f"    🔄 Modo MERGE: empezando con {len(all_attributes)} atributos del modelo (columnas + relaciones)")
@@ -1282,16 +1327,13 @@ def generate_schema_from_model(model_class, form_name: str, container, entity_ma
                         "description": field_map.get("description", attributes_dict[field_name].get("description"))
                     })
                 else:
-                    # Agregar nuevo atributo desde entityMap
-                    print(f"      ➕ Agregando campo '{field_name}' desde entityMap")
-                    attributes_dict[field_name] = {
-                        "name": field_name,
-                        "type_value": "text",  # Tipo por defecto
-                        "display_name": field_map.get("displayName", field_name),
-                        "description": field_map.get("description", ""),
-                        "is_optional": True,
-                        "is_unique": False
-                    }
+                    # Agregar nuevo atributo desde entityMap (enriquecer con m2m si existe relación)
+                    attr_new = _attr_from_entity_map_or_synthetic(field_name, field_map)
+                    attributes_dict[field_name] = attr_new
+                    if attr_new.get("is_many_to_many"):
+                        print(f"      ➕ Agregando campo '{field_name}' desde entityMap (many-to-many: {attr_new.get('many_to_many_table')})")
+                    else:
+                        print(f"      ➕ Agregando campo '{field_name}' desde entityMap")
         
         # Mantener el orden original del modelo
         attributes_to_process = []
@@ -1563,7 +1605,8 @@ def _get_schema_attributes_signature(schema: Dict[str, Any]) -> str:
                         "name": field.get("name"),
                         "type_value": field.get("type_value"),
                         "nullable": field.get("is_optional", True),
-                        "unique": field.get("is_unique", False)
+                        "unique": field.get("is_unique", False),
+                        "is_logical_identifier": field.get("is_logical_identifier", False),
                     })
             break
     
@@ -1586,17 +1629,99 @@ def _get_schema_attributes_signature(schema: Dict[str, Any]) -> str:
                             "name": field_name,
                             "type_value": field.get("type_value"),
                             "nullable": field.get("is_optional", True),
-                            "unique": field.get("is_unique", False)
+                            "unique": field.get("is_unique", False),
+                            "is_logical_identifier": field.get("is_logical_identifier", False),
                         })
     
-    # Generar firma similar a _get_attributes_signature
+    # Generar firma similar a _get_attributes_signature (incluye is_logical_identifier para detectar cambios en entityMap)
     signature_data = []
     for attr in sorted(attributes, key=lambda x: x["name"]):
         signature_data.append({
             "name": attr["name"],
             "type_value": attr.get("type_value", "text"),
             "nullable": attr.get("nullable", True),
-            "unique": attr.get("unique", False)
+            "unique": attr.get("unique", False),
+            "is_logical_identifier": attr.get("is_logical_identifier", False),
         })
     
     return json.dumps(signature_data, sort_keys=True)
+
+
+def _get_logical_identifier_fields(schema: Optional[Dict[str, Any]]) -> List[str]:
+    """Lista los nombres de campo con is_logical_identifier=true (puede ser 0, 1 o más)."""
+    if not schema or not isinstance(schema.get("instructions"), list):
+        return []
+    out = []
+    for instruction in schema["instructions"]:
+        schema_gather = instruction.get("schema_gather")
+        if schema_gather is None:
+            continue
+        gather_fields = schema_gather if isinstance(schema_gather, list) else [schema_gather]
+        for field in gather_fields:
+            if isinstance(field, dict) and field.get("is_logical_identifier") is True:
+                name = field.get("name")
+                if name and name not in out:
+                    out.append(name)
+    return out
+
+
+def get_logical_identifier_field(schema: Optional[Dict[str, Any]], default: Optional[str] = None) -> Optional[str]:
+    """
+    Devuelve el nombre del campo que tiene is_logical_identifier=true en el schema.
+    Solo puede haber uno por formulario. Fuente de verdad para plantilla y carga masiva.
+
+    Args:
+        schema: schema_forms.schema (dict con 'instructions')
+        default: Si no hay campo con is_logical_identifier, devolver este valor (ej. "id").
+
+    Returns:
+        Nombre del campo (ej: 'dni'), o default si no hay o hay más de uno.
+    """
+    fields = _get_logical_identifier_fields(schema)
+    result = fields[0] if len(fields) == 1 else None
+    if result is not None:
+        return result
+    return default
+
+
+def get_entity_identifier_column(schema: Optional[Dict[str, Any]], default: str = "id") -> str:
+    """
+    Devuelve la columna a usar como identificador al resolver entidades (ej. para lookup en plantilla/carga masiva).
+    Si no hay is_logical_identifier en el schema, usa 'id' por defecto.
+    """
+    return get_logical_identifier_field(schema, default=default) or default
+
+
+def get_schema_columns_for_template(schema: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Devuelve la lista de columnas para plantilla Excel en orden estable.
+    Cada item: name, display_name (opcional), type_value, is_optional, is_logical_identifier.
+    """
+    if not schema or not isinstance(schema.get("instructions"), list):
+        return []
+    columns = []
+    seen = set()
+    for instruction in schema["instructions"]:
+        schema_gather = instruction.get("schema_gather")
+        if schema_gather is None:
+            continue
+        gather_fields = schema_gather if isinstance(schema_gather, list) else [schema_gather]
+        for field in gather_fields:
+            if not isinstance(field, dict) or not field.get("is_module_attr", False):
+                continue
+            name = field.get("name")
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            display_name = field.get("display_name") or name
+            col = {
+                "name": name,
+                "display_name": display_name,
+                "type_value": field.get("type_value", "text"),
+                "is_optional": field.get("is_optional", True),
+                "is_logical_identifier": field.get("is_logical_identifier", False),
+            }
+            if field.get("type_value") == "entity" and field.get("foreign_key_table"):
+                col["foreign_key_table"] = field["foreign_key_table"]
+            columns.append(col)
+    return columns

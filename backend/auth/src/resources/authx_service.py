@@ -109,7 +109,7 @@ class AuthXService:
     
     def register_entity(self, 
                     username,
-                    disabled = True,
+                    disabled = False,
                     roles = [],
                     permissions = [],
                     eid = None,
@@ -153,11 +153,11 @@ class AuthXService:
             'cell_number': cell_number,
             'sms_number': sms_number,
             'email': email,
-            'country': country,
             'organization_tenant_id': self.TENANT,
+            'country': country,
             'application_context_id': self.APP_CONTEXT_ID
         }
-        
+        print(data)
         response = requests.post(url, headers=headers , data=json.dumps(data))
         if response.status_code // 100 == 2:
             return response.json()
@@ -248,30 +248,43 @@ class AuthXService:
         else:
             raise Exception(f"Request failed (status_code: {response.status_code}): {response.json()}")
                    
-        url = f"{self.AUTHX_BASE_URL}/entities?tenant_id={self.TENANT}&application_context_id={self.APP_CONTEXT_ID}&which_users={which_users}"
+    def get_organization(self, tenant_id: str) -> dict:
+        """Obtiene una organización por tenant"""
         headers = {
             "Content-Type": "application/json",
         }
         headers['Authorization'] = f"Identi {self.access_token}"
-        
-        if page:
-            url = f"{url}&page={page}"
-        if per_page:
-            url = f"{url}&per_page={per_page}"
-        if sort_by:
-            url = f"{url}&sort_by={sort_by}"
-        if order:
-            url = f"{url}&order={order}"
-        if search:
-            url = f"{url}&search={search}"
-            
-        for role in roles:
-            url = f"{url}&roles={role}"
-        for permission in permissions:
-            url = f"{url}&permissions={permission}"
-
+        url = f"{self.AUTHX_BASE_URL}/organizations/{tenant_id}"
+        print(url)
+        print(headers)
         response = requests.get(url, headers=headers)
         if response.status_code // 100 == 2:
             return response.json()
+        else:
+            raise Exception(f"Request failed (status_code: {response.status_code}): {response.json()}")
         
-        raise Exception(f"Request failed (status_code: {response.status_code}): {response.json()}")
+    def patch_organization(self, 
+                            tenant_id: str,
+                            logo_path: str = None,
+                            country_id: str = None,
+                            department_id: str = None,
+                            province_id: str = None,
+                            district_id: str = None) -> dict:
+        """Actualiza una organización existente"""
+        headers = {
+            "Content-Type": "application/json",
+        }
+        headers['Authorization'] = f"Identi {self.access_token}"
+        url = f"{self.AUTHX_BASE_URL}/organizations/{tenant_id}"
+        data = {
+            'logo_path': logo_path,
+            'country_id': country_id,
+            'department_id': department_id,
+            'province_id': province_id,
+            'district_id': district_id
+        }
+        response = requests.patch(url, headers=headers, json=data)
+        if response.status_code // 100 == 2:
+            return response.json()
+        else:
+            raise Exception(f"Request failed (status_code: {response.status_code}): {response.json()}")

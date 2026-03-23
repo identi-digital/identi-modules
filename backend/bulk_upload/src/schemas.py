@@ -7,6 +7,7 @@ from uuid import UUID
 class BulkUploadJobResponse(BaseModel):
     id: UUID
     form_id: UUID
+    form_name: Optional[str] = None
     entity_name: str
     file_name: Optional[str] = None
     total_rows: int
@@ -16,6 +17,7 @@ class BulkUploadJobResponse(BaseModel):
     created_at: datetime
     created_by: Optional[UUID] = None
     finished_at: Optional[datetime] = None
+    processed_rows: Optional[int] = None  # success_count + error_count, para saber en qué fila va cuando status=processing
 
     class Config:
         from_attributes = True
@@ -59,10 +61,11 @@ class JobRowResponse(BaseModel):
 
 
 class PaginatedJobRowsResponse(BaseModel):
-    """Filas del job paginadas; cada fila tiene columnas y columnas_error."""
+    """Filas del job paginadas; cada fila tiene columnas y columnas_error. Soporta hasta 10.000 filas."""
     page: int = 1
     per_page: int = 10
     total: int
+    total_pages: int = 1
     items: List[Dict[str, Any]] = []
 
 

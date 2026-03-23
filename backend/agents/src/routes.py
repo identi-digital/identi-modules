@@ -56,6 +56,22 @@ def update_agent(
         raise HTTPException(status_code=404, detail="Agente no encontrado")
     return agent
 
+@router.delete("/{agent_id}", response_model=AgentResponse)
+def disable_agent(agent_id: UUID, svc=Depends(get_funcionalities)):
+    """Deshabilita un agente"""
+    agent = svc.disable_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agente no encontrado")
+    return agent
+
+@router.post("/{agent_id}/restore", response_model=AgentResponse)
+def restore_agent(agent_id: UUID, svc=Depends(get_funcionalities)):
+    """Restaura un agente deshabilitado"""
+    agent = svc.restore_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agente deshabilitado no encontrado")
+    return agent
+
 # ========== AGENT ASSIGNMENT ROUTES ==========
 @router.post("/assignments", response_model=AgentAssignmentResponse, status_code=201)
 def assign_farmer_to_agent(assignment_data: AgentAssignmentCreate, svc=Depends(get_funcionalities)):

@@ -72,14 +72,6 @@ class BulkUploadJobModel(Model):
         nullable=True,
         info={"display_name": "Columnas", "description": "nombres de columnas del job en orden"},
     )
-    rows_data = Column(
-        JSONB,
-        nullable=True,
-        info={
-            "display_name": "Filas",
-            "description": "por cada fila: {row_index, values: {col: value}, errors: {col: message}}",
-        },
-    )
 
     def __init__(self, **kwargs):
         super(BulkUploadJobModel, self).__init__(**kwargs)

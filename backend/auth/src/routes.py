@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request, HTTPException, Query
 from uuid import UUID
 from typing import Optional
 from .schemas import (
-    IdentityCreate, IdentityUpdate, IdentityResponse, PaginatedIdentityResponse
+    IdentityCreate, IdentityUpdate, IdentityResponse, PaginatedIdentityResponse, GetOrganizationResponse, PatchOrganization, PatchOrganizationResponse
 )
 
 router = APIRouter(
@@ -88,3 +88,26 @@ def update_identity(
     if not identity:
         raise HTTPException(status_code=404, detail="Identidad no encontrada")
     return identity
+
+@router.get("/organizations/{tenant_id}", response_model=GetOrganizationResponse)
+def get_organization(
+    tenant_id: UUID,
+    svc=Depends(get_functionalities)
+):
+    """Obtiene una organización por tenant"""
+    organization = svc.get_organization(tenant_id)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organización no encontrada")
+    return organization
+
+@router.patch("/organizations/{tenant_id}", response_model=PatchOrganizationResponse)
+def patch_organization(
+    tenant_id: UUID,
+    organization_data: PatchOrganization,
+    svc=Depends(get_functionalities)
+):
+    """Actualiza una organización existente"""
+    organization = svc.patch_organization(tenant_id, organization_data)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organización no encontrada")
+    return organization

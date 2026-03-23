@@ -1,5 +1,11 @@
+import logging
+import logging
 from datetime import datetime
 from typing import Optional, List, Dict, Any, TypedDict, Union
+
+logger = logging.getLogger(__name__)
+
+logger = logging.getLogger(__name__)
 from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import func, inspect
@@ -20,11 +26,19 @@ from .schemas import (
 from .models.schema_forms import SchemaFormModel
 from .resources.schema_processor import process_schema_add_data_input_to_metadata
 from .resources.register_processor import (
-    find_model_by_entity_name, 
+    find_model_by_entity_name,
     extract_entity_data_from_detail,
     process_register_to_entity
 )
+from .resources.form_auto_creator import (
+    get_logical_identifier_field,
+    _get_logical_identifier_fields,
+    get_schema_columns_for_template,
+)
 from .resources import resolve_display_name
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Type definitions for detail structure
@@ -623,6 +637,39 @@ class Funcionalities:
             schema_copy = copy.deepcopy(schema) if schema else {}
             processed_schema = process_schema_add_data_input_to_metadata(schema_copy)
             
+            # Validar identificador lógico: a lo sumo uno; si hay uno, debe ser único y no nulo en el modelo
+            logical_fields = _get_logical_identifier_fields(processed_schema)
+            if len(logical_fields) > 1:
+                raise ValueError("Solo puede haber un campo marcado como identificador lógico.")
+            if len(logical_fields) == 1:
+                field_name = logical_fields[0]
+                if form.entity_name and form.form_purpose == FormPurpose.entity:
+                    model_class = find_model_by_entity_name(form.entity_name)
+                    if not model_class:
+                        raise ValueError(f"No se encontró modelo para la entidad '{form.entity_name}'.")
+                    insp = inspect(model_class)
+                    if field_name not in [c.key for c in insp.columns]:
+                        raise ValueError(
+                            f"El campo '{field_name}' marcado como identificador lógico no existe en la entidad '{form.entity_name}'."
+                        )
+                    col = insp.columns[field_name]
+                    if col.nullable:
+                        raise ValueError(
+                            f"El campo '{field_name}' debe ser obligatorio (no nulo) para ser identificador lógico."
+                        )
+                    # Comprobar unicidad: Column(unique=True) o UniqueConstraint en la tabla
+                    is_unique = getattr(col, "unique", False) is True
+                    if not is_unique and hasattr(insp.table, "constraints"):
+                        for c in insp.table.constraints:
+                            if type(c).__name__ == "UniqueConstraint" and hasattr(c, "columns"):
+                                if col in c.columns:
+                                    is_unique = True
+                                    break
+                    if not is_unique:
+                        raise ValueError(
+                            f"El campo '{field_name}' debe ser único para ser identificador lógico."
+                        )
+            
             # Crear el schema_form
             schema_form = SchemaFormModel(
                 form_id=form_id,
@@ -740,6 +787,136 @@ class Funcionalities:
         }
         
         return FormWithSchemaResponse(**form_dict)
+
+    def get_form_by_entity_name(self, entity_name: str) -> Optional[FormWithSchemaResponse]:
+        """
+        Obtiene el primer formulario de tipo entity con el entity_name dado (incluye schema).
+        Útil para carga masiva cuando se conoce la entidad pero no el form_id.
+        """
+        if not entity_name or not entity_name.strip():
+            return None
+        db = self._get_db()
+        entity_name_clean = entity_name.strip().lower()
+        form = (
+            db.query(FormModel)
+            .filter(
+                FormModel.disabled_at.is_(None),
+                FormModel.form_purpose == FormPurpose.entity,
+                func.lower(FormModel.entity_name) == entity_name_clean,
+            )
+            .first()
+        )
+        if not form:
+            return None
+        return self.get_form_by_id(form.id)
+
+    def get_forms_entity(
+        self,
+        page: int = 1,
+        per_page: int = 50,
+        entity_name: Optional[str] = None,
+    ) -> PaginatedFormResponse:
+        """Lista formularios con form_purpose=entity (para carga masiva). Opcional: filtrar por entity_name."""
+        db = self._get_db()
+        query = db.query(FormModel).filter(
+            FormModel.disabled_at.is_(None),
+            FormModel.form_purpose == FormPurpose.entity,
+        )
+        if entity_name and entity_name.strip():
+            query = query.filter(func.lower(FormModel.entity_name) == entity_name.strip().lower())
+        total = query.count()
+        offset = (page - 1) * per_page
+        items = query.order_by(FormModel.entity_name.asc(), FormModel.name.asc()).offset(offset).limit(per_page).all()
+        return PaginatedFormResponse(
+            page=page,
+            per_page=per_page,
+            total=total,
+            items=[FormResponse.model_validate(f) for f in items],
+        )
+
+    def get_schema_columns_for_template(self, schema: Optional[Dict[str, Any]], entity_name: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        Devuelve columnas para plantilla Excel desde el schema.
+        Para columnas tipo entity (FK): si la entidad referenciada tiene form con form_purpose=entity,
+        usa {prefix}_{logical_id} (ej: farmer_dni) en vez de farmer_id.
+        Cada form se crea desde una entidad: entity_name permite buscar display_name de cada attr en el modelo.
+        """
+        columns = get_schema_columns_for_template(schema)
+        filtered = []
+        for col in columns:
+            if col.get("type_value") != "entity":
+                filtered.append(col)
+                continue
+            fk_table = col.get("foreign_key_table")
+            if not fk_table and col.get("name", "").endswith("_id"):
+                prefix = col["name"][:-3]
+                fk_table = f"{prefix}s"
+                col["foreign_key_table"] = fk_table
+            if not fk_table:
+                continue
+            related_form = self.get_form_by_entity_name(fk_table)
+            if not related_form or not related_form.schema:
+                continue
+            lid_field = get_logical_identifier_field(related_form.schema)
+            if not lid_field:
+                continue
+            original_name = col["name"]
+            prefix = original_name[:-3] if original_name.endswith("_id") else original_name
+            new_name = f"{prefix}_{lid_field}"
+            col["schema_field_name"] = original_name
+            col["name"] = new_name
+            col["display_name"] = new_name
+            try:
+                rel_model = find_model_by_entity_name(fk_table)
+                if rel_model and hasattr(rel_model, "__table__") and lid_field in rel_model.__table__.c:
+                    sa_col = rel_model.__table__.c[lid_field]
+                    if getattr(sa_col, "info", None) and isinstance(sa_col.info, dict) and sa_col.info.get("display_name"):
+                        col["display_name"] = sa_col.info["display_name"]
+            except Exception:
+                pass
+            filtered.append(col)
+        columns = filtered
+        # display_name desde el modelo (column.info["display_name"]) - usar sqlalchemy.inspect
+        model_class = None
+        if entity_name:
+            model_class = find_model_by_entity_name(entity_name)
+        if not model_class:
+            try:
+                from core.models.registry import get_registry
+                non_entity_names = {c.get("name") for c in columns if c.get("type_value") != "entity" and c.get("name")}
+                if non_entity_names:
+                    best_match, best_count = None, 0
+                    for _tablename, mod in get_registry().get_all_models().items():
+                        if not hasattr(mod, "__table__"):
+                            continue
+                        table_names = set(mod.__table__.c.keys())
+                        match_count = len(non_entity_names & table_names)
+                        if match_count > best_count:
+                            best_count, best_match = match_count, mod
+                    if best_match:
+                        model_class = best_match
+            except Exception:
+                pass
+        if model_class and hasattr(model_class, "__table__"):
+            table = model_class.__table__
+            display_map = {}
+            try:
+                for key in table.c.keys():
+                    try:
+                        sa_col = table.c[key]
+                    except (KeyError, TypeError):
+                        continue
+                    if getattr(sa_col, "info", None) and isinstance(sa_col.info, dict) and sa_col.info.get("display_name"):
+                        display_map[key] = sa_col.info["display_name"]
+            except Exception:
+                pass
+            for col in columns:
+                if col.get("type_value") == "entity":
+                    continue
+                attr_name = col.get("name")
+                if attr_name and attr_name in display_map:
+                    col["display_name"] = display_map[attr_name]
+        return columns
     
     # Core Register methods
     
@@ -778,13 +955,15 @@ class Funcionalities:
             identity_id_to_use = register_data.identity_id
             if identity_id_to_use is not None:
                 from modules.auth.src.models.identities import IdentityModel
-                identity_exists = db.query(IdentityModel).filter(
-                    IdentityModel.id == identity_id_to_use,
+                identity_query = db.query(IdentityModel).filter(
+                    IdentityModel.sub == identity_id_to_use,
                     IdentityModel.disabled_at.is_(None)
-                ).first() is not None
+                ).first()
+                identity_exists = identity_query is not None
                 if not identity_exists:
                     print(f"⚠️ Identity {identity_id_to_use} from token not found in identities table; saving register without identity_id")
-                    identity_id_to_use = None
+                    raise ValueError("Identidad no encontrada")
+                    # identity_id_to_use = None
             
             # Crear el registro
             # status se establece por defecto como success (el schema no lo incluye)
@@ -799,7 +978,7 @@ class Funcionalities:
                 location=location_geom,
                 entity_name=entity_name,  # Obtenido del formulario
                 entity_id=None,  # Se actualizará si se procesa la entidad
-                identity_id=identity_id_to_use,  # Usuario quien registra (None si no existe en identities)
+                identity_id=identity_query.id,  # Usuario quien registra (None si no existe en identities)
                 duration=register_data.duration  # Tiempo que demoró el registro
             )
             db.add(register)
@@ -1050,11 +1229,12 @@ class Funcionalities:
                             ).first()
                             
                             if schema_form and schema_form.schema:
-                                # Obtener la firma de los atributos del schema existente
-                                existing_attr_signature = _get_schema_attributes_signature(schema_form.schema)
+                                # Comparar firmas de schema (incluye is_logical_identifier desde entityMap)
+                                # Usar el schema generado (con entityMap aplicado) vs el existente en BD
+                                current_schema_signature = _get_schema_attributes_signature(schema)
+                                existing_schema_signature = _get_schema_attributes_signature(schema_form.schema)
                                 
-                                # Comparar firmas para detectar cambios
-                                if current_attr_signature != existing_attr_signature:
+                                if current_schema_signature != existing_schema_signature:
                                     print(f"    🔄 Cambios detectados en entidad '{entity_name}', generando nuevo schema para formulario '{existing_form.name}'...")
                                     
                                     # Generar nuevo schema
@@ -1677,7 +1857,18 @@ class Funcionalities:
                         
                         # Caso 3: value es un valor simple (string, number, etc.)
                         else:
-                            value = value_data if value_data is not None else ''
+                            # verificar si es un media
+                            type_detail = item.get('type_value')
+                            if type_detail and type_detail == 'media':
+                                # obtengo el media usando la funcionalidad get_media_by_id
+                                storage_service = self.container.get("storage_s3")
+                                media_url = storage_service.get_url_by_media_id(value_data, 604800)
+                                if media_url:
+                                    value = media_url
+                                else:
+                                    value = ''
+                            else:
+                                value = value_data if value_data is not None else ''
                         
                         detail_dict[item['name']] = value
             
@@ -1762,7 +1953,7 @@ class Funcionalities:
         # 12. Generar nombre de archivo sugerido
         form_name_clean = form_name.replace(" ", "_").lower()
         timestamp = dt.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"registros_{form_name_clean}_{timestamp}.xlsx"
+        filename = f"{form_name_clean}_{timestamp}.xlsx"
         
         return excel_bytes, filename
     
