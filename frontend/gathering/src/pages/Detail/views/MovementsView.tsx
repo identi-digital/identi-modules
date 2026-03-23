@@ -44,12 +44,14 @@ const MovementsView: React.FC<MovementsViewProps> = ({
     ): Promise<AxiosResponse<any>> => {
       console.log(page, perPage, orderBy, order, search);
       const data = await BalanceService.getBalances(
+        page,
+        perPage,
         gatheringId,
         '',
         'recharge',
       );
       // const data = await api.get('/forms');
-      console.log(data);
+      // console.log(data);
       return {
         data: {
           data: {

@@ -26,8 +26,25 @@ export const FormService = {
     );
   },
   // forms
-  getAll() {
-    return api().get('/forms');
+  getAll(
+    page: number,
+    per_page: number,
+    sort_by: string,
+    order: string,
+    search: string,
+  ) {
+    return api().get(
+      '/forms?page=' +
+        page +
+        '&per_page=' +
+        per_page +
+        '&sort_by=' +
+        sort_by +
+        '&order=' +
+        order +
+        '&search=' +
+        search,
+    );
   },
 
   getById(id: string) {

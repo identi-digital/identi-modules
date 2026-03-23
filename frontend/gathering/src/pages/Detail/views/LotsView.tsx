@@ -20,7 +20,11 @@ import {
 import { fCurrency } from '@ui/utils/formatNumber';
 import DateCell from '@ui/components/atoms/DateCell/DateCell';
 // import { getDetailValue, getRepresentativeValue, getStoreNameFromRelations } from '~/utils/EntityUtils';
-import { showMessage, showYesNoQuestion } from '@ui/utils/Messages';
+import {
+  // alertMessage,
+  showMessage,
+  showYesNoQuestion,
+} from '@ui/utils/Messages';
 import SalesTable from '../../../components/SalesTable';
 // import { ContextLayout } from '~/ui/templates/Layouts/Layout';
 // import { ChangeHistory, Entity, EntityDetail } from '~/models/entities';
@@ -35,7 +39,8 @@ import { GatheringService } from '../../../services/gathering';
 import { AxiosResponse } from 'axios';
 // import useDebounce from '@/ui/hooks/use_debounce';
 import { LotService } from '../../../services/lots';
-
+// import { enqueueSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 // import { EntityDetail } from '~models/entities';
 
 type LotsViewProps = {
@@ -118,6 +123,7 @@ const LotsView: React.FC<LotsViewProps> = (props: LotsViewProps) => {
   // } = useGathering();
   const [headers, setHeaders] = useState<TableHeadColumn[]>([]);
   const { user } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   // console.log(user);
   // cambios peso neto
   const [openChangeDetail, setOpenChangeDetail] = useState<boolean>(false);
@@ -1097,6 +1103,17 @@ const LotsView: React.FC<LotsViewProps> = (props: LotsViewProps) => {
           isSelect={handleSelects && (view === 0 || view === 1)}
           handleSelects={handleSelects}
           onLoad={onLoad}
+          disableAllSelect={true}
+          filterSelect={(row: any) => {
+            let active = row.net_weight !== null && row.net_weight > 0;
+            // alertMessage('Lote inactivo', 'warning', 3000);
+            if (!active) {
+              enqueueSnackbar('El lote debe tener peso neto', {
+                variant: 'warning',
+              });
+            }
+            return active;
+          }}
         />
       </Paper>
       {openChangeDetail && (

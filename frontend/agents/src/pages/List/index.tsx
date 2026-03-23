@@ -1,5 +1,5 @@
 // Ruta principal: Lista de agricultores
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Grid,
@@ -14,7 +14,7 @@ import { ModuleConfig } from '@core/moduleLoader';
 // import { getDetailRoute } from '../../../index';
 import FilterComponent from '@/ui/components/molecules/FilterComponent';
 import { useCallback, useEffect, useState } from 'react';
-import { Add, Delete, Visibility } from '@mui/icons-material';
+import { Add, Delete } from '@mui/icons-material';
 import { TableHeadColumn } from '@/ui/components/molecules/TableHead/TableHead';
 import DataTable from '@/ui/components/organisms/DataTable/ServerSide/DataTable';
 import { AxiosResponse } from 'axios';
@@ -26,11 +26,16 @@ import { AgentCreate, AgentList } from '../../models/agent';
 import useDebounce from '@/ui/hooks/use_debounce';
 import { AgentsService } from '../../services/agents';
 import CreateAgentModal from '../../components/dialogs/CreateAgent';
-import { showMessage } from '@/ui/utils/Messages';
+import { showMessage, showYesNoQuestion } from '@/ui/utils/Messages';
 import {
   MODULE_ACTOR_DISPLAY_NAME,
   MODULE_ACTOR_DISPLAY_NAME_PLURAL,
 } from '../../../';
+import {
+  trackAddAgent,
+  trackFilterStatusAgents,
+  trackSearchAgents,
+} from '../../analytics/agents/tracks';
 
 interface AgentsListProps {
   config?: ModuleConfig;
@@ -39,7 +44,7 @@ interface AgentsListProps {
 // Datos dummy de agente
 
 export default function AgentsList({ config }: AgentsListProps) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // console.log(config);
   const theme = useTheme();
   const isActiveDesktop = useMediaQuery(theme.breakpoints.down('md'));
@@ -72,6 +77,9 @@ export default function AgentsList({ config }: AgentsListProps) {
         sort = statusSelected === 'Activos' ? 'asc' : 'desc';
       } else {
         orderField = 'first_name';
+      }
+      if (textDebounce !== '') {
+        trackSearchAgents({});
       }
       const data = await AgentsService.getAgentsPaginate(
         page,
@@ -138,6 +146,35 @@ export default function AgentsList({ config }: AgentsListProps) {
     }
   }, []);
 
+  const handleDisableAgent = useCallback((gathererId: string): void => {
+    showYesNoQuestion(
+      `¿Seguro de querer eliminar el ${MODULE_ACTOR_DISPLAY_NAME}?`,
+      '',
+      'warning',
+    ).then((val: any) => {
+      if (val) {
+        AgentsService.disableAgent(gathererId)
+          .then((resp: any) => {
+            if (resp) {
+              setIsRefresh((prevValue: boolean) => !prevValue);
+              showMessage(
+                '',
+                `Se deshabilitó el ${MODULE_ACTOR_DISPLAY_NAME} exitosamente`,
+                'success',
+              );
+            }
+          })
+          .catch(() => {
+            showMessage(
+              '',
+              `No se ha podido deshabilitar el ${MODULE_ACTOR_DISPLAY_NAME}, intente nuevamente.`,
+              'error',
+            );
+          });
+      }
+    });
+  }, []);
+
   useEffect(() => {
     const _setHeaders: any = [
       {
@@ -192,14 +229,14 @@ export default function AgentsList({ config }: AgentsListProps) {
           );
         },
       },
-      {
-        sorteable: false,
-        align: 'left',
-        text: 'Productores asignados',
-        value: 'farmers_assigned',
-        padding: 'none',
-        render: (row: AgentList) => <>{row.farmers_assigned}/100</>,
-      },
+      // {
+      //   sorteable: false,
+      //   align: 'left',
+      //   text: 'Productores asignados',
+      //   value: 'farmers_assigned',
+      //   padding: 'none',
+      //   render: (row: AgentList) => <>{row.farmers_assigned}/100</>,
+      // },
       {
         sorteable: false,
         align: 'center',
@@ -209,17 +246,9 @@ export default function AgentsList({ config }: AgentsListProps) {
           return (
             <>
               <Box display="flex" flexDirection="row" justifyContent="center">
-                <Tooltip title="Ver productor">
-                  <IconButton
-                    onClick={() => navigate('/farmers/detail/' + row.id)}
-                    size="small"
-                  >
-                    <Visibility />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title="Eliminar">
                   <IconButton
-                    onClick={() => console.log(row)}
+                    onClick={() => handleDisableAgent(row.id)}
                     size="small"
                     //   variant="contained"
                     // color="error"
@@ -311,17 +340,21 @@ export default function AgentsList({ config }: AgentsListProps) {
               />
               <FilterComponent
                 buttonLabel={'Estado'}
-                options={['Todos', 'Activos', 'Inactivos', 'Retirados']}
+                options={['Todos', 'Activos', 'Inactivos']}
                 labelSelected={statusSelected}
                 color="primary"
                 onSelectOption={function(value: string): void {
                   setStatusSelected(value);
+                  trackFilterStatusAgents({});
                 }}
               />
               <Button
                 variant="contained"
                 startIcon={<Add />}
-                onClick={() => handleCloseAction()}
+                onClick={() => {
+                  handleCloseAction();
+                  trackAddAgent({});
+                }}
                 fullWidth
                 sx={{
                   width: '180px',

@@ -51,6 +51,7 @@ import MapComponent from '@ui/components/molecules/MapComponent';
 import { getListRoute } from '@/modules/forms';
 import { FormService } from '../../services/forms';
 import { ModuleConfig } from '@/core/moduleLoader';
+import { trackDownloadFormRecords } from '../../analytics/forms/track';
 
 // const ChipSelectedStyled = styled(Box)<TypographyProps>(({ theme }) => ({
 //   display: 'flex',
@@ -279,16 +280,16 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         );
         const endDate = new Date(dateRange?.endDate || new Date());
 
-        // al startDate le pongo el inicio del día
-        if (startDate && dateRange?.startDate) {
-          startDate.setHours(0, 0, 0, 0);
-          //// console.log(startDate);
-        }
-        // al endDate le pongo el final del día
-        if (endDate && dateRange?.endDate) {
-          endDate.setHours(23, 59, 59, 999);
-          //// console.log(endDate);
-        }
+        // // al startDate le pongo el inicio del día
+        // if (startDate && dateRange?.startDate) {
+        //   startDate.setHours(0, 0, 0, 0);
+        //   //// console.log(startDate);
+        // }
+        // // al endDate le pongo el final del día
+        // if (endDate && dateRange?.endDate) {
+        //   endDate.setHours(23, 59, 59, 999);
+        //   //// console.log(endDate);
+        // }
 
         start = startDate.toISOString().slice(0, 10);
         end = endDate.toISOString().slice(0, 10);
@@ -400,6 +401,9 @@ export default function RecordsPage({ config }: RecordsPageProps) {
       })
       .finally(() => {
         setIsLoadingDownload(false);
+        trackDownloadFormRecords({
+          form_id: form_id,
+        });
       });
   }, []);
   // const handleDownloadData = useCallback(async () => {
@@ -643,7 +647,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         //console.log(header);
         if (header.header_type === 'geojson') {
           return {
-            sorteable: true,
+            sorteable: false,
             align: 'left',
             text: header.display_name,
             value: header.name,
@@ -695,7 +699,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         }
         if (header.header_type === 'media') {
           return {
-            sorteable: true,
+            sorteable: false,
             align: 'left',
             text: header.display_name,
             value: header.name,
@@ -736,7 +740,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
 
         if (header.header_type === 'option') {
           return {
-            sorteable: true,
+            sorteable: false,
             align: 'left',
             text: header.display_name,
             value: header.name,
@@ -761,7 +765,7 @@ export default function RecordsPage({ config }: RecordsPageProps) {
         }
         if (header.header_type === 'entity') {
           return {
-            sorteable: true,
+            sorteable: false,
             align: 'left',
             text: header.display_name,
             value: header.name,

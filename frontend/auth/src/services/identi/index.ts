@@ -1,7 +1,7 @@
 // import apiClient from '../api_identi';
-import { getServiceApi } from '@/core/apiRegistry';
+import { getModuleApi, getServiceApi } from '@/core/apiRegistry';
 const apiClient = () => getServiceApi('authx');
-
+const authApi = () => getModuleApi('auth');
 import {
   generateRandomString,
   pkce_challenge_from_verifier,
@@ -101,7 +101,10 @@ function getEntity() {
   // const tenant_id = localStorage.getItem('tenant_id');
   return apiClient().get('me');
 }
-
+function getOrganizationProfile() {
+  const tenant_id = localStorage.getItem('tenant_id');
+  return authApi().get('organizations/' + tenant_id);
+}
 //request init reset password
 /**
  * Envía una clave al usuario para el cambio de contraseña
@@ -118,6 +121,7 @@ function initResetPassword(username: string) {
 export {
   initResetPassword,
   getEntity,
+  getOrganizationProfile,
   launchAuthentication,
   getToken,
   getTenantsOfEntity,

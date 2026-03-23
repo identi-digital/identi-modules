@@ -5,7 +5,7 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
-  Chip,
+  // Chip,
   Tooltip,
   IconButton,
   Icon,
@@ -15,17 +15,17 @@ import {
   getCreateRoute,
   getEditRoute,
   getRecordsRoute,
-  getUpdateRoute,
+  // getUpdateRoute,
 } from '../../../index';
-import FilterComponent from '@ui/components/molecules/FilterComponent';
+// import FilterComponent from '@ui/components/molecules/FilterComponent';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Add,
-  Delete,
-  Download,
+  // Delete,
+  // Download,
   Edit,
-  PlusOne,
-  Upload,
+  // PlusOne,
+  // Upload,
   Visibility,
 } from '@mui/icons-material';
 import { TableHeadColumn } from '@/ui/components/molecules/TableHead/TableHead';
@@ -35,10 +35,18 @@ import DateCell from '@/ui/components/atoms/DateCell/DateCell';
 import Breadcrumbs from '@/ui/components/molecules/Breadcrumbs/Breadcrumbs';
 import TextFieldSearch from '@/ui/components/molecules/TextFieldSearch/TextFieldSearch';
 import Button from '@/ui/components/atoms/Button/Button';
-import { ApiClient } from '@/core/apiClient';
+// import { ApiClient } from '@/core/apiClient';
 import RegisterFormDialog from '../../components/RegisterFormDialog';
 import { Module } from '../../models/forms';
 import { FormService } from '../../services/forms';
+import useDebounce from '@/ui/hooks/use_debounce';
+import {
+  trackAddRecord,
+  trackCreateForm,
+  trackEditForm,
+  trackSearchForms,
+  trackViewForm,
+} from '../../analytics/forms/track';
 
 interface FormsListProps {
   config?: ModuleConfig;
@@ -59,103 +67,9 @@ interface Form {
   updated_at?: string;
   disabled_at?: string;
 }
-// const DAYS_ACTIVE = 15;
-// Datos dummy de agricultores
-const dummyForms: Form[] = [
-  {
-    id: '1',
-    channel_name: 'form1',
-    flow_type: 'form',
-    name: 'Formulario 1',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    description: 'Descripción del formulario 1',
-    schema_id: '1',
-    viewer: 'viewer1',
-    entity_name: 'forms',
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-  {
-    id: '2',
-    channel_name: 'form2',
-    flow_type: 'form',
-    name: 'Formulario 2',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    description: 'Descripción del formulario 2',
-    schema_id: '2',
-    viewer: 'viewer2',
-    entity_name: 'forms',
-
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-  {
-    id: '3',
-    channel_name: 'form3',
-    flow_type: 'form',
-    name: 'Formulario 3',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    description: 'Descripción del formulario 3',
-    schema_id: '3',
-    viewer: 'viewer3',
-    entity_name: 'forms',
-
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-  {
-    id: '4',
-    channel_name: 'form4',
-    flow_type: 'form',
-    name: 'Formulario 4',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    description: 'Descripción del formulario 4',
-    schema_id: '4',
-    viewer: 'viewer4',
-    entity_name: 'forms',
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-  {
-    id: '5',
-    channel_name: 'form5',
-    flow_type: 'form',
-    name: 'Formulario 5',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    description: 'Descripción del formulario 5',
-    schema_id: '5',
-    viewer: 'viewer5',
-    entity_name: 'forms',
-
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-  {
-    id: '6',
-    channel_name: 'form6',
-    flow_type: 'form',
-    name: 'Formulario 6',
-    image_path:
-      'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-
-    description: 'Descripción del formulario 6',
-    schema_id: '6',
-    viewer: 'viewer6',
-    entity_name: 'forms',
-    created_at: '2023-03-01T00:00:00.000Z',
-  },
-];
 
 export default function FormsList({ config }: FormsListProps) {
   const navigate = useNavigate();
-  // const [api] = useState(
-  //   () =>
-  //     new ApiClient(
-  //       config?.apiUrl || 'http://127.0.0.1:8000',
-  //       config?.backendModule || 'forms',
-  //     ),
-  // );
-  // console.log(config);
   const theme = useTheme();
   const isActiveDesktop = useMediaQuery(theme.breakpoints.down('md'));
   const isActiveButtons = useMediaQuery(theme.breakpoints.up('md'));
@@ -163,9 +77,11 @@ export default function FormsList({ config }: FormsListProps) {
   // const [orderSelected, setOrderSelected] = useState<string>('A - Z');
   // const [statusSelected, setStatusSelected] = useState<string>('Todos');
   // const [tecSelected, setTecSelected] = useState<string>('Técnico 1');
+  const [searchText, setSearchText] = useState<string>('');
   const [isRefresh, setIsRefresh] = useState<boolean>(true);
   const [headers, setHeaders] = useState<TableHeadColumn[]>([]);
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+  const textDebounce = useDebounce(searchText, 500);
 
   const onLoad = useCallback(
     async (
@@ -173,10 +89,19 @@ export default function FormsList({ config }: FormsListProps) {
       perPage: number,
       orderBy: string,
       order: string,
-      search: string,
+      _search: string,
     ): Promise<AxiosResponse<any>> => {
-      console.log(page, perPage, orderBy, order, search);
-      const data = await FormService.getAll();
+      if (textDebounce !== '') {
+        trackSearchForms({});
+      }
+      // console.log(page, perPage, orderBy, order, search);
+      const data = await FormService.getAll(
+        page,
+        perPage,
+        orderBy,
+        order,
+        textDebounce,
+      );
 
       return {
         data: {
@@ -191,10 +116,11 @@ export default function FormsList({ config }: FormsListProps) {
         config: {} as any,
       };
     },
-    [], // 👈 sin dependencias → no se recrea
+    [textDebounce], // 👈 sin dependencias → no se recrea
   );
 
   const handleCreateForm = (): void => {
+    trackCreateForm({});
     navigate(getCreateRoute());
   };
 
@@ -202,9 +128,9 @@ export default function FormsList({ config }: FormsListProps) {
     setIsOpenDialog(true);
   };
 
-  const handleUpdateForm = (id: string): void => {
-    navigate(getUpdateRoute(id));
-  };
+  // const handleUpdateForm = (id: string): void => {
+  //   navigate(getUpdateRoute(id));
+  // };
   const handleCloseAction = useCallback((isUpdateDataTable?: boolean) => {
     setIsOpenDialog((open: boolean) => !open);
     if (typeof isUpdateDataTable !== 'object' && isUpdateDataTable) {
@@ -232,7 +158,7 @@ export default function FormsList({ config }: FormsListProps) {
         render: (row: Form) => <>{row.description}</>,
       },
       {
-        sorteable: true,
+        sorteable: false,
         align: 'left',
         text: 'Último registro',
         padding: 'none',
@@ -256,7 +182,12 @@ export default function FormsList({ config }: FormsListProps) {
               <Box display="flex" flexDirection="row" justifyContent="center">
                 <Tooltip title="Ver formulario">
                   <IconButton
-                    onClick={() => navigate(getRecordsRoute(row.id))}
+                    onClick={() => {
+                      trackViewForm({
+                        form_id: row.id,
+                      });
+                      navigate(getRecordsRoute(row.id));
+                    }}
                     size="small"
                   >
                     <Visibility />
@@ -264,7 +195,12 @@ export default function FormsList({ config }: FormsListProps) {
                 </Tooltip>
                 <Tooltip title="Editar formulario">
                   <IconButton
-                    onClick={() => navigate(getEditRoute(row.id))}
+                    onClick={() => {
+                      trackEditForm({
+                        form_id: row.id,
+                      });
+                      navigate(getEditRoute(row.id));
+                    }}
                     size="small"
                   >
                     <Edit />
@@ -274,6 +210,9 @@ export default function FormsList({ config }: FormsListProps) {
                   <IconButton
                     onClick={() => {
                       setForm(row);
+                      trackAddRecord({
+                        form_id: row.id,
+                      });
                       handleOpenDialog();
                     }}
                     size="small"
@@ -372,7 +311,8 @@ export default function FormsList({ config }: FormsListProps) {
                 size="small"
                 fullWidth
                 onChange={function(value: string): void {
-                  throw new Error('Function not implemented.');
+                  setSearchText(value);
+                  // throw new Error('Function not implemented.');
                 }}
               />
               {/* </Box> */}
@@ -396,31 +336,7 @@ export default function FormsList({ config }: FormsListProps) {
         headers={headers}
         hideSearch={true}
         onLoad={onLoad}
-        // onLoad={function (
-        //   page: number,
-        //   perPage: number,
-        //   orderBy: string,
-        //   order: string,
-        //   search: string
-        // ): Promise<AxiosResponse<any>> {
-        //   console.log(page, perPage, orderBy, order, search);
-        //   return new Promise((resolve) => {
-        //     const obj: AxiosResponse<any> = {
-        //       data: {
-        //         data: {
-        //           items: dummyForms,
-        //           total: dummyForms.length,
-        //         },
-        //       },
-        //       status: 200,
-        //       statusText: 'OK',
-        //       headers: {},
-        //       config: {} as any,
-        //     };
-        //     console.log(obj);
-        //     resolve(obj);
-        //   });
-        // }}
+        refresh={isRefresh}
       />
       {isOpenDialog && form && (
         <RegisterFormDialog handleClose={handleCloseAction} module={form} />

@@ -28,6 +28,14 @@ import { saveAs } from '@/ui/utils/dowloadExcel';
 import { showMessage } from '@/ui/utils/Messages';
 import { WarehouseService } from '@/modules/warehouse/src/services/warehouse';
 import { LotService } from '../../services/lots';
+import {
+  trackBalancesView,
+  trackDeletedLots,
+  trackDispatchLots,
+  trackDownloadGatheringCenter,
+  trackGatherersView,
+  trackStockLots,
+} from '../../analytics/track';
 
 interface GatherersListProps {
   config?: ModuleConfig;
@@ -66,6 +74,7 @@ export default function DetailPage({ config }: GatherersListProps) {
       // console.log('asignar', obj);
       // console.log(selectedRows);
       // arreglo de ids
+      setIsAssignLoad(true);
       const lot_ids = selectedRows.map((element: any) => element.id);
       LotService.dispatchLots({
         lot_ids,
@@ -88,6 +97,9 @@ export default function DetailPage({ config }: GatherersListProps) {
             `No se ha podido asignar el almacén a los lotes seleccionados, intente nuevamente.`,
             'error',
           );
+        })
+        .finally(() => {
+          setIsAssignLoad(false);
         });
     },
     [selectedRows],
@@ -117,6 +129,10 @@ export default function DetailPage({ config }: GatherersListProps) {
       })
       .finally(() => {
         setIsDownloadAllData(false);
+        trackDownloadGatheringCenter({
+          type_download: 'técnicos comerciales',
+          gathering_id: gathering_id ?? '',
+        });
       });
   }, [gathering_id]);
 
@@ -142,6 +158,10 @@ export default function DetailPage({ config }: GatherersListProps) {
       })
       .finally(() => {
         setIsDownloadAllData(false);
+        trackDownloadGatheringCenter({
+          type_download: 'movimientos de caja',
+          gathering_id: gathering_id ?? '',
+        });
       });
   }, [gathering_id]);
 
@@ -178,9 +198,52 @@ export default function DetailPage({ config }: GatherersListProps) {
         })
         .finally(() => {
           setIsDownloadAllData(false);
+          let type_download: any = 'lotes activos';
+          if (activeTab === 1) type_download = 'lotes en stock';
+          if (activeTab === 2) type_download = 'lotes despachados';
+          if (activeTab === 3) type_download = 'lotes eliminados';
+          trackDownloadGatheringCenter({
+            type_download,
+            gathering_id: gathering_id ?? '',
+          });
         });
     },
     [activeTab],
+  );
+
+  const handleTrackTab = useCallback(
+    (tab: number) => {
+      switch (tab) {
+        case 1:
+          trackStockLots({
+            gathering_id: gathering_id ?? '',
+          });
+          break;
+        case 2:
+          trackDispatchLots({
+            gathering_id: gathering_id ?? '',
+          });
+          break;
+        case 3:
+          trackDeletedLots({
+            gathering_id: gathering_id ?? '',
+          });
+          break;
+        case 4:
+          trackGatherersView({
+            gathering_id: gathering_id ?? '',
+          });
+          break;
+        case 5:
+          trackBalancesView({
+            gathering_id: gathering_id ?? '',
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    [gathering_id],
   );
 
   useEffect(() => {
@@ -269,6 +332,7 @@ export default function DetailPage({ config }: GatherersListProps) {
               activeTab={activeTab}
               onChangeTab={function(tab: number): void {
                 setActiveTab(tab);
+                handleTrackTab(tab);
               }}
             />
             <Box

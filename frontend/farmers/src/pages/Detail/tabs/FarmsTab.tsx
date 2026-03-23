@@ -19,10 +19,9 @@ import { FarmerGet } from '../../../models/farmer';
 import { BorderColorOutlined } from '@mui/icons-material';
 import FarmEditDialog from '../components/FarmEditDialog';
 import {
-  trackFarmEdit,
-  trackFarmUploadPolygon,
-  trackFarmViewPolygon,
-} from '../../../analytics/farms/track';
+  trackUploadPolygon,
+  trackViewPolygon,
+} from '../../../analytics/farmers/track';
 
 type FarmsTabProps = {
   // farmerId: string;
@@ -58,9 +57,6 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
         setTotal(0);
         setHasMore(true);
         setOpenFarmEditDialog(false);
-        trackFarmEdit({
-          farm_id: id,
-        });
       })
       .catch(() => {
         showMessage(
@@ -140,7 +136,7 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
               setPage(1);
               setTotal(0);
               setHasMore(true);
-              trackFarmUploadPolygon({
+              trackUploadPolygon({
                 farm_id: farm.id,
               });
               // console.log(resp);
@@ -282,7 +278,7 @@ const FarmsTab: React.FC<FarmsTabProps> = (props: FarmsTabProps) => {
                     text="Ver polígono"
                     variant="contained"
                     onClick={() => {
-                      trackFarmViewPolygon({
+                      trackViewPolygon({
                         farm_id: farm.id,
                       });
                       setFarmSelected(farm);

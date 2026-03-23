@@ -12,9 +12,9 @@ import { FarmerGet } from '../../../models/farmer';
 import UploadGeoFile from './UploadGeoFile';
 import { showMessage } from '@/ui/utils/Messages';
 import {
-  trackFarmDownloadDeforestationReport,
-  trackFarmDownloadPolygon,
-} from '../../../analytics/farms/track';
+  trackDownloadDeforestationReport,
+  trackDownloadPolygon,
+} from '../../../analytics/farmers/track';
 import {
   LOW_DEFORESTATION_RATE,
   MEDIUM_DEFORESTATION_RATE,
@@ -133,7 +133,7 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
     a.download = 'polygon.geojson';
     a.click();
     URL.revokeObjectURL(url);
-    trackFarmDownloadPolygon({
+    trackDownloadPolygon({
       farm_id: farm?.id ?? '',
     });
     setIsDownloading(false);
@@ -179,7 +179,7 @@ const PolygonDialog: React.FC<PolygonDialogProps> = (
       pdf.addImage(imgData, 'PNG', x, y, width, height);
       const name = farm?.name ?? '';
       pdf.save(`informe_deforestación_${name ?? ''}.pdf`);
-      trackFarmDownloadDeforestationReport({
+      trackDownloadDeforestationReport({
         farm_id: farm?.id ?? '',
       });
     } catch (error) {

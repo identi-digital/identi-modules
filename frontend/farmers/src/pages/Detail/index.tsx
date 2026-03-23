@@ -17,6 +17,10 @@ import FormsTab from './tabs/FormsTab';
 import { FarmerService } from '../../services/farmer';
 import { FarmerGet } from '../../models/farmer';
 import LinearProgress from '@/ui/components/atoms/LinearProgress/LinearProgress';
+import {
+  trackViewFarms,
+  trackViewFormsFarmer,
+} from '../../analytics/farmers/track';
 
 export const BoxIconButton = styled(Box)(() => ({
   borderRadius: '50%',
@@ -108,7 +112,20 @@ export default function FarmerDetail({ config }: FarmerDetailProps) {
             { label: 'Formularios', icon: <ContentPaste /> },
           ]}
           activeTab={tab}
-          onChangeTab={(value: number) => setTab(value)}
+          onChangeTab={(value: number) => {
+            if (value === tab) return;
+            if (value === 1) {
+              trackViewFarms({
+                farmer_id: farmer.id,
+              });
+            }
+            if (value === 2) {
+              trackViewFormsFarmer({
+                farmer_id: farmer.id,
+              });
+            }
+            setTab(value);
+          }}
           completeLine
         />
       </Paper>

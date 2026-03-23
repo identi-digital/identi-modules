@@ -38,6 +38,12 @@ import { FormService } from '@/modules/forms/src/services/forms';
 import { Module } from '@/modules/forms/src/models/forms';
 import RegisterFormDialog from '@/modules/forms/src/components/RegisterFormDialog';
 import { saveAs } from '@/ui/utils/dowloadExcel';
+import {
+  trackAddGatherer,
+  trackAssignBalanceToGathering,
+  trackDownloadGatheringData,
+  trackViewGatheringCenter,
+} from '../../analytics/track';
 
 // type DataRow = {
 //   id?: string;
@@ -198,6 +204,9 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
       })
       .catch(() => {
         showMessage('', 'Problemas al exportar los registros', 'error', true);
+      })
+      .finally(() => {
+        trackDownloadGatheringData({});
       });
   }, []);
 
@@ -209,7 +218,23 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
       'warning',
     ).then((val: any) => {
       if (val) {
-        console.log('disabledEntity', `${id}`);
+        // console.log('disabledEntity', `${id}`);
+        GatheringService.delete(id)
+          .then(() => {
+            showMessage(
+              '',
+              `El ${MODULE_ENTITY_DISPLAY_NAME} fue eliminado correctamente.`,
+              'success',
+            );
+            setIsLoadData((prev: boolean) => !prev);
+          })
+          .catch(() => {
+            showMessage(
+              '',
+              `Problemas al eliminar el ${MODULE_ENTITY_DISPLAY_NAME}, inténtelo nuevamente.`,
+              'error',
+            );
+          });
         // disabledEntity(`${row?.id}`)
         //   .then(() => {
         //     showMessage('', 'El centro de acopio fue eliminado correctamente.', 'success');
@@ -309,7 +334,12 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
 
               <Tooltip title="Asignar saldo">
                 <IconButton
-                  onClick={() => handleOpenAssignBalance(row?.id ?? '')}
+                  onClick={() => {
+                    trackAssignBalanceToGathering({
+                      gathering_id: row?.id ?? '',
+                    });
+                    handleOpenAssignBalance(row?.id ?? '');
+                  }}
                 >
                   <AddCardRounded />
                 </IconButton>
@@ -320,6 +350,9 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
                   onClick={() => {
                     setRowSelected(row);
                     setOpenDialog(true);
+                    trackAddGatherer({
+                      gathering_id: row.id,
+                    });
                   }}
                 >
                   <PersonAddAlt1Rounded />
@@ -329,6 +362,9 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
               <Tooltip title={`Ver ${MODULE_ENTITY_DISPLAY_NAME}`}>
                 <IconButton
                   onClick={() => {
+                    trackViewGatheringCenter({
+                      gathering_id: row.id,
+                    });
                     navigate(getDetailRoute(row.id));
                     // console.log('navigate');
                   }}

@@ -81,10 +81,10 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
   const open = Boolean(anchorEl);
   const id = open ? 'date-popover' : undefined;
 
-  console.log(element);
+  //console.log(element);
 
   if (element.type_value === 'option') {
-    // console.log(element);
+    //// console.log(element);
     const isMultiple =
       element?.metadata?.data_input?.sub_type === 'list' || false;
     return (
@@ -102,7 +102,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
         touched={touched}
         value={element.value}
         onChange={(_name: any, value: any) => {
-          // console.log(value);
+          //// console.log(value);
           if (Array.isArray(value) && isMultiple) {
             const options = value.map((element: any) =>
               itemValue ? element[itemValue] : String(element),
@@ -118,7 +118,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
   if (element.type_value === 'date') {
     let date: string = '';
     if (element.value) {
-      // console.log(element.value);
+      //// console.log(element.value);
       date = new Date(element.value).toLocaleDateString();
     }
     return (
@@ -178,7 +178,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
               <Calendar
                 date={element.value}
                 onChange={(dateSelected: any) => {
-                  // console.log(date);
+                  //// console.log(date);
                   updateEntityDetail(element.id, dateSelected);
                   handleClose();
                 }}
@@ -206,16 +206,16 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
     // let arrFiltered = [];
 
     // if (element?.instruction_id === '7223c167-110a-4e42-a529-a0b0819f9e4a' && producerSelected) {
-    //   // console.log(element);
+    ////   // console.log(element);
     //   const values =
     //     entityValuesArray.find((value: entityValues) =>
     // value.instruction_id === element.instruction_id)?.values ?? [];
-    //   // console.log(values);
+    ////   // console.log(values);
     //   if (values.length > 0) {
     //     arrFiltered = values.filter((value: Option) => value.owner === producerSelected.id);
     //   }
 
-    // console.log(entityValuesArray);
+    //console.log(entityValuesArray);
     // } else {
     //   arrFiltered =
     //     entityValuesArray.find((value: entityValues) =>
@@ -227,7 +227,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
       (value: entityValues) => value.instruction_id === element.instruction_id,
     );
     const options = config?.values ?? [];
-    console.log(config);
+    //console.log(config);
     if (isMultiple) {
       return (
         <AutocompleteMaterial
@@ -236,9 +236,10 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
           options={options}
           getOptionLabel={(option: any) => option.display_name}
           defaultValue={[]}
+          loading={config?.loading}
           sx={{ paddingBlock: 1 }}
           onChange={(_event: any, newValue: any) => {
-            console.log(newValue);
+            //console.log(newValue);
             const newVal = newValue.map((value: any) => {
               return {
                 id: value.id,
@@ -267,12 +268,12 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
         name={element?.metadata?.data_input?.title ?? element.name}
         // isDataLoading={config?.loading ?? false}
         // onInputChange={(search) => {
-        //   // console.log(search);
+        ////   // console.log(search);
         //   return new Promise(async (resolve) => {
         //     const val = entityValuesArray.find(
         //       (value: any) => value.instruction_id === element.instruction_id,
         //     );
-        //     console.log(val);
+        ////     console.log(val);
         //     if (val) {
         //       loadMoreEntityValues &&
         //         (await loadMoreEntityValues({
@@ -286,18 +287,19 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
         //     }
         //   });
         // }}
+        isDataLoading={config?.loading ?? false}
         onChange={(_name: any, value: any) => {
-          console.log(value);
+          //console.log(value);
           const entityArr = entityValuesArray.find(
             (value: entityValues) =>
               value.instruction_id === element.instruction_id,
           );
           if (entityArr?.values) {
-            console.log(entityArr);
+            //console.log(entityArr);
             const option = entityArr?.values.find(
               (element: any) => element.id === value,
             );
-            console.log(option);
+            //console.log(option);
             if (option) {
               updateEntityFieldValue(element.id, element.name, {
                 id: option.id,
@@ -312,7 +314,7 @@ const FieldEntity: React.FC<FieldEntityProps> = (props: FieldEntityProps) => {
         itemValue="id"
         errors={errors}
         renderItem={(item) => {
-          // console.log(item);
+          //// console.log(item);
           if (renderItem) {
             return renderItem(item);
           }

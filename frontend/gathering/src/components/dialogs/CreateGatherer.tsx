@@ -47,15 +47,28 @@ const GathererDialog: React.FC<GathererDialogProps> = (
 
   // validation
   const validationSchema = yup.object().shape({
-    last_name: yup.string().required('Campo requerido.'),
-    first_name: yup.string().required('Campo requerido.'),
-    username: yup.string().required('Campo requerido.'),
+    last_name: yup
+      .string()
+      .required('Campo requerido.')
+      .max(50, 'El apellido no puede tener mas de 50 caracteres'),
+    first_name: yup
+      .string()
+      .required('Campo requerido.')
+      .max(50, 'El nombre no puede tener mas de 50 caracteres'),
+    username: yup
+      .string()
+      .required('Campo requerido.')
+      .max(50, 'El nombre de usuario no puede tener mas de 50 caracteres'),
     call_number: yup.string().required('Campo requerido.'),
+    email: yup
+      .string()
+      .required('Campo requerido.')
+      .max(50, 'El email no puede tener mas de 50 caracteres'),
     sms_number: yup
       .string()
       .required('Campo requerido.')
       .min(6, 'Ingrese un número válido'),
-    dni: yup.string().required('Campo requerido.'),
+    dni: yup.number().required('Campo requerido.'),
     // group: yup.string().required('Campo requerido.')
   });
 
@@ -103,7 +116,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
         if (!wsp_phone.includes('+')) {
           prevUser['wsp_number'] = wsp_phone.length > 5 ? '+' + wsp_phone : '';
         }
-        prevUser.eid = prevUser.dni;
+        prevUser.eid = prevUser.dni.toString();
         saveAction(prevUser);
       } catch (error) {
         closeAction();
@@ -136,6 +149,11 @@ const GathererDialog: React.FC<GathererDialogProps> = (
 
   const handleVerifyEid = useCallback(
     async (eid: string) => {
+      if (eid === '') {
+        formik.setErrors({ dni: 'El DNI no puede estar vacío.' });
+        formik.setTouched({ dni: true });
+        return;
+      }
       try {
         const resp = await AuthService.getIdentityByEid(eid);
         if (resp) {
@@ -192,7 +210,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
               }}
               color="primary"
               variant="contained"
-              disabled={formik.isSubmitting}
+              disabled={formik.isSubmitting || formik.values.dni === ''}
               isLoading={formik.isSubmitting}
               text={formik.values.username === '' ? 'Validar DNI' : 'Registrar'}
             />
@@ -216,8 +234,13 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             disabled={formik.isSubmitting}
             errors={formik.errors}
             touched={formik.touched}
+            onBlur={formik.handleBlur}
             onChange={(e: any) => {
-              formik.handleChange(e);
+              // valido que el dni sea un número maximo de 15 caracteres
+              const newValue = `${e.target.value}`;
+              if (newValue.length <= 15) {
+                formik.handleChange(e);
+              }
             }}
           />
         </Grid>
@@ -234,6 +257,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             label=""
             value={formik.values.first_name}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
             errors={formik.errors}
             touched={formik.touched}
@@ -252,6 +276,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             label=""
             value={formik.values.last_name}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
             errors={formik.errors}
             touched={formik.touched}
@@ -270,6 +295,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
             variant="outlined"
             value={formik.values.email}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
             errors={formik.errors}
             touched={formik.touched}
@@ -327,6 +353,7 @@ const GathererDialog: React.FC<GathererDialogProps> = (
               label=""
               value={formik.values.username}
               onChange={handleOnChangeUsernameInput}
+              onBlur={formik.handleBlur}
               disabled={formik.isSubmitting}
               errors={formik.errors}
               touched={formik.touched}

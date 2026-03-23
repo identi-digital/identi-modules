@@ -145,6 +145,10 @@ export const GatheringService = {
     return api().post('/', data);
   },
 
+  delete(id: string) {
+    return api().delete(`/gathering-centers/${id}`);
+  },
+
   getSchemaById(schema_id: string) {
     return api().get(`/schema-forms/${schema_id}`);
   },

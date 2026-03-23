@@ -28,6 +28,10 @@ import { Module } from '@/modules/forms/src/models/forms';
 import RegisterFormDialog from '@/modules/forms/src/components/RegisterFormDialog';
 import { saveAs } from '@/ui/utils/dowloadExcel';
 import DateCell from '@/ui/components/atoms/DateCell/DateCell';
+import {
+  trackDownloadWarehouseData,
+  trackViewWarehouseCenter,
+} from '../../analytics/warehouse/track';
 
 type GatheringPageProps = {
   config?: ModuleConfig;
@@ -126,6 +130,9 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
       })
       .catch(() => {
         showMessage('', 'Problemas al exportar los registros', 'error', true);
+      })
+      .finally(() => {
+        trackDownloadWarehouseData({});
       });
   }, []);
 
@@ -211,6 +218,9 @@ const GatheringPage: React.FC<GatheringPageProps> = ({
               <Tooltip title={`Ver ${MODULE_ENTITY_DISPLAY_NAME}`}>
                 <IconButton
                   onClick={() => {
+                    trackViewWarehouseCenter({
+                      warehouse_id: row?.id,
+                    });
                     navigate(getDetailRoute(row?.id));
                     // console.log('navigate');
                   }}

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   exchangeToken,
   getEntity,
+  getOrganizationProfile,
   getTenantsOfEntity,
   getToken,
 } from '../../services/identi';
@@ -24,7 +25,7 @@ import { Business } from '@mui/icons-material';
 import ILoading from '@ui/components/molecules/IdentiLoading';
 
 const AuthCallback: React.FC = () => {
-  const { setUser, setOrganizationTenant } = useAuth();
+  const { setUser, setOrganizationTenant, setOrganizationProfile } = useAuth();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [continueLoading, setContinueLoading] = useState<boolean>(false);
@@ -56,6 +57,11 @@ const AuthCallback: React.FC = () => {
             if (data) {
               // console.log(data);
               setUser && setUser(data);
+              const organizationProfile = await getOrganizationProfile();
+              if (organizationProfile) {
+                setOrganizationProfile &&
+                  setOrganizationProfile(organizationProfile);
+              }
               // const respCredentials = await getCredentials();
               // const { appId, javascriptKey, serverURL } = respCredentials?.data?.payload?.keys;
               // Parse.initialize(appId, javascriptKey);
@@ -129,6 +135,11 @@ const AuthCallback: React.FC = () => {
               const data = authx_user;
               if (data) {
                 setUser && setUser(data);
+                const organizationProfile = await getOrganizationProfile();
+                if (organizationProfile) {
+                  setOrganizationProfile &&
+                    setOrganizationProfile(organizationProfile);
+                }
                 setLoading(false);
                 navigate('/farmers');
               }

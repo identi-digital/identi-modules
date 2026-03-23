@@ -119,7 +119,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   const navigate = useNavigate();
   // const { atlasApp } = useRealmApp();
   const { user } = useAuth();
-  // console.log(user);
+  console.log(user);
   // const {
   //   createEntity,
   //   addRelationToEntity,
@@ -168,7 +168,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   // const handleSaveEntityLocation = useCallback(
   //   (entityId: string) => {
   //     if (newLocation.country_id !== '') {
-  //       console.log('saveLocationEntity', entityId, newLocation);
+
   //       // saveLocationEntity(entityId, newLocation);
   //     }
   //   },
@@ -184,9 +184,8 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         duration: new Date().getTime() - newSession.created_at.getTime(),
         updated_at: new Date(),
       };
-      // console.log(newSession);
-      // createModuleSession(saveNewSession);
       console.log('createModuleSession', saveNewSession);
+      // createModuleSession(saveNewSession);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [newSession],
@@ -256,7 +255,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   };
 
   const updateEntityDetail = (id: string, value: any) => {
-    console.log(id, value);
     setEntityDetail((prevItems: EntityDetailMetadata[]) =>
       prevItems.map((item: EntityDetailMetadata) => {
         if (item.id === id) {
@@ -276,27 +274,9 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   };
 
   const [filteredFields, setFilteredFields] = useState<any>({});
-  // const [activeFarmFilter, setActiveFarmFilter] = useState<boolean>(false);
-  // const [activePlantFilter, setActivePlantFilter] = useState<boolean>(false);
-  // const [activeCobFilter, setActiveCobFilter] = useState<boolean>(false);
-  // const [activeFlowerFilter, setActiveFlowerFilter] = useState<boolean>(false);
-
-  // const [producerSelected, setProducerSelected] = useState<any>(null);
-  // const [farmSelected, setFarmSelected] = useState<any>(null);
-  // const [plantSelected, setPlantSelected] = useState<any>(null);
-
-  // const [questionFarmId, setQuestionFarmId] = useState<string>('');
-  // const [questionPlantId, setQuestionPlantId] = useState<string>('');
-  // const [questionCobId, setQuestionCobId] = useState<string>('');
-  // const [questionFlowerId, setQuestionFlowerId] = useState<string>('');
 
   const handleUpdateArrayEntitiesValues = useCallback(
     async (id: string, name: string, value: any) => {
-      console.log(id);
-      console.log(name);
-      console.log(value);
-      console.log(entityValuesArray);
-      console.log(filteredFields);
       const idToUpdate = filteredFields[`${name}`];
       if (idToUpdate && typeof value === 'object') {
         const entity = entityValuesArray.find(
@@ -305,9 +285,14 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
 
         if (entity && entity.filter && entity.filter !== '') {
           // entity.loading = true;
-          // setEntityValuesArray((prev: entityValues[]) => [...prev, entity]);
-          let strNew = entity.filter.replace(/\{\{.*?\}\}/g, value?.id);
+          // setEntityValuesArray((prev) =>
+          //   prev.map((e) =>
+          //     e.instruction_id === idToUpdate ? { ...e, loading: true } : e,
+          //   ),
+          // );
 
+          let strNew = entity.filter.replace(/\{\{.*?\}\}/g, value?.id);
+          // try {
           const newOptions = await FormService.getListEntitiesData(
             entity.idSelected,
             1,
@@ -320,8 +305,8 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
           );
           if (newOptions) {
             const { items, page, per_page, total } = newOptions;
+            console.log(items);
             const newItems: Option[] = items.map((element: any) => {
-              // console.log(element);
               const option: Option = {
                 id: element.id,
                 display_name: element.name,
@@ -332,7 +317,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
 
               return option;
             });
-            // console.log(newOptions);
+
             entity.values = newItems ?? [];
             entity.page = page;
             entity.per_page = per_page;
@@ -340,6 +325,13 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
             entity.loading = false;
             setEntityValuesArray((prev: entityValues[]) => [...prev, entity]);
           }
+          // } catch (error) {
+          //   setEntityValuesArray((prev) =>
+          //     prev.map((e) =>
+          //       e.instruction_id === idToUpdate ? { ...e, loading: true } : e,
+          //     ),
+          //   );
+          // }
         }
         //  obtengo las nuevas entidades filtradas
       }
@@ -349,7 +341,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
 
   const updateEntityFieldValue = useCallback(
     (id: string, name: string, value: any) => {
-      console.log(id, name, value);
       handleUpdateArrayEntitiesValues(id, name, value);
       // filtro para parcelas por productor
       // if (
@@ -357,7 +348,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
       //   value?.module_id === modulesConfig.PRODUCER_MODULE_UUID
       // ) {
       //   setProducerSelected(value);
-      //   // console.log(entityValuesArray);
+
       // }
       // // filtro para plantas por parcela
       // // bd65f8f6-818a-4996-9b69-fd093963128f -> parcelas
@@ -366,18 +357,18 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
       //   value?.module_id === modulesConfig.PRODUCTIVE_MODULE_UUID
       // ) {
       //   setFarmSelected(value);
-      //   // console.log(entityValuesArray);
+
       // }
       // // filtro para mazorcas por planta
       // // 4b9bbb3a-8a48-4945-8830-52081bfa593c -> plantas
       // if (activeCobFilter && value?.module_id === PLANT_MODULE_ID) {
       //   setPlantSelected(value);
-      //   // console.log(entityValuesArray);
+
       // }
       // //filtro para flores por planta
       // if (activeFlowerFilter && value?.module_id === PLANT_MODULE_ID) {
       //   setPlantSelected(value);
-      //   // console.log(entityValuesArray);
+
       // }
 
       updateEntityDetail(id, value);
@@ -462,7 +453,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
               }
             });
             //get data
-            console.log('api_media_s3', action.on_action.location, obj);
+
             // api_media_s3
             //   .post(action.on_action.location, obj, {
             //     ApiKey: action.on_action.api_key,
@@ -625,7 +616,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         // );
         //
         const detail = newDetail.map((element: EntityDetailMetadata) => {
-          // console.log(element);
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { metadata, ...entityDetail } = element;
           entityDetail.display_name =
@@ -653,8 +643,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
           identity_id: newSession.user.id,
           duration: new Date().getTime() - newSession.created_at.getTime(),
         };
-        // console.log(newRow);
-        console.log('createEntity', newRow);
+
         FormService.createRegister(register)
           .then((register_resp: any) => {
             if (register_resp) {
@@ -680,7 +669,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
 
         // createEntity(newRow)
         //   .then(async (respCreate: any) => {
-        //     // console.log(respCreate);
+
         //     handleSaveEntityLocation(respCreate?.objectId);
         //     //actualizar las entidades externas con las relaciones
         //     newExternalRelations.forEach(
@@ -847,7 +836,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         !detail.value &&
         visibleQuestions.includes(detail.instruction_id ?? '')
       ) {
-        console.log(detail);
         newErrors = { ...newErrors, [detail.name]: 'El campo es obligatorio' };
         newTouched = { ...newTouched, [detail.name]: true };
       }
@@ -855,7 +843,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     //UNIQUE VALIDATION
     const arrayToEvaluate = newDetail.map((detail: EntityDetailMetadata) => {
       if (typeof detail.value === 'string' && detail.is_unique === true) {
-        console.log(detail);
         return {
           name: detail.name,
           value: detail.value,
@@ -865,7 +852,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
       return null;
     });
     if (arrayToEvaluate.length > 0) {
-      // console.log('validateEntityUniqueField', arrayToEvaluate);
       const fieldsToValidate = arrayToEvaluate.filter(Boolean);
       for (const field of fieldsToValidate) {
         if (field) {
@@ -928,7 +914,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
       //   });
       // }
     }
-    console.log(entityDetail);
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setTouched(newTouched);
@@ -963,7 +949,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     page = 1,
     append = true,
   }: any) => {
-    // console.log(idSelected, instruction_id, search, page, append);
     setEntityValuesArray((prev) =>
       prev.map((e) =>
         e.instruction_id === instruction_id
@@ -1017,10 +1002,9 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         arrToEvaluate = elementValue;
       }
       if (arrToEvaluate.length > 0) {
-        // console.log(arrToEvaluate);
         arrToEvaluate.forEach((idSelected: string) => {
-          const filter: any = undefined;
-          let extraFilter: any = undefined;
+          // const filter: any = undefined;
+          // let extraFilter: any = undefined;
           // if (idSelected === modulesConfig.LOT_MODULE_UUID) {
           //   extraFilter = {
           //     entity_relations: {
@@ -1032,7 +1016,21 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
           //     },
           //   };
           // }
-          console.log('getEntitiesByModuleId', idSelected, filter, extraFilter);
+
+          // activo el loading en el id de la pregunta
+
+          // setEntityValuesArray((prev: entityValues[]) => {
+          //   const newArr = prev.map((element: entityValues) => {
+          //     if (element.instruction_id === idSelected) {
+          //       return {
+          //         ...element,
+          //         loading: true,
+          //       };
+          //     }
+          //     return element;
+          //   });
+          //   return newArr;
+          // });
           FormService.getListEntitiesData(
             idSelected,
             1,
@@ -1042,148 +1040,79 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
             '',
             '',
             '',
-          ).then((resp: any) => {
-            if (resp) {
-              const listValues: Option[] = [];
-              // const { entities, entity_type } = resp[0];
-              const { items, page, per_page, total } = resp;
-              // console.log(entities);
-              Array.isArray(items) &&
-                items.forEach((element: any) => {
-                  // console.log(element);
-                  const option: Option = {
-                    id: element.id,
-                    display_name: element.name,
-                    description: element.name,
-                    module_id: idSelected,
-                    module_name: idSelected,
-                  };
+          )
+            .then((resp: any) => {
+              if (resp) {
+                const listValues: Option[] = [];
+                // const { entities, entity_type } = resp[0];
+                const { items, page, per_page, total } = resp;
 
-                  listValues.push(option);
-                });
-              // console.log(listValues);
-              const filterStr = element1?.metadata?.data_input?.filter ?? '';
-              if (filterStr && filterStr !== '') {
-                // filtro: departments.country_id={{farmers.country_id}}
-                // obtengo lo que esta entre los corchetes
-                const filterField = filterStr.match(/{{(.*?)}}/g);
-                // console.log(filterField);
-                if (filterField) {
-                  const filterFieldName = filterField[0]
-                    .replace('{{', '')
-                    .replace('}}', '')
-                    .split('.')[1];
-                  // const obj={
-                  //   filtered_field: element1?.schema_gather?.name,
-                  // }
-                  setFilteredFields((prev: any) => {
-                    return {
-                      ...prev,
-                      [`${filterFieldName}`]: element1?.id,
+                Array.isArray(items) &&
+                  items.forEach((element: any) => {
+                    const option: Option = {
+                      id: element.id,
+                      display_name: element.name,
+                      description: element.name,
+                      module_id: idSelected,
+                      module_name: idSelected,
                     };
+
+                    listValues.push(option);
                   });
+
+                const filterStr = element1?.metadata?.data_input?.filter ?? '';
+                if (filterStr && filterStr !== '') {
+                  // filtro: departments.country_id={{farmers.country_id}}
+                  // obtengo lo que esta entre los corchetes
+                  const filterField = filterStr.match(/{{(.*?)}}/g);
+
+                  if (filterField) {
+                    const filterFieldName = filterField[0]
+                      .replace('{{', '')
+                      .replace('}}', '')
+                      .split('.')[1];
+                    // const obj={
+                    //   filtered_field: element1?.schema_gather?.name,
+                    // }
+                    setFilteredFields((prev: any) => {
+                      return {
+                        ...prev,
+                        [`${filterFieldName}`]: element1?.id,
+                      };
+                    });
+                  }
                 }
+                setEntityValuesArray((prev: entityValues[]) => {
+                  const obj: entityValues = {
+                    instruction_id: element1.id,
+                    values: listValues,
+                    page: page,
+                    per_page: per_page,
+                    total: total,
+                    filter: filterStr,
+                    loading: false,
+                    search: '',
+                    idSelected,
+                  };
+                  return [...prev, obj];
+                });
               }
-              setEntityValuesArray((prev: entityValues[]) => {
-                const obj: entityValues = {
-                  instruction_id: element1.id,
-                  values: listValues,
-                  page: page,
-                  per_page: per_page,
-                  total: total,
-                  filter: filterStr,
-                  loading: false,
-                  search: '',
-                  idSelected,
-                };
-                return [...prev, obj];
-              });
-            }
-          });
-
-          // getEntitiesByModuleId(idSelected, filter, extraFilter).then(
-          //   (resp: any) => {
-          //     // console.log(resp);
-          //     if (resp && resp.length > 0) {
-          //       const listValues: Option[] = [];
-          //       const { entities, entity_type } = resp[0];
-          //       // console.log(entities);
-          //       Array.isArray(entities) &&
-          //         entities.forEach((element: Entity) => {
-          //           // console.log(element);
-          //           const option: Option = {
-          //             id: element.idRef,
-          //             display_name: getRepresentativeValue(
-          //               element.module_detail,
-          //             ),
-          //             description: entity_type,
-          //             module_id: element.module_id,
-          //             module_name: element.module_name ?? '',
-          //           };
-          //           if (isFarm) {
-          //             option.deforest_value = getDeforestIndicatorValue(
-          //               element.module_detail,
-          //             );
-          //           }
-          //           if (
-          //             element.module_id === modulesConfig.PRODUCTIVE_MODULE_UUID
-          //           ) {
-          //             // obtengo la relación con el productor
-          //             const producerRel = element.entity_relations.find(
-          //               (value: EntityRelations) =>
-          //                 value.module_id ===
-          //                 modulesConfig.PRODUCER_MODULE_UUID,
-          //             );
-          //             if (producerRel) {
-          //               option.owner = producerRel.entity_id ?? '';
-          //             }
-          //           }
-          //           if (element.module_id === PLANT_MODULE_ID) {
-          //             // obtengo la relación con la parcela
-          //             const farmRel = element.entity_relations.find(
-          //               (value: EntityRelations) =>
-          //                 value.module_id ===
-          //                 modulesConfig.PRODUCTIVE_MODULE_UUID,
-          //             );
-          //             if (farmRel) {
-          //               option.owner = farmRel.entity_id ?? '';
-          //             }
-          //           }
-          //           if (element.module_id === COB_MODULE_ID) {
-          //             // obtengo la relación con la planta
-          //             const plantRel = element.entity_relations.find(
-          //               (value: EntityRelations) =>
-          //                 value.module_id === PLANT_MODULE_ID,
-          //             );
-          //             if (plantRel) {
-          //               option.owner = plantRel.entity_id ?? '';
-          //             }
-          //           }
-          //           if (element.module_id === FLOWER_MODULE_ID) {
-          //             // obtengo la relación flor con la planta
-          //             const plantRel = element.entity_relations.find(
-          //               (value: EntityRelations) =>
-          //                 value.module_id === PLANT_MODULE_ID,
-          //             );
-          //             if (plantRel) {
-          //               // console.log(plantRel);
-          //               option.owner = plantRel.entity_id ?? '';
-          //             }
-          //           }
-          //           listValues.push(option);
-          //         });
-          //       // console.log(listValues);
-
-          //       setEntityValuesArray((prev: entityValues[]) => {
-          //         const obj: entityValues = {
-          //           instruction_id: element.id,
-          //           values: listValues,
-          //         };
-          //         return [...prev, obj];
-          //       });
-          //     }
-          //   },
-          // );
+            })
+            .finally(() => {
+              console.log('finally');
+              // setEntityValuesArray((prev: entityValues[]) => {
+              //   const newArr = prev.map((element: entityValues) => {
+              //     if (element.instruction_id === idSelected) {
+              //       return {
+              //         ...element,
+              //         loading: false,
+              //       };
+              //     }
+              //     return element;
+              //   });
+              //   return newArr;
+              // });
+            });
         });
       }
     },
@@ -1224,25 +1153,22 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
   const [instructionStart, setInstructionStart] = useState<string>('');
 
   // const loadModuleSchema = async (schema_id: string) => {
-  //   console.log('getModuleSchemaById', schema_id);
+
   //   const resp: any = await FormService.getSchemaById(schema_id);
   //   const { instructions, instruction_start } = resp?.schema;
   //   setInstructionStart(instruction_start);
 
-  //   console.log(resp);
   // };
 
   useEffect(() => {
-    // console.log(module);
     if (module?.id) {
       setIsLoading(true);
       // loadModuleSchema(module?.schema_id ?? '');
       // setIsLoading(false);
       FormService.getById(module?.id ?? '')
         .then((resp: any) => {
-          // console.log(resp);
           const { instructions, instruction_start } = resp?.schema;
-          // console.log(instructions);
+
           // setInstructions(instructions);
           setInstructionStart(instruction_start);
           if (
@@ -1272,7 +1198,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
                 //     },
                 //   )
                 //   .then((resp: any) => {
-                //     // console.log(resp);
+
                 //     const { data } = resp?.data;
                 //     if (data) {
                 //       const obj: dataVars = {
@@ -1412,15 +1338,14 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
             // if (flowerType && plantType) {
             //   setActiveFlowerFilter(true);
             // }
-            // console.log(newDetail);
+
             // filtro los campos que no son geojson
             // const newDetailFiltered =
             // newDetail.filter((element: any) => !EXCLUDES_TYPES.includes(element.type_value));
 
             setEntityRelations(newRelations);
             // setExternalEntityRelations(newExternalRelationsArray);
-            // console.log(newDetailFiltered);
-            // console.log(newDetailFiltered);
+
             setEntityDetail(newDetail);
             setIsLoading(false);
           } else {
@@ -1433,8 +1358,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
             handleCancelRegisterView();
           }
         })
-        .catch((error) => {
-          console.log(error);
+        .catch((_error) => {
           showMessage('', 'No se pudo obtener los datos del módulo', 'error');
           setIsLoading(false);
           navigate(getListRoute());
@@ -1468,18 +1392,16 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         }),
       );
     }
-    // console.log(entityDetail);
-    // console.log(varsActionsInstructions);
   }, [varsActionsInstructions]);
 
   // useEffect(() => {
-  //   console.log(instructions);
+
   //   // return () => {
 
   //   // };
   // }, [instructions]);
   // useEffect(() => {
-  //   console.log(entityDetail);
+
   // }, [entityDetail]);
 
   // new set de preguntas visibles
@@ -1522,7 +1444,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     // const node = idToNode.get(nodeId);
     const node = entityDetail.find((n) => n.instruction_id === nodeId);
     if (!node) return null;
-    // console.log(node);
+
     const title =
       node?.metadata?.data_input?.title || node?.name || '(sin título)';
 
@@ -1530,7 +1452,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     if (!visibleQuestions.includes(nodeId)) {
       setVisibleQuestions((prev: string[]) => [...prev, nodeId]);
     }
-    // console.log(entityValuesArray);
+
     // const currentAnswer = answers[node.id] || '';
     let arrFiltered = entityValuesArray;
     // Filtro las parcelas por productor
@@ -1578,8 +1500,7 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     // }
     // // filtro para flores por planta
     // if (node?.instruction_id === questionFlowerId && plantSelected) {
-    //   // console.log(element);
-    //   // console.log(entityValuesArray);
+
     //   arrFiltered = entityValuesArray.map((value: entityValues) => {
     //     if (value.instruction_id === questionFlowerId) {
     //       return {
@@ -1594,8 +1515,6 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     // }
 
     // render del nodo actual
-
-    // console.log(errors);
 
     return (
       <>
@@ -1647,12 +1566,12 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
     );
   }
 
-  useEffect(() => {
-    console.log(entityValuesArray);
-  }, [entityValuesArray]);
-  useEffect(() => {
-    console.log(filteredFields);
-  }, [filteredFields]);
+  // useEffect(() => {
+
+  // }, [entityValuesArray]);
+  // useEffect(() => {
+
+  // }, [filteredFields]);
 
   useEffect(() => {
     setNewSession((session: ModuleSession) => {
@@ -1676,11 +1595,11 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
         created_at: new Date(),
         updated_at: new Date(),
       };
-      // console.log(newSession);
+
       return newSession;
     });
     // }, [module?.idRef, module?.schema_id, user?.eid, user?.id]);
-  }, [module?.id, module?.schema_id]);
+  }, [module?.id, module?.schema_id, user?.id]);
 
   return (
     <Grid
@@ -1816,8 +1735,8 @@ const RegisterModuleComponent: React.FC<RegisterModuleComponentProps> = (
                   }
                   // filtro para flores por planta
                   if (element?.instruction_id === questionFlowerId && plantSelected) {
-                    // console.log(element);
-                    // console.log(entityValuesArray);
+                    
+                    
                     arrFiltered = entityValuesArray.map((value: entityValues) => {
                       if (value.instruction_id === questionFlowerId) {
                         return {

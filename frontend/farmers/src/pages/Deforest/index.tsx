@@ -40,6 +40,10 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import DeforestFarm from '../Detail/components/DeforestFarmReport';
 import ReportDialog from './components/ReportDialog';
+import {
+  trackDownloadAllDeforestationReport,
+  trackUpdateDeforestationStatus,
+} from '../../analytics/farmers/track';
 
 const DEFAULT_GEOJSON: any = {
   type: 'FeatureCollection',
@@ -71,7 +75,7 @@ interface FarmersListProps {
 function DeforestPage({ config }: FarmersListProps) {
   const theme = useTheme();
   const isActiveDesktop = useMediaQuery(theme.breakpoints.down('md'));
-  const [statusSelected, setStatusSelected] = useState<any>('baja/nula');
+  const [statusSelected, setStatusSelected] = useState<any>('todos');
   const [isRefresh, setIsRefresh] = useState<boolean>(true);
   const [headers, setHeaders] = useState<TableHeadColumn[]>([]);
   // const [search, setSearch] = useState<string>('');
@@ -138,6 +142,10 @@ function DeforestPage({ config }: FarmersListProps) {
     ): Promise<AxiosResponse<any>> => {
       let orderBy = 'created_at';
       let sort = 'desc';
+      // let status = statusSelected;
+      // if (statusSelected === 'todos') {
+      //   status = '';
+      // }
       const data = await DeforestService.paginateFarmsDeforest(
         page,
         perPage,
@@ -218,6 +226,7 @@ function DeforestPage({ config }: FarmersListProps) {
       })
       .finally(() => {
         setIsDownloading(false);
+        trackDownloadAllDeforestationReport({});
       });
   }, []);
 
@@ -578,7 +587,7 @@ function DeforestPage({ config }: FarmersListProps) {
           >
             <FilterComponent
               buttonLabel={'Estado de deforestación'}
-              options={['baja/nula', 'parcial', 'crítica']}
+              options={['todos', 'baja/nula', 'parcial', 'crítica']}
               labelSelected={statusSelected}
               color="primary"
               onSelectOption={function(value: string): void {
@@ -589,7 +598,10 @@ function DeforestPage({ config }: FarmersListProps) {
               <Button
                 variant="outlined"
                 startIcon={<Refresh />}
-                onClick={() => setIsRefresh((prev: boolean) => !prev)}
+                onClick={() => {
+                  setIsRefresh((prev: boolean) => !prev);
+                  trackUpdateDeforestationStatus({});
+                }}
                 fullWidth
                 // sx={{
                 //   width: '180px',

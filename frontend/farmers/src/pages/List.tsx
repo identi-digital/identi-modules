@@ -27,6 +27,12 @@ import useDebounce from '@/ui/hooks/use_debounce';
 import RegisterFormDialog from '@/modules/forms/src/components/RegisterFormDialog';
 import { Module } from '@/modules/forms/src/models/forms';
 import { FormService } from '@/modules/forms/src/services/forms';
+import { showYesNoQuestion } from '@/ui/utils/Messages';
+import {
+  trackAddFarmer,
+  trackSearchFarmers,
+  trackViewFarmer,
+} from '../analytics/farmers/track';
 
 interface FarmersListProps {
   config?: ModuleConfig;
@@ -80,6 +86,9 @@ export default function FarmersList({ config }: FarmersListProps) {
       if (statusSelected === 'Inactivos') {
         status = 'inactivo';
       }
+      if (textDebounce !== '') {
+        trackSearchFarmers({});
+      }
       const data = await FarmerService.getAll(
         page,
         perPage,
@@ -114,8 +123,24 @@ export default function FarmersList({ config }: FarmersListProps) {
     //  setUser(undefined);
   }, []);
 
-  const handleViewDetail = (farmerId: number): void => {
+  const handleViewDetail = (farmerId: string): void => {
+    trackViewFarmer({
+      farmer_id: farmerId,
+    });
     navigate(getDetailRoute(farmerId));
+  };
+
+  const handleDelete = async (farmerId: string): Promise<void> => {
+    showYesNoQuestion(
+      'Eliminar productor',
+      '¿Está seguro de eliminar este productor?',
+      'warning',
+    ).then(async (result: boolean) => {
+      if (result) {
+        await FarmerService.deleteFarmer(farmerId);
+        setIsRefresh((prevValue: boolean) => !prevValue);
+      }
+    });
   };
 
   useEffect(() => {
@@ -133,7 +158,15 @@ export default function FarmersList({ config }: FarmersListProps) {
         ),
       },
       {
-        sorteable: true,
+        sorteable: false,
+        align: 'left',
+        text: 'DNI',
+        padding: 'none',
+        value: 'dni',
+        render: (row: any) => <>{row.dni}</>,
+      },
+      {
+        sorteable: false,
         align: 'center',
         text: 'Estado',
         padding: 'none',
@@ -148,7 +181,7 @@ export default function FarmersList({ config }: FarmersListProps) {
         },
       },
       {
-        sorteable: true,
+        sorteable: false,
         align: 'left',
         text: 'Última visita',
         padding: 'none',
@@ -183,14 +216,7 @@ export default function FarmersList({ config }: FarmersListProps) {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Eliminar">
-                  <IconButton
-                    //onClick={() => console.log(row)}
-                    size="small"
-                    //   variant="contained"
-                    // color="error"
-                    //   style={{ width: '140px', height: '30px' }}
-                    //   startIcon={<Delete />}
-                  >
+                  <IconButton onClick={() => handleDelete(row.id)} size="small">
                     <Delete />
                   </IconButton>
                 </Tooltip>
@@ -311,7 +337,10 @@ export default function FarmersList({ config }: FarmersListProps) {
               <Button
                 variant="contained"
                 startIcon={<Add />}
-                onClick={() => handleCloseAction()}
+                onClick={() => {
+                  handleCloseAction();
+                  trackAddFarmer({});
+                }}
                 fullWidth
                 sx={{
                   width: '180px',

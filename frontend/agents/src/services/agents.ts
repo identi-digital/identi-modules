@@ -28,4 +28,8 @@ export const AgentsService = {
   postCreateAgent(gatherer: AgentCreate) {
     return api().post('/', gatherer);
   },
+
+  disableAgent(agentId: string) {
+    return api().delete('/' + agentId);
+  },
 };
